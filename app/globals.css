@@ -1,133 +1,180 @@
 @import 'tailwindcss';
-@import 'tw-animate-css';
-
-@custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Tema personalizado baseado na identidade visual */
-  --background: 0 0% 98%; /* Fundo claro suave */
-  --foreground: 0 0% 8%;
+  /* APENAS Variáveis de Cores - SEM aplicação automática de bordas */
+  --background: #FAFAFA;
+  --foreground: #1E1E1E;
   
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 8%;
+  --card: #FFFFFF;
+  --card-foreground: #1E1E1E;
   
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 8%;
+  --popover: #FFFFFF;
+  --popover-foreground: #1E1E1E;
   
-  /* Amarelo vibrante da marca - cor principal */
-  --primary: 48 100% 48%; /* #F5C800 - Amarelo da identidade */
-  --primary-foreground: 0 0% 8%;
+  /* Amarelo vibrante #F5C800 */
+  --primary: #F5C800;
+  --primary-foreground: #1E1E1E;
   
-  --secondary: 40 100% 96%;
-  --secondary-foreground: 0 0% 8%;
+  --secondary: #F5F5F5;
+  --secondary-foreground: #1E1E1E;
   
-  --muted: 0 0% 96%;
-  --muted-foreground: 0 0% 45%;
+  --muted: #F5F5F5;
+  --muted-foreground: #737373;
   
-  --accent: 48 100% 48%;
-  --accent-foreground: 0 0% 8%;
+  --accent: #F5C800;
+  --accent-foreground: #1E1E1E;
   
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
   
-  --border: 0 0% 90%;
-  --input: 0 0% 90%;
-  --ring: 48 100% 48%;
-  
-  /* Cores do gráfico baseadas na paleta da empresa */
-  --chart-1: 48 100% 48%; /* Amarelo */
-  --chart-2: 0 0% 24%; /* Preto/Cinza escuro */
-  --chart-3: 0 0% 78%; /* Cinza claro */
-  --chart-4: 48 100% 60%; /* Amarelo claro */
-  --chart-5: 45 100% 35%; /* Dourado */
+  /* IMPORTANTE: Bordas transparentes por padrão */
+  --border: transparent;
+  --input: #E5E5E5;
+  --ring: #F5C800;
   
   --radius: 0.5rem;
   
-  /* Sidebar com fundo escuro e detalhes amarelos */
-  --sidebar: 0 0% 12%; /* Fundo escuro #1E1E1E */
-  --sidebar-foreground: 0 0% 96%;
-  --sidebar-primary: 48 100% 48%; /* Amarelo */
-  --sidebar-primary-foreground: 0 0% 8%;
-  --sidebar-accent: 0 0% 18%;
-  --sidebar-accent-foreground: 0 0% 96%;
-  --sidebar-border: 0 0% 20%;
-  --sidebar-ring: 48 100% 48%;
+  /* Sidebar preta */
+  --sidebar: #1E1E1E;
+  --sidebar-foreground: #FAFAFA;
+  --sidebar-primary: #F5C800;
+  --sidebar-primary-foreground: #1E1E1E;
+  --sidebar-accent: #2A2A2A;
+  --sidebar-accent-foreground: #FAFAFA;
+  --sidebar-border: #333333;
+  --sidebar-ring: #F5C800;
 }
 
-.dark {
-  --background: 0 0% 8%;
-  --foreground: 0 0% 96%;
-  --card: 0 0% 8%;
-  --card-foreground: 0 0% 96%;
-  --popover: 0 0% 8%;
-  --popover-foreground: 0 0% 96%;
-  --primary: 0 0% 96%;
-  --primary-foreground: 0 0% 8%;
-  --secondary: 0 0% 11%;
-  --secondary-foreground: 0 0% 96%;
-  --muted: 0 0% 11%;
-  --muted-foreground: 0 0% 64%;
-  --accent: 0 0% 11%;
-  --accent-foreground: 0 0% 96%;
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 0 0% 96%;
-  --border: 0 0% 11%;
-  --input: 0 0% 11%;
-  --ring: 0 0% 24%;
-  --chart-1: 220 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
+/* Reset COMPLETO - Remove TODAS as bordas automáticas */
+* {
+  border: 0 !important;
+  border-width: 0 !important;
 }
 
-@theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+/* Fundo do body */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  margin: 0;
+  padding: 0;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
+/* Animações Sci-Fi para Background Flutuante */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
   }
-  body {
-    @apply bg-background text-foreground;
+  33% {
+    transform: translate(30px, -30px) scale(1.05);
   }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+}
+
+@keyframes float-medium {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-40px, 40px) scale(1.08);
+  }
+}
+
+@keyframes float-fast {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -40px) scale(1.1);
+  }
+  50% {
+    transform: translate(-30px, -20px) scale(0.9);
+  }
+  75% {
+    transform: translate(40px, 30px) scale(1.05);
+  }
+}
+
+@keyframes float-slower {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate(40px, -50px) scale(1.1) rotate(5deg);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulse-slower {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes ping-slower {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Classes de animação */
+.animate-float-slow {
+  animation: float-slow 20s ease-in-out infinite;
+}
+
+.animate-float-medium {
+  animation: float-medium 15s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: float-fast 10s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: float-slower 25s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s ease-in-out infinite;
+}
+
+.animate-pulse-slower {
+  animation: pulse-slower 12s ease-in-out infinite;
+}
+
+.animate-ping-slow {
+  animation: ping-slow 6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-ping-slower {
+  animation: ping-slower 8s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 

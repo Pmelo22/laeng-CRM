@@ -1,17 +1,31 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileText, Building2, TrendingUp, DollarSign, ArrowUpRight, Activity } from 'lucide-react';
+import { Users, FileText, Building2, TrendingUp, DollarSign, ArrowUpRight, Activity, MapPin, BarChart3 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { DashboardCharts } from "@/components/dashboard-charts";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  // Buscar estatísticas
+  // Buscar estatísticas de clientes
   const { count: clientesCount } = await supabase
     .from("clientes")
     .select("*", { count: "exact", head: true });
 
+  // Buscar estatísticas de obras
+  const { data: obras } = await supabase
+    .from("obras")
+    .select("*");
+
+  const obrasAtivas = obras?.filter(o => o.status === 'EM ANDAMENTO').length || 0;
+  const obrasFinalizadas = obras?.filter(o => o.status === 'FINALIZADO').length || 0;
+  const totalObras = obras?.length || 0;
+
+  // Calcular receita total
+  const receitaTotal = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
+
+  // Buscar estatísticas de contratos
   const { count: contratosCount } = await supabase
     .from("contratos")
     .select("*", { count: "exact", head: true });
@@ -61,7 +75,7 @@ export default async function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold">{contratosAtivosCount || 0}</div>
+            <div className="text-3xl font-bold">{obrasAtivas}</div>
             <p className="text-xs text-white/80 mt-1 flex items-center gap-1">
               <Activity className="h-3 w-3" />
               Em andamento
@@ -86,7 +100,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-primary to-yellow-500 text-primary-foreground overflow-hidden relative group hover:shadow-xl transition-all">
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-primary to-yellow-500 text-black overflow-hidden relative group hover:shadow-xl transition-all">
           <div className="absolute top-0 right-0 w-24 h-24 bg-black/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
@@ -95,7 +109,12 @@ export default async function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold">R$ 0,00</div>
+            <div className="text-3xl font-bold">
+              {new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }).format(receitaTotal)}
+            </div>
             <p className="text-xs opacity-80 mt-1 flex items-center gap-1">
               <TrendingUp className="h-3 w-3" />
               Valor total
@@ -103,6 +122,9 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Charts Section */}
+      <DashboardCharts obras={obras || []} />
 
       {/* Main Content Grid */}
       <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3">

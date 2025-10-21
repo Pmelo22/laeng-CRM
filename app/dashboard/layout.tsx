@@ -9,13 +9,17 @@ import {
   Menu,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ScrollText,
+  User
 } from 'lucide-react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const menuItems = [
   {
@@ -38,6 +42,11 @@ const menuItems = [
     icon: DollarSign,
     href: "/dashboard/financeira",
   },
+  {
+    title: "Logs",
+    icon: ScrollText,
+    href: "/dashboard/logs",
+  },
 ];
 
 function Logo({ collapsed }: { collapsed: boolean }) {
@@ -49,12 +58,12 @@ function Logo({ collapsed }: { collapsed: boolean }) {
         </div>
       ) : (
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#F5C800] flex items-center justify-center">
-            <span className="text-2xl font-black text-black">A</span>
+          <div className="w-12 h-12 rounded-xl bg-[#F5C800] flex items-center justify-center shadow-lg">
+            <span className="text-3xl font-black text-[#1E1E1E]">A</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-100">Setor Escritório</span>
-            <span className="text-xs text-gray-400">Gestão de Engenharia</span>
+            <span className="text-xl font-black text-white">LA Engenharia</span>
+            <span className="text-xs text-[#F5C800] font-medium">Sistema de Gestão</span>
           </div>
         </div>
       )}
@@ -64,6 +73,16 @@ function Logo({ collapsed }: { collapsed: boolean }) {
 
 function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const pathname = usePathname();
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, [supabase]);
 
   return (
     <aside 
@@ -108,6 +127,31 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
           );
         })}
       </nav>
+
+      {/* Usuário Autenticado */}
+      {user && !collapsed && (
+        <div className="border-t border-gray-800 p-3 bg-[#2A2A2A]">
+          <div className="flex items-center gap-3 p-2 rounded-lg">
+            <div className="w-10 h-10 rounded-full bg-[#F5C800] flex items-center justify-center flex-shrink-0">
+              <User className="h-5 w-5 text-[#1E1E1E]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {user.user_metadata?.name || user.email?.split('@')[0] || 'Usuário'}
+              </p>
+              <p className="text-xs text-gray-400 truncate">{user.email}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {collapsed && user && (
+        <div className="border-t border-gray-800 p-3 bg-[#2A2A2A] flex justify-center">
+          <div className="w-10 h-10 rounded-full bg-[#F5C800] flex items-center justify-center">
+            <User className="h-5 w-5 text-[#1E1E1E]" />
+          </div>
+        </div>
+      )}
 
       <div className="border-t border-gray-800 p-3">
         <form action="/auth/signout" method="post">
@@ -239,12 +283,7 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        {/* Desktop Header */}
-        <header className="hidden lg:flex h-16 items-center justify-between border-b bg-white px-6 shadow-sm">
-          <div className="text-sm text-gray-600">
-            Sistema de Gestão de Engenharia
-          </div>
-        </header>
+        {/* Desktop Header - Removido para melhor visual */}
 
         <main className="flex-1 overflow-y-auto bg-gray-50">
           {children}

@@ -1,100 +1,144 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Wallet, ArrowLeft, Building2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { FinanceiroChart } from "@/components/financeiro-chart";
 
-export default function FinanceiraPage() {
+export default async function FinanceiraPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  
+  if (error || !user) {
+    redirect("/auth/login");
+  }
+
+  // Buscar todas as obras para calcular totais
+  const { data: obras } = await supabase.from("obras").select("*");
+
+  // Calcular métricas financeiras
+  const totalReceitas = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
+  const totalEntradas = obras?.reduce((sum, obra) => sum + (Number(obra.entrada) || 0), 0) || 0;
+  const totalFinanciado = obras?.reduce((sum, obra) => sum + (Number(obra.valor_financiado) || 0), 0) || 0;
+  const totalSubsidio = obras?.reduce((sum, obra) => sum + (Number(obra.subsidio) || 0), 0) || 0;
+  const totalTerreno = obras?.reduce((sum, obra) => sum + (Number(obra.valor_terreno) || 0), 0) || 0;
+
+  // Obras por status
+  const obrasFinalizadas = obras?.filter(o => o.status === 'FINALIZADO') || [];
+  const obrasAndamento = obras?.filter(o => o.status === 'EM ANDAMENTO') || [];
+  
+  const receitasFinalizadas = obrasFinalizadas.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0);
+  const receitasEmAndamento = obrasAndamento.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
+
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Seção Financeira</h1>
-        <p className="text-muted-foreground">Controle financeiro e fluxo de caixa</p>
-      </div>
+    <div className="flex min-h-screen flex-col bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <Button asChild variant="ghost" size="sm" className="mb-4">
+          <Link href="/dashboard">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar ao Dashboard
+          </Link>
+        </Button>
+        
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">Gestão Financeira</h1>
+          <p className="text-muted-foreground">Controle financeiro e análise de receitas</p>
+        </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Receitas</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">R$ 0,00</div>
-            <p className="text-xs text-muted-foreground">Total de receitas</p>
-          </CardContent>
-        </Card>
+        {/* Cards de Métricas */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500 to-green-600 text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-white/90">Total de Receitas</CardTitle>
+              <TrendingUp className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(totalReceitas)}</div>
+              <p className="text-xs text-white/80">Todas as obras</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Despesas</CardTitle>
-            <TrendingDown className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">R$ 0,00</div>
-            <p className="text-xs text-muted-foreground">Total de despesas</p>
-          </CardContent>
-        </Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-white/90">Obras Finalizadas</CardTitle>
+              <DollarSign className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(receitasFinalizadas)}</div>
+              <p className="text-xs text-white/80">{obrasFinalizadas.length} obras</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Saldo</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 0,00</div>
-            <p className="text-xs text-muted-foreground">Saldo atual</p>
-          </CardContent>
-        </Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-white/90">Em Andamento</CardTitle>
+              <Building2 className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(receitasEmAndamento)}</div>
+              <p className="text-xs text-white/80">{obrasAndamento.length} obras</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Lucro</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 0,00</div>
-            <p className="text-xs text-muted-foreground">Margem de lucro</p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-primary to-yellow-500 text-black">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Subsídios</CardTitle>
+              <Wallet className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(totalSubsidio)}</div>
+              <p className="text-xs opacity-80">Subsídios recebidos</p>
+            </CardContent>
+          </Card>
+        </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Fluxo de Caixa</CardTitle>
-            <CardDescription>
-              Acompanhe entradas e saídas
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center h-64 border-2 border-dashed rounded-lg">
-              <div className="text-center">
-                <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Em desenvolvimento</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Gráfico de fluxo de caixa será implementado
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Detalhamento Financeiro */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Entradas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600">{formatCurrency(totalEntradas)}</div>
+              <p className="text-sm text-muted-foreground mt-1">Pagamentos iniciais</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Contas a Receber</CardTitle>
-            <CardDescription>
-              Valores pendentes de recebimento
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center h-64 border-2 border-dashed rounded-lg">
-              <div className="text-center">
-                <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Em desenvolvimento</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Lista de contas a receber será implementada
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Valor Financiado</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-600">{formatCurrency(totalFinanciado)}</div>
+              <p className="text-sm text-muted-foreground mt-1">Total financiado</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Valor Terrenos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-orange-600">{formatCurrency(totalTerreno)}</div>
+              <p className="text-sm text-muted-foreground mt-1">Investimento em terrenos</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Gráfico de Análise Financeira */}
+        <FinanceiroChart obras={obras || []} />
       </div>
     </div>
   );
