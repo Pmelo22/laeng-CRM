@@ -4,21 +4,10 @@ import { ClienteComResumo } from "@/lib/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Building2, CheckCircle2, Clock, DollarSign, Edit, MapPin, Trash2, User, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { Building2, CheckCircle2, Clock, DollarSign, Edit, MapPin, Trash2, User } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { useState, useMemo } from "react"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
-type SortField = 'codigo' | 'nome' | 'responsavel_contato' | 'cidade' | 'total_obras' | 'valor_total_obras' | 'total_pago' | 'saldo_pendente'
-type SortDirection = 'asc' | 'desc'
 
 interface ClientesCardsProps {
   clientes: ClienteComResumo[]
@@ -27,66 +16,6 @@ interface ClientesCardsProps {
 export function ClientesCards({ clientes }: ClientesCardsProps) {
   const router = useRouter()
   const supabase = createClient()
-  
-  const [sortField, setSortField] = useState<SortField>('codigo')
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
-
-  const isClienteComResumo = (cliente: any): cliente is ClienteComResumo => {
-    return 'total_obras' in cliente
-  }
-
-  const toggleSortDirection = () => {
-    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
-  }
-
-  // Clientes ordenados
-  const sortedClientes = useMemo(() => {
-    return [...clientes].sort((a, b) => {
-      let aValue: any
-      let bValue: any
-
-      switch (sortField) {
-        case 'codigo':
-          aValue = a.codigo || 0
-          bValue = b.codigo || 0
-          break
-        case 'nome':
-          aValue = a.nome?.toLowerCase() || ''
-          bValue = b.nome?.toLowerCase() || ''
-          break
-        case 'responsavel_contato':
-          aValue = a.responsavel_contato?.toLowerCase() || ''
-          bValue = b.responsavel_contato?.toLowerCase() || ''
-          break
-        case 'cidade':
-          aValue = (a.cidade || a.endereco || '').toLowerCase()
-          bValue = (b.cidade || b.endereco || '').toLowerCase()
-          break
-        case 'total_obras':
-          aValue = isClienteComResumo(a) ? a.total_obras : 0
-          bValue = isClienteComResumo(b) ? b.total_obras : 0
-          break
-        case 'valor_total_obras':
-          aValue = isClienteComResumo(a) ? a.valor_total_obras : 0
-          bValue = isClienteComResumo(b) ? b.valor_total_obras : 0
-          break
-        case 'total_pago':
-          aValue = isClienteComResumo(a) ? a.total_pago : 0
-          bValue = isClienteComResumo(b) ? b.total_pago : 0
-          break
-        case 'saldo_pendente':
-          aValue = isClienteComResumo(a) ? a.saldo_pendente : 0
-          bValue = isClienteComResumo(b) ? b.saldo_pendente : 0
-          break
-        default:
-          return 0
-      }
-
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
-      return 0
-    })
-  }, [clientes, sortField, sortDirection])
 
   const handleDelete = async (id: string, nome: string) => {
     if (!confirm(`Tem certeza que deseja excluir o cliente ${nome}? Todas as obras vinculadas também serão excluídas.`)) return
@@ -116,63 +45,9 @@ export function ClientesCards({ clientes }: ClientesCardsProps) {
     )
   }
 
-  const sortOptions = [
-    { value: 'codigo', label: 'Código' },
-    { value: 'nome', label: 'Nome' },
-    { value: 'responsavel_contato', label: 'Responsável' },
-    { value: 'cidade', label: 'Cidade' },
-    { value: 'total_obras', label: 'Obras' },
-    { value: 'valor_total_obras', label: 'Faturamento' },
-    { value: 'total_pago', label: 'Pago' },
-    { value: 'saldo_pendente', label: 'Pendente' },
-  ]
-
   return (
-    <div className="space-y-4">
-      {/* Filtros de Ordenação */}
-      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#1E1E1E] to-[#2A2A2A] rounded-lg border-2 border-[#F5C800]/20">
-        <span className="text-sm font-medium text-white">Ordenar por:</span>
-        
-        <Select value={sortField} onValueChange={(value) => setSortField(value as SortField)}>
-          <SelectTrigger className="w-[200px] bg-white border-[#F5C800]/30 focus:border-[#F5C800] focus:ring-[#F5C800]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {sortOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleSortDirection}
-          className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 border-[#F5C800] font-bold"
-        >
-          {sortDirection === 'asc' ? (
-            <>
-              <ArrowUp className="h-4 w-4 mr-2" />
-              Crescente
-            </>
-          ) : (
-            <>
-              <ArrowDown className="h-4 w-4 mr-2" />
-              Decrescente
-            </>
-          )}
-        </Button>
-
-        <div className="ml-auto text-sm text-[#F5C800] font-medium">
-          {sortedClientes.length} cliente{sortedClientes.length !== 1 ? 's' : ''}
-        </div>
-      </div>
-
-      {/* Grid de Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {sortedClientes.map((cliente) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {clientes.map((cliente) => (
         <Card key={cliente.id} className="hover:shadow-xl transition-all border-t-4 border-t-[#F5C800] hover:scale-[1.02]">
           <CardHeader className="pb-3 bg-gradient-to-br from-[#1E1E1E] to-[#2A2A2A] text-white rounded-t-lg">
             <div className="flex items-start justify-between">
@@ -276,7 +151,6 @@ export function ClientesCards({ clientes }: ClientesCardsProps) {
           </CardContent>
         </Card>
       ))}
-      </div>
     </div>
   )
 }

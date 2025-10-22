@@ -44,33 +44,9 @@ export default async function ClientesPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 relative overflow-hidden">
-      {/* Background Sci-Fi com elementos flutuantes amarelos */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        {/* Gradiente base */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200" />
-        
-        {/* Orbs flutuantes grandes */}
-        <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#F5C800] rounded-full opacity-10 blur-[120px] animate-float-slow" />
-        <div className="absolute bottom-[-15%] right-[-10%] w-[700px] h-[700px] bg-[#F5C800] rounded-full opacity-15 blur-[140px] animate-float-slower" />
-        <div className="absolute top-[40%] right-[20%] w-[400px] h-[400px] bg-[#F5C800] rounded-full opacity-8 blur-[100px] animate-float-medium" />
-        
-        {/* Partículas menores */}
-        <div className="absolute top-[20%] left-[30%] w-[150px] h-[150px] bg-[#F5C800] rounded-full opacity-20 blur-[60px] animate-float-fast" />
-        <div className="absolute top-[60%] left-[15%] w-[200px] h-[200px] bg-[#F5C800] rounded-full opacity-12 blur-[80px] animate-float-medium" />
-        <div className="absolute top-[80%] right-[40%] w-[180px] h-[180px] bg-[#F5C800] rounded-full opacity-15 blur-[70px] animate-float-slow" />
-        
-        {/* Linhas de energia sutis */}
-        <div className="absolute top-0 left-[20%] w-[2px] h-full bg-gradient-to-b from-transparent via-[#F5C800]/20 to-transparent animate-pulse-slow" />
-        <div className="absolute top-0 right-[35%] w-[2px] h-full bg-gradient-to-b from-transparent via-[#F5C800]/15 to-transparent animate-pulse-slower" />
-        
-        {/* Círculos de onda */}
-        <div className="absolute top-[30%] left-[50%] -translate-x-1/2 w-[300px] h-[300px] border-2 border-[#F5C800]/10 rounded-full animate-ping-slow" />
-        <div className="absolute bottom-[20%] left-[25%] w-[250px] h-[250px] border-2 border-[#F5C800]/8 rounded-full animate-ping-slower" />
-      </div>
-
+    <div className="flex min-h-screen flex-col bg-slate-50">
       {/* Header com identidade visual - Compacto e responsivo */}
-      <div className="bg-[#1E1E1E] border-b-4 border-[#F5C800] relative z-10">
+      <div className="bg-[#1E1E1E] border-b-4 border-[#F5C800]">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
