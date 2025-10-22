@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
@@ -29,12 +29,11 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Refresh session if expired - required for Server Components
+  const { data: { session } } = await supabase.auth.getSession();
 
   if (
-    !user &&
+    !session &&
     !request.nextUrl.pathname.startsWith("/auth") &&
     request.nextUrl.pathname !== "/"
   ) {
