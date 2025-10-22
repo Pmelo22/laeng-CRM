@@ -1,48 +1,29 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
   });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
+  // Check for Supabase auth cookies
+  const authToken = request.cookies.get('sb-tiknxcrzmrgnrntlltmt-auth-token');
+  
+  // Protected routes - require authentication
+  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard');
+  const isAuthRoute = request.nextUrl.pathname.startsWith('/auth');
+  const isHomePage = request.nextUrl.pathname === '/';
 
-  // Refresh session if expired - required for Server Components
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (
-    !session &&
-    !request.nextUrl.pathname.startsWith("/auth") &&
-    request.nextUrl.pathname !== "/"
-  ) {
+  // Redirect to login if accessing protected route without auth token
+  if (isProtectedRoute && !authToken) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
-  return supabaseResponse;
+  // Allow the request to continue
+  return response;
 }
 
 export const config = {

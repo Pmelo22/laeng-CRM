@@ -11,6 +11,7 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  serverExternalPackages: ['@supabase/ssr', '@supabase/supabase-js'],
 }
 
 export default nextConfig
