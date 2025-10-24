@@ -1,0 +1,3 @@
+# Ignore middleware (removed)
+middleware.ts
+middleware.js
