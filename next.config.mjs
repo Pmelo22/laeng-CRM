@@ -11,6 +11,7 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  // Ensure Supabase packages work correctly in Edge Runtime
   serverExternalPackages: ['@supabase/ssr', '@supabase/supabase-js'],
 }
 
