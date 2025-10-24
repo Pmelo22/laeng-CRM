@@ -2,11 +2,13 @@ export interface Cliente {
   id: string;
   codigo: number; // Código único sequencial obrigatório
   nome: string;
+  status?: 'FINALIZADO' | 'EM ANDAMENTO' | 'PENDENTE'; // Status do cliente
+  endereco?: string; // Endereço ou cidade
+  data_cadastro?: string; // Data de cadastro do cliente
   responsavel_contato?: string; // Responsável pelo contato (LA, DERLANE, ANINHA, etc)
   cpf_cnpj?: string;
   telefone?: string;
   email?: string;
-  endereco?: string;
   cidade?: string;
   estado?: string;
   cep?: string;
