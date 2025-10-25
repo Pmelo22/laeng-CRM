@@ -13,38 +13,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Building2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
-
-  // Verifica se usuário já está autenticado
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          router.push('/dashboard');
-          return;
-        }
-      } catch (error) {
-        console.error('Erro ao verificar usuário:', error);
-      } finally {
-        setIsCheckingAuth(false);
-      }
-    };
-
-    checkUser();
-  }, [router, supabase]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
@@ -63,18 +43,6 @@ export default function LoginPage() {
     }
   };
 
-  // Mostra loading enquanto verifica autenticação
-  if (isCheckingAuth) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 via-slate-50 to-yellow-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#F5C800] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-6 bg-gradient-to-br from-slate-100 via-slate-50 to-yellow-50">
       <div className="w-full max-w-md">
@@ -86,9 +54,9 @@ export default function LoginPage() {
               </div>
             </div>
             <div className="text-center space-y-2">
-              <CardTitle className="text-3xl font-bold tracking-tight">LA Engenharia</CardTitle>
+              <CardTitle className="text-3xl font-bold tracking-tight">Setor Escritório</CardTitle>
               <CardDescription className="text-base">
-                Sistema de Gestão
+                Sistema de Gestão de Engenharia
               </CardDescription>
             </div>
           </CardHeader>
