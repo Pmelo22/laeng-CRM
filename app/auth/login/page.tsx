@@ -86,9 +86,9 @@ export default function LoginPage() {
               </div>
             </div>
             <div className="text-center space-y-2">
-              <CardTitle className="text-3xl font-bold tracking-tight">Setor Escritório</CardTitle>
+              <CardTitle className="text-3xl font-bold tracking-tight">LA Engenharia</CardTitle>
               <CardDescription className="text-base">
-                Sistema de Gestão de Engenharia
+                Sistema de Gestão
               </CardDescription>
             </div>
           </CardHeader>
