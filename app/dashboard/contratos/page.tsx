@@ -6,6 +6,8 @@ import Link from "next/link"
 import { Plus, ArrowLeft } from "lucide-react"
 import { ContratosTable } from "@/components/contratos-table"
 
+export const dynamic = 'force-dynamic';
+
 export default async function ContratosPage() {
   const supabase = await createClient()
 

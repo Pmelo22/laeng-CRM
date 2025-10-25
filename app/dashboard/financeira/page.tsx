@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FinanceiroChart } from "@/components/financeiro-chart";
 
+export const dynamic = 'force-dynamic';
+
 export default async function FinanceiraPage() {
   const supabase = await createClient();
 

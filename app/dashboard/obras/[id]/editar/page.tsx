@@ -5,6 +5,8 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { ObraForm } from "@/components/obra-form";
 
+export const dynamic = 'force-dynamic';
+
 interface EditarObraPageProps {
   params: Promise<{
     id: string;

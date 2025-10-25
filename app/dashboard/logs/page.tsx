@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { ScrollText, User, Calendar, Database } from "lucide-react"
 
+export const dynamic = 'force-dynamic';
+
 interface AuditLog {
   id: string
   user_email: string | null

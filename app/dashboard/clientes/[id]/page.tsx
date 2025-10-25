@@ -17,6 +17,8 @@ import {
   Edit
 } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ClientePerfilPage({ params }: { params: { id: string } }) {
   const supabase = await createClient();
 

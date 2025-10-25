@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server"
 import type { Cliente } from "@/lib/types"
 import ClientesPageContent from "./clientes-page-content"
 
+export const dynamic = 'force-dynamic';
+
 // Server Component wrapper
 export default async function ClientesPage() {
   const supabase = await createClient()

@@ -9,6 +9,8 @@ import { Plus, ArrowLeft, Building2, User } from "lucide-react"
 import { ObrasTable } from "@/components/obras-table"
 import type { ObraComCliente } from "@/lib/types"
 
+export const dynamic = 'force-dynamic';
+
 export default async function ObrasPage() {
   const supabase = await createClient()
 

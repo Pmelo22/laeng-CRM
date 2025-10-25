@@ -5,6 +5,8 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { ContratoForm } from "@/components/contrato-form"
 
+export const dynamic = 'force-dynamic';
+
 export default async function NovoContratoPage() {
   const supabase = await createClient()
 
