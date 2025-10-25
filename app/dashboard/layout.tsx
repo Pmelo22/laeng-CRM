@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -260,54 +260,6 @@ export default function DashboardLayout({
 }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-  const supabase = createClient();
-
-  // Proteção de rota - verifica autenticação
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        
-        if (error || !user) {
-          // Redireciona para login se não estiver autenticado
-          router.push('/auth/login');
-          return;
-        }
-        
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Erro ao verificar autenticação:', error);
-        router.push('/auth/login');
-      }
-    };
-
-    checkAuth();
-
-    // Monitora mudanças no estado de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
-        router.push('/auth/login');
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [router, supabase]);
-
-  // Mostra loading enquanto verifica autenticação
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#F5C800] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Verificando autenticação...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
@@ -340,3 +292,4 @@ export default function DashboardLayout({
     </div>
   );
 }
+
