@@ -1,42 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileText, Building2, TrendingUp, DollarSign, ArrowUpRight, Activity, MapPin, BarChart3 } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { DashboardCharts } from "@/components/dashboard-charts";
+import { Construction, Settings } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-
-  // Buscar estatísticas de clientes
-  const { count: clientesCount } = await supabase
-    .from("clientes")
-    .select("*", { count: "exact", head: true });
-
-  // Buscar estatísticas de obras
-  const { data: obras } = await supabase
-    .from("obras")
-    .select("*");
-
-  const obrasAtivas = obras?.filter(o => o.status === 'EM ANDAMENTO').length || 0;
-  const obrasFinalizadas = obras?.filter(o => o.status === 'FINALIZADO').length || 0;
-  const totalObras = obras?.length || 0;
-
-  // Calcular receita total
-  const receitaTotal = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
-
-  // Buscar estatísticas de contratos
-  const { count: contratosCount } = await supabase
-    .from("contratos")
-    .select("*", { count: "exact", head: true });
-
-  const { count: contratosAtivosCount } = await supabase
-    .from("contratos")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "Em andamento");
-
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">
       {/* Header */}
@@ -49,182 +16,25 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white overflow-hidden relative group hover:shadow-xl transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-white/90">Total de Clientes</CardTitle>
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Users className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-3xl font-bold">{clientesCount || 0}</div>
-            <p className="text-xs text-white/80 mt-1 flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
-              Clientes cadastrados
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white overflow-hidden relative group hover:shadow-xl transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-white/90">Obras Ativas</CardTitle>
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Building2 className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-3xl font-bold">{obrasAtivas}</div>
-            <p className="text-xs text-white/80 mt-1 flex items-center gap-1">
-              <Activity className="h-3 w-3" />
-              Em andamento
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white overflow-hidden relative group hover:shadow-xl transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-white/90">Total de Contratos</CardTitle>
-            <div className="p-2 bg-white/20 rounded-lg">
-              <FileText className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-3xl font-bold">{contratosCount || 0}</div>
-            <p className="text-xs text-white/80 mt-1 flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
-              Todos os contratos
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-primary to-yellow-500 text-black overflow-hidden relative group hover:shadow-xl transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-black/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
-            <div className="p-2 bg-black/20 rounded-lg">
-              <DollarSign className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-3xl font-bold">
-              {new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-              }).format(receitaTotal)}
-            </div>
-            <p className="text-xs opacity-80 mt-1 flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
-              Valor total
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts Section */}
-      <DashboardCharts obras={obras || []} />
-
-      {/* Main Content Grid */}
-      <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3">
-        {/* Quick Actions */}
-        <Card className="lg:col-span-2 border-0 shadow-lg">
-          <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-            <CardTitle className="flex items-center gap-2">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Activity className="h-5 w-5 text-primary" />
+      {/* Main Content - Em Manutenção */}
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="max-w-md w-full border-0 shadow-lg">
+          <CardHeader className="text-center pb-4">
+            <div className="flex justify-center mb-4">
+              <div className="p-4 bg-orange-100 rounded-full">
+                <Construction className="h-12 w-12 text-orange-600" />
               </div>
-              Acesso Rápido
-            </CardTitle>
-            <CardDescription>
-              Principais funcionalidades do sistema
+            </div>
+            <CardTitle className="text-2xl">Em Manutenção</CardTitle>
+            <CardDescription className="text-base mt-2">
+              Esta página está temporariamente indisponível
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Link href="/dashboard/clientes" className="group">
-                <div className="p-5 border-2 border-slate-100 rounded-xl hover:border-primary hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50 group-hover:from-primary/5 group-hover:to-primary/10">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-500 transition-colors">
-                      <Users className="h-6 w-6 text-blue-600 group-hover:text-white transition-colors" />
-                    </div>
-                    <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-1">Gestão de Clientes</h3>
-                  <p className="text-sm text-muted-foreground">Cadastro e controle completo</p>
-                </div>
-              </Link>
-
-              <Link href="/dashboard/obras" className="group">
-                <div className="p-5 border-2 border-slate-100 rounded-xl hover:border-primary hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50 group-hover:from-primary/5 group-hover:to-primary/10">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="p-3 bg-orange-100 rounded-lg group-hover:bg-orange-500 transition-colors">
-                      <Building2 className="h-6 w-6 text-orange-600 group-hover:text-white transition-colors" />
-                    </div>
-                    <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-1">Controle de Obras</h3>
-                  <p className="text-sm text-muted-foreground">Acompanhamento de projetos</p>
-                </div>
-              </Link>
-
-              <Link href="/dashboard/financeira" className="group">
-                <div className="p-5 border-2 border-slate-100 rounded-xl hover:border-primary hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50 group-hover:from-primary/5 group-hover:to-primary/10">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-500 transition-colors">
-                      <DollarSign className="h-6 w-6 text-green-600 group-hover:text-white transition-colors" />
-                    </div>
-                    <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-1">Gestão Financeira</h3>
-                  <p className="text-sm text-muted-foreground">Controle de receitas e despesas</p>
-                </div>
-              </Link>
-
-              <Link href="/dashboard/contratos" className="group">
-                <div className="p-5 border-2 border-slate-100 rounded-xl hover:border-primary hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50 group-hover:from-primary/5 group-hover:to-primary/10">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-500 transition-colors">
-                      <FileText className="h-6 w-6 text-purple-600 group-hover:text-white transition-colors" />
-                    </div>
-                    <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                  <h3 className="font-semibold text-lg mb-1">Contratos</h3>
-                  <p className="text-sm text-muted-foreground">Gestão de contratos</p>
-                </div>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Activity Feed */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-            <CardTitle className="flex items-center gap-2">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-primary" />
-              </div>
-              Atividades
-            </CardTitle>
-            <CardDescription>
-              Últimas atualizações
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                <div className="p-2 bg-primary rounded-lg flex-shrink-0">
-                  <Activity className="h-4 w-4 text-primary-foreground" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Sistema iniciado</p>
-                  <p className="text-xs text-muted-foreground mt-1">Pronto para uso</p>
-                </div>
-              </div>
-            </div>
+          <CardContent className="text-center">
+            <p className="text-sm text-muted-foreground">
+              Estamos trabalhando para melhorar sua experiência. 
+              Por favor, acesse a seção de <strong>Clientes</strong> através do menu lateral.
+            </p>
           </CardContent>
         </Card>
       </div>
