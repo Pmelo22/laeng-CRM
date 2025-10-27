@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileText, Building2, TrendingUp, DollarSign, ArrowUpRight, Activity, MapPin, BarChart3 } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { Users, FileText, Building2, TrendingUp, DollarSign, ArrowUpRight, Activity } from 'lucide-react';
 import Link from "next/link";
 import { DashboardCharts } from "@/components/dashboard-charts";
 
@@ -21,8 +20,6 @@ export default async function DashboardPage() {
     .select("*");
 
   const obrasAtivas = obras?.filter(o => o.status === 'EM ANDAMENTO').length || 0;
-  const obrasFinalizadas = obras?.filter(o => o.status === 'FINALIZADO').length || 0;
-  const totalObras = obras?.length || 0;
 
   // Calcular receita total
   const receitaTotal = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
@@ -31,11 +28,6 @@ export default async function DashboardPage() {
   const { count: contratosCount } = await supabase
     .from("contratos")
     .select("*", { count: "exact", head: true });
-
-  const { count: contratosAtivosCount } = await supabase
-    .from("contratos")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "Em andamento");
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">

@@ -1,9 +1,9 @@
 "use client";
 
-import { Obra } from "@/lib/types";
+import { ObraComCliente } from "@/lib/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -20,10 +20,11 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface ObrasTableProps {
-  obras: Obra[];
+  obras: ObraComCliente[];
+  showCliente?: boolean;
 }
 
-export function ObrasTable({ obras }: ObrasTableProps) {
+export function ObrasTable({ obras, showCliente = true }: ObrasTableProps) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -60,7 +61,7 @@ export function ObrasTable({ obras }: ObrasTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>CÓD.</TableHead>
-            <TableHead>NOME</TableHead>
+            {showCliente && <TableHead>CLIENTE</TableHead>}
             <TableHead>RESPONSÁVEL</TableHead>
             <TableHead>ENTIDADE</TableHead>
             <TableHead>ENDEREÇO</TableHead>
@@ -74,7 +75,7 @@ export function ObrasTable({ obras }: ObrasTableProps) {
           {obras.map((obra) => (
             <TableRow key={obra.id}>
               <TableCell className="font-medium">{obra.codigo}</TableCell>
-              <TableCell>{obra.cliente_nome}</TableCell>
+              {showCliente && <TableCell>{obra.cliente_nome}</TableCell>}
               <TableCell>{obra.responsavel}</TableCell>
               <TableCell>{obra.entidade || '-'}</TableCell>
               <TableCell>{obra.endereco}</TableCell>

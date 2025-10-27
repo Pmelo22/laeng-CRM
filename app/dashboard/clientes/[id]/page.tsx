@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 import { 
@@ -47,8 +46,6 @@ export default async function ClientePerfilPage({ params }: { params: { id: stri
 
   // Calcular estatísticas
   const totalObras = obras?.length || 0;
-  const obrasFinalizadas = obras?.filter(o => o.status === "FINALIZADO").length || 0;
-  const obrasEmAndamento = obras?.filter(o => o.status === "EM ANDAMENTO").length || 0;
   
   // Valor Contratual = soma dos valores totais das obras
   const valorContratual = obras?.reduce((sum, obra) => sum + (obra.valor_total || 0), 0) || 0;

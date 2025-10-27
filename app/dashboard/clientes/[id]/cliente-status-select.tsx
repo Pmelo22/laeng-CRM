@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Cliente } from "@/lib/types";
 
 interface ClienteStatusSelectProps {
