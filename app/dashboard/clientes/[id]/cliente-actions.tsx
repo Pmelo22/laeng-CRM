@@ -57,8 +57,9 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
 
       router.refresh();
       setIsModalOpen(false);
-    } catch (error: any) {
-      setError(error.message || "Erro ao salvar cliente");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Erro ao salvar cliente";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -143,7 +144,7 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
                 <Label htmlFor="status">Status *</Label>
                 <Select 
                   value={formData.status} 
-                  onValueChange={(value) => setFormData({ ...formData, status: value as any })}
+                  onValueChange={(value: "PENDENTE" | "EM ANDAMENTO" | "FINALIZADO") => setFormData({ ...formData, status: value })}
                   disabled={isLoading}
                 >
                   <SelectTrigger className="w-full">

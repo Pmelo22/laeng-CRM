@@ -7,7 +7,7 @@ export const config = {
   ],
 };
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Apenas passa a requisição adiante sem fazer nada
   return NextResponse.next();
 }
