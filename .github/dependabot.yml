@@ -1,0 +1,64 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Pmelo22"
+    assignees:
+      - "Pmelo22"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "automated"
+    # Grupos de dependências
+    groups:
+      # Grupo para React e Next.js
+      react-ecosystem:
+        patterns:
+          - "react*"
+          - "next*"
+          - "@vercel/*"
+      # Grupo para UI components
+      ui-components:
+        patterns:
+          - "@radix-ui/*"
+          - "lucide-react"
+          - "tailwind*"
+          - "clsx"
+          - "class-variance-authority"
+      # Grupo para Supabase
+      supabase:
+        patterns:
+          - "@supabase/*"
+      # Grupo para ferramentas de desenvolvimento
+      dev-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "@types/*"
+          - "typescript"
+          - "eslint*"
+          - "postcss"
+    # Versioning strategy
+    versioning-strategy: increase
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "ci"
+      - "automated"
+    reviewers:
+      - "Pmelo22"
