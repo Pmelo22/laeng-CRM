@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Edit, CheckCircle2, Clock, Loader2, AlertCircle } from "lucide-react";
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogCancel } from "@/components/ui/alert-dialog";
+import { Edit, Loader2, Trash2, AlertCircle } from "lucide-react";
 import { Cliente } from "@/lib/types";
 
 interface ClienteActionsProps {
@@ -41,6 +42,49 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
     observacoes: cliente.observacoes || "",
     data_cadastro: cliente.data_cadastro || new Date().toISOString().split('T')[0],
   });
+
+  const [loadingCep, setLoadingCep] = useState(false);
+
+  // Função para buscar endereço pelo CEP
+  const buscarCep = async (cep: string) => {
+    // Remove caracteres não numéricos
+    const cepLimpo = cep.replace(/\D/g, '');
+    
+    // Verifica se o CEP tem 8 dígitos
+    if (cepLimpo.length !== 8) return;
+
+    setLoadingCep(true);
+    
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        // Atualiza apenas os campos vazios ou se o usuário permitir
+        setFormData(prev => ({
+          ...prev,
+          endereco: prev.endereco || data.logradouro || "",
+          cidade: prev.cidade || data.localidade || "",
+          estado: prev.estado || data.uf || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+    } finally {
+      setLoadingCep(false);
+    }
+  };
+
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCep = e.target.value;
+    setFormData({ ...formData, cep: newCep });
+    
+    // Busca automática quando CEP tiver 8 dígitos
+    const cepLimpo = newCep.replace(/\D/g, '');
+    if (cepLimpo.length === 8) {
+      buscarCep(newCep);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +127,7 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
       </Button>
 
       <Dialog open={isModalOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">Editar Cliente</DialogTitle>
             <DialogDescription>
@@ -91,7 +135,7 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto pr-2 flex-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
             {/* Nome */}
             <div className="space-y-2">
               <Label htmlFor="nome">Nome do Cliente *</Label>
@@ -185,7 +229,20 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
               </div>
             </div>
 
-            {/* Endereço */}
+            {/* CEP, Endereço */}
+            <div className="space-y-2">
+              <Label htmlFor="cep">CEP</Label>
+              <Input
+                id="cep"
+                value={formData.cep}
+                onChange={handleCepChange}
+                disabled={isLoading}
+                placeholder="00000-000"
+                maxLength={9}
+              />
+              {loadingCep && <p className="text-xs text-muted-foreground">Buscando endereço...</p>}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="endereco">Endereço *</Label>
               <Input
@@ -194,11 +251,12 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
                 value={formData.endereco}
                 onChange={(e) => setFormData({ ...formData, endereco: e.target.value })}
                 disabled={isLoading}
+                placeholder="Rua, Avenida, etc."
               />
             </div>
 
-            {/* Cidade, Estado, CEP */}
-            <div className="grid grid-cols-3 gap-4">
+            {/* Cidade, Estado */}
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="cidade">Cidade</Label>
                 <Input
@@ -213,18 +271,10 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
                 <Input
                   id="estado"
                   value={formData.estado}
-                  onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, estado: e.target.value.toUpperCase() })}
                   maxLength={2}
                   disabled={isLoading}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cep">CEP</Label>
-                <Input
-                  id="cep"
-                  value={formData.cep}
-                  onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
-                  disabled={isLoading}
+                  placeholder="UF"
                 />
               </div>
             </div>
@@ -291,6 +341,177 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
 }
 
 // ============================================
+// BOTÃO DE DELETAR COM CONFIRMAÇÃO DUPLA
+// ============================================
+export function DeleteClienteButton({ cliente }: ClienteActionsProps) {
+  const router = useRouter();
+  const supabase = createClient();
+  const [isFirstConfirmOpen, setIsFirstConfirmOpen] = useState(false);
+  const [isSecondConfirmOpen, setIsSecondConfirmOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFirstConfirm = () => {
+    setIsFirstConfirmOpen(false);
+    setIsSecondConfirmOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (confirmText !== "EXCLUIR") {
+      setError("Digite exatamente 'EXCLUIR' para confirmar");
+      return;
+    }
+
+    setIsDeleting(true);
+    setError(null);
+
+    try {
+      const { error: deleteError } = await supabase
+        .from("clientes")
+        .delete()
+        .eq("id", cliente.id);
+
+      if (deleteError) throw deleteError;
+
+      // Redireciona para a lista de clientes após exclusão
+      router.push("/dashboard/clientes");
+      router.refresh();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Erro ao excluir cliente";
+      setError(errorMessage);
+      setIsDeleting(false);
+    }
+  };
+
+  const resetSecondConfirm = () => {
+    setIsSecondConfirmOpen(false);
+    setConfirmText("");
+    setError(null);
+  };
+
+  return (
+    <>
+      <Button
+        onClick={() => setIsFirstConfirmOpen(true)}
+        className="bg-red-600 text-white hover:bg-red-700 border-2 border-red-700 font-bold shadow-md"
+      >
+        <Trash2 className="mr-2 h-4 w-4" />
+        Excluir Cliente
+      </Button>
+
+      {/* Primeiro diálogo de confirmação */}
+      <AlertDialog open={isFirstConfirmOpen} onOpenChange={setIsFirstConfirmOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-red-600 flex items-center gap-2">
+              <Trash2 className="h-5 w-5" />
+              Excluir Cliente?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-600 pt-2">
+              Você está prestes a excluir o cliente: <strong>{cliente.nome}</strong>
+              <br />
+              <span className="text-red-600 font-semibold">
+                ⚠️ Esta ação não pode ser desfeita e todos os dados relacionados serão perdidos permanentemente.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="bg-red-50 border border-red-200 p-3 rounded-lg my-2">
+            <div className="font-bold text-red-900">{cliente.nome}</div>
+            <div className="text-sm text-red-700">Código: #{String(cliente.codigo).padStart(3, '0')}</div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <Button
+              onClick={handleFirstConfirm}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Sim, Continuar
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Segundo diálogo de confirmação com digitação */}
+      <AlertDialog open={isSecondConfirmOpen} onOpenChange={resetSecondConfirm}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-red-600 flex items-center gap-2">
+              <AlertCircle className="h-6 w-6" />
+              Confirmação Final
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-600 pt-2">
+              Esta é sua última chance de cancelar.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <div className="space-y-4">
+            <div className="bg-yellow-50 border-2 border-yellow-400 p-3 rounded text-center">
+              <span className="text-yellow-900 font-bold">⚠️ ÚLTIMA CHANCE DE CANCELAR ⚠️</span>
+            </div>
+            
+            <div className="text-sm text-gray-700">
+              Para confirmar a exclusão permanente de <strong className="text-red-600">{cliente.nome}</strong>, digite exatamente:
+            </div>
+            
+            <div className="bg-red-100 border-2 border-red-400 p-4 rounded text-center">
+              <span className="font-mono font-bold text-xl text-red-700">EXCLUIR</span>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirm-text" className="font-semibold">
+                Digite EXCLUIR para confirmar:
+              </Label>
+              <Input
+                id="confirm-text"
+                value={confirmText}
+                onChange={(e) => {
+                  setConfirmText(e.target.value.toUpperCase());
+                  setError(null);
+                }}
+                placeholder="Digite EXCLUIR"
+                disabled={isDeleting}
+                className="font-mono text-base"
+                autoComplete="off"
+              />
+              {error && (
+                <div className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>{error}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              Cancelar
+            </AlertDialogCancel>
+            <Button
+              onClick={handleDelete}
+              disabled={isDeleting || confirmText !== "EXCLUIR"}
+              className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Excluindo...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Excluir Permanentemente
+                </>
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
+// ============================================
 // BADGE DE STATUS CLICÁVEL
 // ============================================
 export function ClienteStatusBadge({ cliente }: ClienteActionsProps) {
@@ -336,40 +557,30 @@ export function ClienteStatusBadge({ cliente }: ClienteActionsProps) {
   const statusConfig = {
     "FINALIZADO": { 
       color: "bg-green-500 hover:bg-green-600 text-white", 
-      icon: CheckCircle2,
       label: "Finalizado"
     },
     "EM ANDAMENTO": { 
       color: "bg-red-500 hover:bg-red-600 text-white", 
-      icon: Clock,
       label: "Em Andamento"
     },
     "PENDENTE": { 
-      color: "bg-yellow-500 hover:bg-yellow-600 text-white", 
-      icon: AlertCircle,
+      color: "bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E]", 
       label: "Pendente"
     }
   };
 
   const config = statusConfig[cliente.status as keyof typeof statusConfig] || statusConfig["PENDENTE"];
-  const Icon = config.icon;
 
   return (
     <Badge 
-      className={`${config.color} font-semibold px-3 py-1.5 cursor-pointer transition-all border-0 ${isUpdating ? 'opacity-50' : ''}`}
+      className={`${config.color} font-semibold text-sm px-3 py-1.5 cursor-pointer transition-all border-0 inline-block ${isUpdating ? 'opacity-50' : ''}`}
       onClick={handleClick}
       title="Clique para alterar o status"
     >
       {isUpdating ? (
-        <>
-          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-          Atualizando...
-        </>
+        <span className="font-bold">Atualizando...</span>
       ) : (
-        <>
-          <Icon className="h-3 w-3 mr-1" />
-          {config.label}
-        </>
+        <span className="font-bold">{config.label}</span>
       )}
     </Badge>
   );

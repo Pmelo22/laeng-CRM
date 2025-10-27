@@ -59,3 +59,33 @@ body {
   padding: 0;
 }
 
+/* Scrollbar customizada - fina e discreta */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Suporte para Firefox */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+/* Fix para SelectTrigger - Forçar largura fixa */
+[data-slot="select-trigger"] {
+  min-width: 180px !important;
+  width: 180px !important;
+  max-width: 180px !important;
+}

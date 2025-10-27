@@ -38,6 +38,45 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     data_cadastro: new Date().toISOString().split('T')[0],
   });
 
+  const [loadingCep, setLoadingCep] = useState(false);
+
+  // Função para buscar endereço pelo CEP
+  const buscarCep = async (cep: string) => {
+    const cepLimpo = cep.replace(/\D/g, '');
+    
+    if (cepLimpo.length !== 8) return;
+
+    setLoadingCep(true);
+    
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setFormData(prev => ({
+          ...prev,
+          endereco: prev.endereco || data.logradouro || "",
+          cidade: prev.cidade || data.localidade || "",
+          estado: prev.estado || data.uf || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+    } finally {
+      setLoadingCep(false);
+    }
+  };
+
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCep = e.target.value;
+    setFormData({ ...formData, cep: newCep });
+    
+    const cepLimpo = newCep.replace(/\D/g, '');
+    if (cepLimpo.length === 8) {
+      buscarCep(newCep);
+    }
+  };
+
   // Atualizar formData quando o modal abrir ou o cliente mudar
   useEffect(() => {
     if (isOpen) {
@@ -117,8 +156,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b">
           <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
             {cliente ? "Editar Cliente" : "Novo Cliente"}
           </DialogTitle>
@@ -129,7 +168,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin pr-4">
           {/* Nome */}
           <div className="space-y-2">
             <Label htmlFor="nome" className="text-sm font-semibold">
@@ -244,6 +284,23 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             </div>
           </div>
 
+          {/* CEP */}
+          <div className="space-y-2">
+            <Label htmlFor="cep" className="text-sm font-semibold">
+              CEP
+            </Label>
+            <Input
+              id="cep"
+              value={formData.cep}
+              onChange={handleCepChange}
+              placeholder="00000-000"
+              maxLength={9}
+              disabled={isLoading}
+              className="border-2 focus:border-[#F5C800]"
+            />
+            {loadingCep && <p className="text-xs text-muted-foreground">Buscando endereço...</p>}
+          </div>
+
           {/* Endereço */}
           <div className="space-y-2">
             <Label htmlFor="endereco" className="text-sm font-semibold">
@@ -260,8 +317,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             />
           </div>
 
-          {/* Cidade, Estado e CEP */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Cidade e Estado */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="cidade" className="text-sm font-semibold">
                 Cidade
@@ -282,22 +339,9 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
               <Input
                 id="estado"
                 value={formData.estado}
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, estado: e.target.value.toUpperCase() })}
                 placeholder="UF"
                 maxLength={2}
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cep" className="text-sm font-semibold">
-                CEP
-              </Label>
-              <Input
-                id="cep"
-                value={formData.cep}
-                onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
-                placeholder="00000-000"
                 disabled={isLoading}
                 className="border-2 focus:border-[#F5C800]"
               />
@@ -340,8 +384,9 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
               {error}
             </div>
           )}
+          </div>
 
-          <DialogFooter className="gap-2 sm:gap-0 pt-4">
+          <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t bg-gray-50">
             <Button
               type="button"
               variant="outline"
