@@ -33,6 +33,16 @@ const menuItems = [
     href: "/dashboard/clientes",
   },
   {
+    title: "Obras",
+    icon: Building2,
+    href: "/dashboard/obras",
+  },
+  {
+    title: "Financeiro",
+    icon: DollarSign,
+    href: "/dashboard/financeira",
+  },
+  {
     title: "Logs",
     icon: ScrollText,
     href: "/dashboard/logs",

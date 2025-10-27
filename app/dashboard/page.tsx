@@ -1,9 +1,42 @@
+import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Construction, Settings } from 'lucide-react';
+import { Users, FileText, Building2, TrendingUp, DollarSign, ArrowUpRight, Activity, MapPin, BarChart3 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { DashboardCharts } from "@/components/dashboard-charts";
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
+  const supabase = await createClient();
+
+  // Buscar estatísticas de clientes
+  const { count: clientesCount } = await supabase
+    .from("clientes")
+    .select("*", { count: "exact", head: true });
+
+  // Buscar estatísticas de obras
+  const { data: obras } = await supabase
+    .from("obras")
+    .select("*");
+
+  const obrasAtivas = obras?.filter(o => o.status === 'EM ANDAMENTO').length || 0;
+  const obrasFinalizadas = obras?.filter(o => o.status === 'FINALIZADO').length || 0;
+  const totalObras = obras?.length || 0;
+
+  // Calcular receita total
+  const receitaTotal = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
+
+  // Buscar estatísticas de contratos
+  const { count: contratosCount } = await supabase
+    .from("contratos")
+    .select("*", { count: "exact", head: true });
+
+  const { count: contratosAtivosCount } = await supabase
+    .from("contratos")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "Em andamento");
+
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">
       {/* Header */}
@@ -180,11 +213,18 @@ export default async function DashboardPage() {
               Últimas atualizações
             </CardDescription>
           </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-sm text-muted-foreground">
-              Estamos trabalhando para melhorar sua experiência. 
-              Por favor, acesse a seção de <strong>Clientes</strong> através do menu lateral.
-            </p>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                <div className="p-2 bg-primary rounded-lg flex-shrink-0">
+                  <Activity className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Sistema iniciado</p>
+                  <p className="text-xs text-muted-foreground mt-1">Pronto para uso</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
