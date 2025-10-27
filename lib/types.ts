@@ -18,6 +18,12 @@ export interface Cliente {
   updated_by_name?: string;
   created_at: string;
   updated_at: string;
+  // Campos agregados das obras
+  valor_terreno?: number;
+  entrada?: number;
+  valor_financiado?: number;
+  subsidio?: number;
+  valor_total?: number;
 }
 
 export interface ClienteComResumo extends Cliente {

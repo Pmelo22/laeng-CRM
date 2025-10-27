@@ -93,7 +93,7 @@ export default async function LogsPage() {
           <div className="flex items-center gap-4">
             <ScrollText className="h-8 w-8 text-[#F5C800]" />
             <div>
-              <h1 className="text-3xl font-bold text-white">Logs de Auditoria</h1>
+              <h1 className="text-3xl font-bold text-white uppercase">LOGS DE AUDITORIA</h1>
               <p className="text-[#F5C800] font-medium text-sm">
                 Histórico completo de todas as operações no sistema
               </p>
@@ -107,7 +107,7 @@ export default async function LogsPage() {
         <div className="grid gap-4 md:grid-cols-4 mb-6">
           <Card className="border-l-4 border-l-green-500 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Criações</CardTitle>
+              <CardTitle className="text-sm font-medium uppercase">TOTAL DE CRIAÇÕES</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-700">
@@ -118,7 +118,7 @@ export default async function LogsPage() {
 
           <Card className="border-l-4 border-l-blue-500 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Edições</CardTitle>
+              <CardTitle className="text-sm font-medium uppercase">TOTAL DE EDIÇÕES</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-700">
@@ -129,7 +129,7 @@ export default async function LogsPage() {
 
           <Card className="border-l-4 border-l-red-500 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Exclusões</CardTitle>
+              <CardTitle className="text-sm font-medium uppercase">TOTAL DE EXCLUSÕES</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-700">
@@ -140,7 +140,7 @@ export default async function LogsPage() {
 
           <Card className="border-l-4 border-l-[#F5C800] shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Operações</CardTitle>
+              <CardTitle className="text-sm font-medium uppercase">TOTAL DE OPERAÇÕES</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-[#1E1E1E]">
@@ -153,9 +153,9 @@ export default async function LogsPage() {
         {/* Lista de Logs */}
         <Card className="shadow-lg border-t-4 border-t-[#F5C800]">
           <CardHeader className="bg-gradient-to-r from-[#1E1E1E] to-[#2A2A2A] text-white rounded-t-lg py-6">
-            <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <CardTitle className="text-2xl font-bold flex items-center gap-2 uppercase">
               <ScrollText className="h-6 w-6" />
-              Histórico de Operações
+              HISTÓRICO DE OPERAÇÕES
             </CardTitle>
             <CardDescription className="text-[#F5C800] font-medium text-base mt-2">
               {auditLogs.length} registro(s) encontrado(s) - últimos 100

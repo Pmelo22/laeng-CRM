@@ -5,11 +5,11 @@ import type { Cliente } from "@/lib/types"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Edit, Trash2, User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, CheckCircle2, Clock, AlertCircle } from "lucide-react"
+import { Edit, User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, CheckCircle2, Clock, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ClienteModal } from "@/components/cliente-modal"
 
 interface ClientesTableProps {
   clientes: Cliente[]
@@ -21,12 +21,13 @@ type SortDirection = 'asc' | 'desc' | 'none'
 
 export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps) {
   const router = useRouter()
-  const supabase = createClient()
   
   const [sortField, setSortField] = useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>('none')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(20)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedCliente, setSelectedCliente] = useState<Cliente | undefined>(undefined)
 
   // Filtrar clientes pela busca
   const filteredClientes = useMemo(() => {
@@ -158,16 +159,14 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
     return pages
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este cliente? Todas as obras vinculadas também serão excluídas.")) return
+  const handleEdit = (cliente: Cliente) => {
+    setSelectedCliente(cliente)
+    setIsModalOpen(true)
+  }
 
-    const { error } = await supabase.from("clientes").delete().eq("id", id)
-
-    if (error) {
-      alert("Erro ao excluir cliente: " + error.message)
-    } else {
-      router.refresh()
-    }
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedCliente(undefined)
   }
 
   const formatCurrency = (value: number) => {
@@ -185,17 +184,17 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       "FINALIZADO": { 
-        color: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100", 
+        color: "bg-green-500 text-white border-green-600 hover:bg-green-600", 
         icon: CheckCircle2,
         label: "Finalizado"
       },
       "EM ANDAMENTO": { 
-        color: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100", 
+        color: "bg-red-500 text-white border-red-600 hover:bg-red-600", 
         icon: Clock,
         label: "Em Andamento"
       },
       "PENDENTE": { 
-        color: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100", 
+        color: "bg-yellow-500 text-white border-yellow-600 hover:bg-yellow-600", 
         icon: AlertCircle,
         label: "Pendente"
       },
@@ -267,7 +266,22 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
                 {getSortIcon('data_cadastro')}
               </div>
             </TableHead>
-            <TableHead className="text-[#F5C800] font-bold py-3">AÇÕES</TableHead>
+            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+              TERRENO (R$)
+            </TableHead>
+            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+              ENTRADA (R$)
+            </TableHead>
+            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+              VALOR FINANCIADO (R$)
+            </TableHead>
+            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+              SUBSÍDIO (R$)
+            </TableHead>
+            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+              VALOR TOTAL (R$)
+            </TableHead>
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">AÇÕES</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -290,32 +304,41 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               <TableCell className="text-center py-3">
                 <span className="text-sm">{formatDate(cliente.data_cadastro)}</span>
               </TableCell>
+              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
+                <span className="text-sm">{formatCurrency(cliente.valor_terreno || 0)}</span>
+              </TableCell>
+              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
+                <span className="text-sm">{formatCurrency(cliente.entrada || 0)}</span>
+              </TableCell>
+              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
+                <span className="text-sm">{formatCurrency(cliente.valor_financiado || 0)}</span>
+              </TableCell>
+              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
+                <span className="text-sm">{formatCurrency(cliente.subsidio || 0)}</span>
+              </TableCell>
+              <TableCell className="text-center py-3 bg-yellow-50 font-bold">
+                <span className="text-sm text-green-700">{formatCurrency(cliente.valor_total || 0)}</span>
+              </TableCell>
               <TableCell className="py-3">
-                <div className="flex items-center gap-2">
-                  <Link href={`/dashboard/clientes/${cliente.id}`} className="flex-1">
-                    <div className="group flex items-center gap-2 px-3 py-2 bg-white border-2 border-gray-200 rounded-lg hover:border-[#F5C800] hover:shadow-sm transition-all duration-200 cursor-pointer">
-                      <div className="h-8 w-8 rounded-full bg-[#F5C800]/10 flex items-center justify-center group-hover:bg-[#F5C800]/20 transition-colors flex-shrink-0">
-                        <User className="h-4 w-4 text-[#F5C800]" />
-                      </div>
-                      <div className="text-left min-w-0">
-                        <p className="text-xs font-semibold text-foreground group-hover:text-[#F5C800] transition-colors truncate">
-                          Ver Perfil
-                        </p>
-                        <p className="text-[10px] text-muted-foreground truncate">
-                          Detalhes completos
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-[#F5C800] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                    </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Button 
+                    size="sm" 
+                    onClick={() => handleEdit(cliente)}
+                    className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 h-9 w-9 p-0"
+                    title="Editar Cliente"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Link href={`/dashboard/clientes/${cliente.id}`}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-2 border-gray-300 hover:border-[#F5C800] hover:bg-[#F5C800]/10 h-9 w-9 p-0"
+                      title="Ver Perfil Completo"
+                    >
+                      <User className="h-4 w-4" />
+                    </Button>
                   </Link>
-                  <Button asChild size="sm" className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 h-8 w-8 p-0">
-                    <Link href={`/dashboard/clientes/${cliente.id}/editar`}>
-                      <Edit className="h-3.5 w-3.5" />
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleDelete(cliente.id)} className="border-red-200 text-red-600 hover:bg-red-50 h-8 w-8 p-0">
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -394,6 +417,13 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
           </div>
         </div>
       </div>
+
+      {/* Modal de Edição */}
+      <ClienteModal 
+        cliente={selectedCliente}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   )
 }

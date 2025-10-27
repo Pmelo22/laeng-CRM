@@ -4,9 +4,9 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import Link from "next/link"
 import { Plus, Search } from "lucide-react"
 import { ClientesTable } from "@/components/clientes-table"
+import { ClienteModal } from "@/components/cliente-modal"
 import type { Cliente } from "@/lib/types"
 
 interface ClientesPageContentProps {
@@ -15,6 +15,7 @@ interface ClientesPageContentProps {
 
 export default function ClientesPageContent({ clientes }: ClientesPageContentProps) {
   const [searchTerm, setSearchTerm] = useState("")
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
@@ -24,7 +25,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
           <div className="flex items-center justify-between gap-6">
             {/* Título à esquerda */}
             <div className="min-w-fit">
-              <h1 className="text-3xl font-bold text-white">Lista de Clientes</h1>
+              <h1 className="text-3xl font-bold text-white uppercase">GESTÃO DE CLIENTES</h1>
               <p className="text-[#F5C800] font-medium text-sm">{clientes.length} cliente(s) cadastrado(s)</p>
             </div>
 
@@ -42,11 +43,12 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
             </div>
 
             {/* Botão à direita */}
-            <Button asChild className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold shadow-lg min-w-fit">
-              <Link href="/dashboard/clientes/novo">
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Cliente
-              </Link>
+            <Button 
+              onClick={() => setIsModalOpen(true)}
+              className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold shadow-lg min-w-fit"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Cliente
             </Button>
           </div>
         </div>
@@ -59,6 +61,12 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal para Novo Cliente */}
+      <ClienteModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   )
 }
