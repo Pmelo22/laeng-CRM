@@ -81,13 +81,28 @@ export function ClienteForm({ cliente }: ClienteFormProps) {
               value={formData.status} 
               onValueChange={(value) => setFormData({ ...formData, status: value as "FINALIZADO" | "EM ANDAMENTO" | "PENDENTE" })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Selecione o status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="FINALIZADO">FINALIZADO</SelectItem>
-                <SelectItem value="EM ANDAMENTO">EM ANDAMENTO</SelectItem>
-                <SelectItem value="PENDENTE">PENDENTE</SelectItem>
+                <SelectItem value="PENDENTE">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                    <span>PENDENTE</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="EM ANDAMENTO">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                    <span>EM ANDAMENTO</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="FINALIZADO">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                    <span>FINALIZADO</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

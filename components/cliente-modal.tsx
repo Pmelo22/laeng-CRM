@@ -203,26 +203,26 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
                 onValueChange={(value) => setFormData({ ...formData, status: value as "FINALIZADO" | "EM ANDAMENTO" | "PENDENTE" })}
                 disabled={isLoading}
               >
-                <SelectTrigger className="border-2 focus:ring-[#F5C800]">
+                <SelectTrigger className="border-2 focus:ring-[#F5C800] w-full">
                   <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
-                <SelectContent position="popper" sideOffset={5}>
+                <SelectContent>
                   <SelectItem value="PENDENTE">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                      PENDENTE
+                      <span>PENDENTE</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="EM ANDAMENTO">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      EM ANDAMENTO
+                      <span>EM ANDAMENTO</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="FINALIZADO">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      FINALIZADO
+                      <span>FINALIZADO</span>
                     </div>
                   </SelectItem>
                 </SelectContent>

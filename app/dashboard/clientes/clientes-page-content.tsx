@@ -25,7 +25,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
           <div className="flex items-center justify-between gap-6">
             {/* Título à esquerda */}
             <div className="min-w-fit">
-              <h1 className="text-3xl font-bold text-white">Gestão de Clientes</h1>
+              <h1 className="text-3xl font-bold text-white uppercase">GESTÃO DE CLIENTES</h1>
               <p className="text-[#F5C800] font-medium text-sm">{clientes.length} cliente(s) cadastrado(s)</p>
             </div>
 

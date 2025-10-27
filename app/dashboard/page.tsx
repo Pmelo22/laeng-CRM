@@ -41,8 +41,8 @@ export default async function DashboardPage() {
     <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-          Dashboard
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent uppercase">
+          DASHBOARD
         </h1>
         <p className="text-muted-foreground text-sm md:text-base">
           Bem-vindo ao sistema de gestão de engenharia
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
         <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white overflow-hidden relative group hover:shadow-xl transition-all">
           <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-white/90">Total de Clientes</CardTitle>
+            <CardTitle className="text-sm font-medium text-white/90 uppercase">TOTAL DE CLIENTES</CardTitle>
             <div className="p-2 bg-white/20 rounded-lg">
               <Users className="h-4 w-4" />
             </div>
@@ -71,7 +71,7 @@ export default async function DashboardPage() {
         <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white overflow-hidden relative group hover:shadow-xl transition-all">
           <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-white/90">Obras Ativas</CardTitle>
+            <CardTitle className="text-sm font-medium text-white/90 uppercase">OBRAS ATIVAS</CardTitle>
             <div className="p-2 bg-white/20 rounded-lg">
               <Building2 className="h-4 w-4" />
             </div>
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
         <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white overflow-hidden relative group hover:shadow-xl transition-all">
           <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-white/90">Total de Contratos</CardTitle>
+            <CardTitle className="text-sm font-medium text-white/90 uppercase">TOTAL DE CONTRATOS</CardTitle>
             <div className="p-2 bg-white/20 rounded-lg">
               <FileText className="h-4 w-4" />
             </div>
@@ -105,7 +105,7 @@ export default async function DashboardPage() {
         <Card className="border-0 shadow-lg bg-gradient-to-br from-primary to-yellow-500 text-black overflow-hidden relative group hover:shadow-xl transition-all">
           <div className="absolute top-0 right-0 w-24 h-24 bg-black/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
+            <CardTitle className="text-sm font-medium uppercase">RECEITA TOTAL</CardTitle>
             <div className="p-2 bg-black/20 rounded-lg">
               <DollarSign className="h-4 w-4" />
             </div>
@@ -133,11 +133,11 @@ export default async function DashboardPage() {
         {/* Quick Actions */}
         <Card className="lg:col-span-2 border-0 shadow-lg">
           <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 uppercase">
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Activity className="h-5 w-5 text-primary" />
               </div>
-              Acesso Rápido
+              ACESSO RÁPIDO
             </CardTitle>
             <CardDescription>
               Principais funcionalidades do sistema
@@ -153,7 +153,7 @@ export default async function DashboardPage() {
                     </div>
                     <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-1">Gestão de Clientes</h3>
+                  <h3 className="font-semibold text-lg mb-1 uppercase">GESTÃO DE CLIENTES</h3>
                   <p className="text-sm text-muted-foreground">Cadastro e controle completo</p>
                 </div>
               </Link>
@@ -166,7 +166,7 @@ export default async function DashboardPage() {
                     </div>
                     <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-1">Controle de Obras</h3>
+                  <h3 className="font-semibold text-lg mb-1 uppercase">CONTROLE DE OBRAS</h3>
                   <p className="text-sm text-muted-foreground">Acompanhamento de projetos</p>
                 </div>
               </Link>
@@ -179,7 +179,7 @@ export default async function DashboardPage() {
                     </div>
                     <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-1">Gestão Financeira</h3>
+                  <h3 className="font-semibold text-lg mb-1 uppercase">GESTÃO FINANCEIRA</h3>
                   <p className="text-sm text-muted-foreground">Controle de receitas e despesas</p>
                 </div>
               </Link>
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
                     </div>
                     <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-1">Contratos</h3>
+                  <h3 className="font-semibold text-lg mb-1 uppercase">CONTRATOS</h3>
                   <p className="text-sm text-muted-foreground">Gestão de contratos</p>
                 </div>
               </Link>
@@ -203,11 +203,11 @@ export default async function DashboardPage() {
         {/* Activity Feed */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 uppercase">
               <div className="p-2 bg-primary/10 rounded-lg">
                 <TrendingUp className="h-5 w-5 text-primary" />
               </div>
-              Atividades
+              ATIVIDADES
             </CardTitle>
             <CardDescription>
               Últimas atualizações

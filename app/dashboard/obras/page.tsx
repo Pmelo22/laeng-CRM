@@ -59,7 +59,7 @@ export default async function ObrasPage() {
           </Button>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Obras</h1>
+              <h1 className="text-3xl font-bold uppercase">OBRAS</h1>
               <p className="text-muted-foreground">
                 Obras organizadas por cliente
               </p>
@@ -77,7 +77,7 @@ export default async function ObrasPage() {
         <div className="grid gap-4 md:grid-cols-3 mb-6">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Total de Obras</CardTitle>
+              <CardTitle className="text-sm font-medium uppercase">TOTAL DE OBRAS</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
@@ -89,7 +89,7 @@ export default async function ObrasPage() {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Clientes com Obras</CardTitle>
+              <CardTitle className="text-sm font-medium uppercase">CLIENTES COM OBRAS</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
@@ -101,7 +101,7 @@ export default async function ObrasPage() {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+              <CardTitle className="text-sm font-medium uppercase">VALOR TOTAL</CardTitle>
             </CardHeader>
             <CardContent>
               <span className="text-2xl font-bold">
@@ -114,7 +114,7 @@ export default async function ObrasPage() {
         {/* Obras Agrupadas por Cliente */}
         <Card>
           <CardHeader>
-            <CardTitle>Obras por Cliente</CardTitle>
+            <CardTitle className="uppercase">OBRAS POR CLIENTE</CardTitle>
             <CardDescription>
               {Object.keys(obrasPorCliente).length} cliente(s) com {obrasComCliente.length} obra(s)
             </CardDescription>

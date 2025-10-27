@@ -55,7 +55,7 @@ export default async function FinanceiraPage() {
         </Button>
         
         <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Gestão Financeira</h1>
+          <h1 className="text-3xl font-bold tracking-tight uppercase">GESTÃO FINANCEIRA</h1>
           <p className="text-muted-foreground">Controle financeiro e análise de receitas</p>
         </div>
 
@@ -63,7 +63,7 @@ export default async function FinanceiraPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
           <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500 to-green-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/90">Total de Receitas</CardTitle>
+              <CardTitle className="text-sm font-medium text-white/90 uppercase">TOTAL DE RECEITAS</CardTitle>
               <TrendingUp className="h-4 w-4" />
             </CardHeader>
             <CardContent>
@@ -74,7 +74,7 @@ export default async function FinanceiraPage() {
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/90">Obras Finalizadas</CardTitle>
+              <CardTitle className="text-sm font-medium text-white/90 uppercase">OBRAS FINALIZADAS</CardTitle>
               <DollarSign className="h-4 w-4" />
             </CardHeader>
             <CardContent>
@@ -85,7 +85,7 @@ export default async function FinanceiraPage() {
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white/90">Em Andamento</CardTitle>
+              <CardTitle className="text-sm font-medium text-white/90 uppercase">EM ANDAMENTO</CardTitle>
               <Building2 className="h-4 w-4" />
             </CardHeader>
             <CardContent>
@@ -96,7 +96,7 @@ export default async function FinanceiraPage() {
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-primary to-yellow-500 text-black">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Subsídios</CardTitle>
+              <CardTitle className="text-sm font-medium uppercase">TOTAL SUBSÍDIOS</CardTitle>
               <Wallet className="h-4 w-4" />
             </CardHeader>
             <CardContent>

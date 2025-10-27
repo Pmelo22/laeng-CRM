@@ -42,7 +42,7 @@ export default async function ContratosPage() {
           </Button>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Contratos</h1>
+              <h1 className="text-3xl font-bold uppercase">CONTRATOS</h1>
               <p className="text-muted-foreground">Gerencie seus contratos e obras</p>
             </div>
             <Button asChild>
@@ -56,7 +56,7 @@ export default async function ContratosPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Lista de Contratos</CardTitle>
+            <CardTitle className="uppercase">LISTA DE CONTRATOS</CardTitle>
             <CardDescription>{contratos?.length || 0} contrato(s) cadastrado(s)</CardDescription>
           </CardHeader>
           <CardContent>
