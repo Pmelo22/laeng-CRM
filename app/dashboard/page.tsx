@@ -1,9 +1,33 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Construction, Settings } from 'lucide-react';
+import { Users, Building2, FileText, DollarSign, TrendingUp, Activity, ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
+import { DashboardCharts } from '@/components/dashboard-charts';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
+  const supabase = await createClient();
+
+  // Buscar dados do Supabase
+  const { data: clientes } = await supabase
+    .from('clientes')
+    .select('id');
+
+  const { data: obras } = await supabase
+    .from('obras')
+    .select('*');
+
+  const { data: contratos } = await supabase
+    .from('contratos')
+    .select('id, valor');
+
+  // Calcular estatísticas
+  const clientesCount = clientes?.length || 0;
+  const obrasAtivas = obras?.filter(obra => obra.status === 'ativa').length || 0;
+  const contratosCount = contratos?.length || 0;
+  const receitaTotal = contratos?.reduce((acc, contrato) => acc + (contrato.valor || 0), 0) || 0;
+
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">
       {/* Header */}
