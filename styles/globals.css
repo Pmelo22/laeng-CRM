@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+
+:root {
+  /* Variáveis de Cores Simples - SEM bordas automáticas */
+  --background: #FAFAFA;
+  --foreground: #1E1E1E;
+  
+  --card: #FFFFFF;
+  --card-foreground: #1E1E1E;
+  
+  --popover: #FFFFFF;
+  --popover-foreground: #1E1E1E;
+  
+  /* Amarelo #F5C800 */
+  --primary: #F5C800;
+  --primary-foreground: #1E1E1E;
+  
+  --secondary: #F5F5F5;
+  --secondary-foreground: #1E1E1E;
+  
+  --muted: #F5F5F5;
+  --muted-foreground: #737373;
+  
+  --accent: #F5C800;
+  --accent-foreground: #1E1E1E;
+  
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  
+  /* Bordas transparentes */
+  --border: transparent;
+  --input: #E5E5E5;
+  --ring: #F5C800;
+  
+  --radius: 0.5rem;
+  
+  /* Sidebar */
+  --sidebar: #1E1E1E;
+  --sidebar-foreground: #FAFAFA;
+  --sidebar-primary: #F5C800;
+  --sidebar-primary-foreground: #1E1E1E;
+  --sidebar-accent: #2A2A2A;
+  --sidebar-accent-foreground: #FAFAFA;
+  --sidebar-border: #333333;
+  --sidebar-ring: #F5C800;
+}
+
+/* Reset de bordas */
+* {
+  border: 0 !important;
+  border-width: 0 !important;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  margin: 0;
+  padding: 0;
+}
