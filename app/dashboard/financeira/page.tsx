@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, TrendingUp, TrendingDown, Wallet, ArrowLeft, Building2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DollarSign, TrendingUp, Wallet, ArrowLeft, Building2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FinanceiroChart } from "@/components/financeiro-chart";

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 
 export const config = {
   matcher: [
@@ -7,7 +6,7 @@ export const config = {
   ],
 };
 
-export function proxy(request: NextRequest) {
+export function proxy() {
   // Apenas passa a requisição adiante sem fazer nada
   return NextResponse.next();
 }

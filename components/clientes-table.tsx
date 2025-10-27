@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Edit, User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, CheckCircle2, Clock, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ClienteModal } from "@/components/cliente-modal"
 
@@ -20,8 +19,6 @@ type SortField = 'codigo' | 'nome' | 'status' | 'endereco' | 'data_cadastro'
 type SortDirection = 'asc' | 'desc' | 'none'
 
 export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps) {
-  const router = useRouter()
-  
   const [sortField, setSortField] = useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>('none')
   const [currentPage, setCurrentPage] = useState(1)
