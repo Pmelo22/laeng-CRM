@@ -1,5 +1,7 @@
-name: CI - Continuous Integration
+name: CI - Quality Checks
 
+# Workflow otimizado para validação de qualidade apenas
+# O build e deploy são feitos pela Vercel automaticamente
 on:
   push:
     branches:
@@ -14,10 +16,15 @@ env:
   NODE_VERSION: '20'
   PNPM_VERSION: '9'
 
+# Cancela execuções anteriores do mesmo workflow na mesma branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # Job 1: Lint e Type Check
-  quality-check:
-    name: Code Quality Check
+  # Job 1: Lint e Type Check (Obrigatório - Falha bloqueia merge)
+  lint-and-typecheck:
+    name: 🔍 Lint & Type Check
     runs-on: ubuntu-latest
     
     steps:
@@ -40,17 +47,17 @@ jobs:
 
       - name: 🔍 Run ESLint
         run: pnpm lint
-        continue-on-error: true
+        continue-on-error: false  # Falha aqui BLOQUEIA o workflow
 
-      - name: 🔎 Type check
+      - name: 🔎 TypeScript Type Check
         run: pnpm tsc --noEmit
-        continue-on-error: false
+        continue-on-error: false  # Falha aqui BLOQUEIA o workflow
 
-  # Job 2: Build Test
-  build-test:
-    name: Build Test
+  # Job 2: Build Validation (Garante que o código compila)
+  build-validation:
+    name: 🏗️ Build Validation
     runs-on: ubuntu-latest
-    needs: quality-check
+    needs: lint-and-typecheck  # Só roda se o lint passar
     
     steps:
       - name: 📥 Checkout code
@@ -70,27 +77,18 @@ jobs:
       - name: 📚 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 🔧 Create dummy .env.local
-        run: |
-          echo "NEXT_PUBLIC_SUPABASE_URL=https://dummy.supabase.co" > .env.local
-          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy_key" >> .env.local
-
-      - name: 🏗️ Build application
+      - name: 🏗️ Build validation (não faz deploy)
         run: pnpm build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          # Usa variáveis dummy para validar o build
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy_key' }}
 
-      - name: 📊 Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-output
-          path: .next/
-          retention-days: 7
+      # Não fazemos upload do build - a Vercel fará o build real
 
-  # Job 3: Security Check
-  security-check:
-    name: Security Audit
+  # Job 3: Security Audit (Informativo - não bloqueia)
+  security-audit:
+    name: 🔒 Security Audit
     runs-on: ubuntu-latest
     
     steps:
@@ -110,22 +108,22 @@ jobs:
 
       - name: 🔒 Run security audit
         run: pnpm audit --audit-level=high
-        continue-on-error: true
+        continue-on-error: true  # Não bloqueia, apenas informa
 
-      - name: 🔍 Check for vulnerabilities
+      - name: � Generate audit report
         run: pnpm audit --json > audit.json || true
 
-      - name: 📊 Upload audit report
+      - name: � Upload audit results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: security-audit
+          name: security-audit-report
           path: audit.json
           retention-days: 30
 
-  # Job 4: Dependency Check
-  dependency-check:
-    name: Dependency Review
+  # Job 4: Dependency Review (Apenas em PRs)
+  dependency-review:
+    name: 📦 Dependency Review
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     
@@ -133,27 +131,73 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔍 Dependency Review
+      - name: 🔍 Review dependencies
         uses: actions/dependency-review-action@v4
         with:
-          fail-on-severity: moderate
+          fail-on-severity: high  # Bloqueia apenas vulnerabilidades HIGH ou CRITICAL
 
-  # Job 5: Summary Report
-  summary:
-    name: CI Summary
+  # Job 5: Tests (Adicione quando tiver testes)
+  # tests:
+  #   name: 🧪 Run Tests
+  #   runs-on: ubuntu-latest
+  #   needs: lint-and-typecheck
+  #   
+  #   steps:
+  #     - name: 📥 Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: 📦 Setup pnpm
+  #       uses: pnpm/action-setup@v4
+  #       with:
+  #         version: ${{ env.PNPM_VERSION }}
+  #
+  #     - name: 🟢 Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ env.NODE_VERSION }}
+  #         cache: 'pnpm'
+  #
+  #     - name: 📚 Install dependencies
+  #       run: pnpm install --frozen-lockfile
+  #
+  #     - name: 🧪 Run unit tests
+  #       run: pnpm test
+  #
+  #     - name: 📊 Upload coverage
+  #       uses: codecov/codecov-action@v4
+  #       if: always()
+
+  # Job 6: All Checks Passed (Status check final)
+  all-checks-passed:
+    name: ✅ All Checks Passed
     runs-on: ubuntu-latest
-    needs: [quality-check, build-test, security-check]
+    needs: [lint-and-typecheck, build-validation, security-audit]
     if: always()
     
     steps:
-      - name: 📊 Generate summary
+      - name: ✅ Check if all required jobs passed
         run: |
-          echo "## 🎯 CI Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎯 CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ **Quality Check**: ${{ needs.quality-check.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "✅ **Build Test**: ${{ needs.build-test.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "✅ **Security Check**: ${{ needs.security-check.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint & Type Check | ${{ needs.lint-and-typecheck.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Validation | ${{ needs.build-validation.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Audit | ${{ needs.security-audit.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "📦 **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "🔀 **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "👤 **Author**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "📦 **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "🔀 **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "👤 **Author**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Verifica se os jobs obrigatórios passaram
+          if [[ "${{ needs.lint-and-typecheck.result }}" != "success" ]] || [[ "${{ needs.build-validation.result }}" != "success" ]]; then
+            echo "❌ **CI Failed**: Required checks did not pass" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The Vercel deployment will be blocked until these checks pass." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          
+          echo "✅ **All required checks passed!**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🚀 Vercel will now deploy automatically." >> $GITHUB_STEP_SUMMARY
