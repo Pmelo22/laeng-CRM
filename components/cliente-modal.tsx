@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from 'next/navigation';
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Cliente } from "@/lib/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, DollarSign } from "lucide-react";
 
 interface ClienteModalProps {
   cliente?: Cliente;
@@ -36,7 +36,70 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     responsavel_contato: "",
     observacoes: "",
     data_cadastro: new Date().toISOString().split('T')[0],
+    // Valores Financeiros
+    valor_terreno: 0,
+    entrada: 0,
+    valor_financiado: 0,
+    subsidio: 0,
+    valor_total: 0,
   });
+
+  const [loadingCep, setLoadingCep] = useState(false);
+
+  // Calcular Valor Total Automaticamente
+  const valorTotalCalculado = useMemo(() => {
+    return formData.valor_terreno + formData.entrada + formData.valor_financiado + formData.subsidio;
+  }, [formData.valor_terreno, formData.entrada, formData.valor_financiado, formData.subsidio]);
+
+  // Atualizar valor_total quando os componentes mudarem
+  useEffect(() => {
+    setFormData(prev => ({ ...prev, valor_total: valorTotalCalculado }));
+  }, [valorTotalCalculado]);
+
+  // Formatar valor monetário para exibição
+  const formatCurrency = (value: number): string => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
+
+  // Função para buscar endereço pelo CEP
+  const buscarCep = async (cep: string) => {
+    const cepLimpo = cep.replace(/\D/g, '');
+    
+    if (cepLimpo.length !== 8) return;
+
+    setLoadingCep(true);
+    
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setFormData(prev => ({
+          ...prev,
+          endereco: prev.endereco || data.logradouro || "",
+          cidade: prev.cidade || data.localidade || "",
+          estado: prev.estado || data.uf || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+    } finally {
+      setLoadingCep(false);
+    }
+  };
+
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCep = e.target.value;
+    setFormData({ ...formData, cep: newCep });
+    
+    const cepLimpo = newCep.replace(/\D/g, '');
+    if (cepLimpo.length === 8) {
+      buscarCep(newCep);
+    }
+  };
 
   // Atualizar formData quando o modal abrir ou o cliente mudar
   useEffect(() => {
@@ -56,6 +119,12 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           responsavel_contato: cliente.responsavel_contato || "",
           observacoes: cliente.observacoes || "",
           data_cadastro: cliente.data_cadastro || new Date().toISOString().split('T')[0],
+          // Valores Financeiros
+          valor_terreno: cliente.valor_terreno || 0,
+          entrada: cliente.entrada || 0,
+          valor_financiado: cliente.valor_financiado || 0,
+          subsidio: cliente.subsidio || 0,
+          valor_total: cliente.valor_total || 0,
         });
       } else {
         // Modal de criação - resetar para valores padrão
@@ -72,6 +141,12 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           responsavel_contato: "",
           observacoes: "",
           data_cadastro: new Date().toISOString().split('T')[0],
+          // Valores Financeiros
+          valor_terreno: 0,
+          entrada: 0,
+          valor_financiado: 0,
+          subsidio: 0,
+          valor_total: 0,
         });
       }
       setError(null);
@@ -117,8 +192,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b">
           <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
             {cliente ? "Editar Cliente" : "Novo Cliente"}
           </DialogTitle>
@@ -129,7 +204,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin pr-4">
           {/* Nome */}
           <div className="space-y-2">
             <Label htmlFor="nome" className="text-sm font-semibold">
@@ -244,6 +320,23 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             </div>
           </div>
 
+          {/* CEP */}
+          <div className="space-y-2">
+            <Label htmlFor="cep" className="text-sm font-semibold">
+              CEP
+            </Label>
+            <Input
+              id="cep"
+              value={formData.cep}
+              onChange={handleCepChange}
+              placeholder="00000-000"
+              maxLength={9}
+              disabled={isLoading}
+              className="border-2 focus:border-[#F5C800]"
+            />
+            {loadingCep && <p className="text-xs text-muted-foreground">Buscando endereço...</p>}
+          </div>
+
           {/* Endereço */}
           <div className="space-y-2">
             <Label htmlFor="endereco" className="text-sm font-semibold">
@@ -260,8 +353,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             />
           </div>
 
-          {/* Cidade, Estado e CEP */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Cidade e Estado */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="cidade" className="text-sm font-semibold">
                 Cidade
@@ -282,22 +375,9 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
               <Input
                 id="estado"
                 value={formData.estado}
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, estado: e.target.value.toUpperCase() })}
                 placeholder="UF"
                 maxLength={2}
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cep" className="text-sm font-semibold">
-                CEP
-              </Label>
-              <Input
-                id="cep"
-                value={formData.cep}
-                onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
-                placeholder="00000-000"
                 disabled={isLoading}
                 className="border-2 focus:border-[#F5C800]"
               />
@@ -335,13 +415,113 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             />
           </div>
 
+          {/* Separador - Valores Financeiros */}
+          <div className="pt-4 border-t-2 border-[#F5C800]/20">
+            <h3 className="text-lg font-bold text-[#1E1E1E] mb-2 flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-[#F5C800]" />
+              Valores Financeiros
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Preencha os valores relacionados aos projetos/obras do cliente
+            </p>
+          </div>
+
+          {/* Grid de Valores */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Valor do Terreno */}
+            <div className="space-y-2">
+              <Label htmlFor="valor_terreno" className="text-sm font-semibold">
+                Valor do Terreno (R$)
+              </Label>
+              <Input
+                id="valor_terreno"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.valor_terreno || ''}
+                onChange={(e) => setFormData({ ...formData, valor_terreno: Number(e.target.value) || 0 })}
+                placeholder="0,00"
+                disabled={isLoading}
+                className="border-2 focus:border-[#F5C800]"
+              />
+            </div>
+
+            {/* Entrada */}
+            <div className="space-y-2">
+              <Label htmlFor="entrada" className="text-sm font-semibold">
+                Entrada (R$)
+              </Label>
+              <Input
+                id="entrada"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.entrada || ''}
+                onChange={(e) => setFormData({ ...formData, entrada: Number(e.target.value) || 0 })}
+                placeholder="0,00"
+                disabled={isLoading}
+                className="border-2 focus:border-[#F5C800]"
+              />
+            </div>
+
+            {/* Valor Financiado */}
+            <div className="space-y-2">
+              <Label htmlFor="valor_financiado" className="text-sm font-semibold">
+                Valor Financiado (R$)
+              </Label>
+              <Input
+                id="valor_financiado"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.valor_financiado || ''}
+                onChange={(e) => setFormData({ ...formData, valor_financiado: Number(e.target.value) || 0 })}
+                placeholder="0,00"
+                disabled={isLoading}
+                className="border-2 focus:border-[#F5C800]"
+              />
+            </div>
+
+            {/* Subsídio */}
+            <div className="space-y-2">
+              <Label htmlFor="subsidio" className="text-sm font-semibold">
+                Subsídio (R$)
+              </Label>
+              <Input
+                id="subsidio"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.subsidio || ''}
+                onChange={(e) => setFormData({ ...formData, subsidio: Number(e.target.value) || 0 })}
+                placeholder="0,00"
+                disabled={isLoading}
+                className="border-2 focus:border-[#F5C800]"
+              />
+            </div>
+          </div>
+
+          {/* Valor Total - Calculado Automaticamente - Estilo do Sistema */}
+          <div className="p-4 bg-[#F5C800]/10 rounded-lg border-2 border-[#F5C800]">
+            <Label className="text-lg font-semibold text-[#1E1E1E]">
+              Valor Total Calculado
+            </Label>
+            <p className="text-3xl font-bold text-[#F5C800] mt-2">
+              {formatCurrency(valorTotalCalculado)}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Terreno + Entrada + Valor Financiado + Subsídio
+            </p>
+          </div>
+
           {error && (
             <div className="p-3 text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-md">
               {error}
             </div>
           )}
+          </div>
 
-          <DialogFooter className="gap-2 sm:gap-0 pt-4">
+          <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t bg-gray-50">
             <Button
               type="button"
               variant="outline"

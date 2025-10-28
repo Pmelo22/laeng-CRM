@@ -1,15 +1,18 @@
-import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
-
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Setor Escritório - Sistema de Gestão',
   description: 'Sistema de gestão para escritório de engenharia',
   generator: 'Next.js',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({
@@ -18,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body className={`font-sans antialiased`}>
         {children}
         <Analytics />

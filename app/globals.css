@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
 
 :root {
   /* APENAS Variáveis de Cores - SEM aplicação automática de bordas */
@@ -59,3 +60,26 @@ body {
   padding: 0;
 }
 
+/* Scrollbar customizada - fina e discreta */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Suporte para Firefox */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}

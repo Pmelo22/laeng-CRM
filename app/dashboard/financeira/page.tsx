@@ -1,11 +1,11 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Construction, ArrowLeft } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Construction, ArrowLeft } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export const dynamic = 'force-dynamic';
 
-export default async function FinanceiraPage() {
+export default async function ObrasPage() {
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
       <div className="container mx-auto px-4 py-8">
@@ -39,5 +39,5 @@ export default async function FinanceiraPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

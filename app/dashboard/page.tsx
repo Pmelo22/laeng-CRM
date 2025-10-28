@@ -1,32 +1,29 @@
+import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Building2, FileText, DollarSign, TrendingUp, Activity, ArrowUpRight } from 'lucide-react';
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
-import { DashboardCharts } from '@/components/dashboard-charts';
+import { Users, FileText, Building2, TrendingUp, DollarSign, ArrowUpRight, Activity } from 'lucide-react';
+import Link from "next/link";
+import { DashboardCharts } from "@/components/dashboard-charts";
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  // Buscar dados do Supabase
-  const { data: clientes } = await supabase
-    .from('clientes')
-    .select('id');
+  // Buscar estatísticas em paralelo para melhor performance
+  const [
+    { count: clientesCount },
+    { data: obras },
+    { count: contratosCount }
+  ] = await Promise.all([
+    supabase.from("clientes").select("*", { count: "exact", head: true }),
+    supabase.from("obras").select("*"),
+    supabase.from("contratos").select("*", { count: "exact", head: true })
+  ]);
 
-  const { data: obras } = await supabase
-    .from('obras')
-    .select('*');
+  const obrasAtivas = obras?.filter(o => o.status === 'EM ANDAMENTO').length || 0;
 
-  const { data: contratos } = await supabase
-    .from('contratos')
-    .select('id, valor');
-
-  // Calcular estatísticas
-  const clientesCount = clientes?.length || 0;
-  const obrasAtivas = obras?.filter(obra => obra.status === 'ativa').length || 0;
-  const contratosCount = contratos?.length || 0;
-  const receitaTotal = contratos?.reduce((acc, contrato) => acc + (contrato.valor || 0), 0) || 0;
+  // Calcular receita total
+  const receitaTotal = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">
@@ -204,11 +201,18 @@ export default async function DashboardPage() {
               Últimas atualizações
             </CardDescription>
           </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-sm text-muted-foreground">
-              Estamos trabalhando para melhorar sua experiência. 
-              Por favor, acesse a seção de <strong>Clientes</strong> através do menu lateral.
-            </p>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                <div className="p-2 bg-primary rounded-lg flex-shrink-0">
+                  <Activity className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Sistema iniciado</p>
+                  <p className="text-xs text-muted-foreground mt-1">Pronto para uso</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
