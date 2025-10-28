@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
 
 :root {
   /* APENAS Variáveis de Cores - SEM aplicação automática de bordas */
@@ -81,11 +82,4 @@ body {
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: #d1d5db transparent;
-}
-
-/* Fix para SelectTrigger - Forçar largura fixa */
-[data-slot="select-trigger"] {
-  min-width: 180px !important;
-  width: 180px !important;
-  max-width: 180px !important;
 }

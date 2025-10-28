@@ -186,12 +186,12 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
         label: "Finalizado"
       },
       "EM ANDAMENTO": { 
-        color: "bg-yellow-100 text-yellow-700 border-yellow-300", 
+        color: "bg-red-100 text-red-700 border-red-300", 
         label: "Em Andamento"
       },
       "PENDENTE": { 
-        color: "bg-gray-100 text-gray-600 border-gray-300", 
-        label: "Inativo"
+        color: "bg-yellow-100 text-yellow-600 border-yellow-300", 
+        label: "Pendente"
       },
     }
 
@@ -243,15 +243,6 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               </div>
             </TableHead>
             <TableHead 
-              className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-              onClick={() => handleSort('endereco')}
-            >
-              <div className="flex items-center">
-                ENDEREÇO
-                {getSortIcon('endereco')}
-              </div>
-            </TableHead>
-            <TableHead 
               className="text-center text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
               onClick={() => handleSort('data_cadastro')}
             >
@@ -291,9 +282,6 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               </TableCell>
               <TableCell className="py-3">
                 {getStatusBadge(cliente.status || "PENDENTE")}
-              </TableCell>
-              <TableCell className="py-3">
-                <span className="text-sm">{cliente.endereco || "-"}</span>
               </TableCell>
               <TableCell className="text-center py-3">
                 <span className="text-sm">{formatDate(cliente.data_cadastro)}</span>

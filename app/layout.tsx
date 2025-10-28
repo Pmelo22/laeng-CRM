@@ -1,13 +1,18 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/next'
-// @ts-expect-error: allow side-effect import of global CSS without type declarations
 import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Setor Escritório - Sistema de Gestão',
   description: 'Sistema de gestão para escritório de engenharia',
   generator: 'Next.js',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({
@@ -16,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body className={`font-sans antialiased`}>
         {children}
         <Analytics />

@@ -104,8 +104,8 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
             {/* Filtro e botão com mesma altura e largura */}
             <div className="flex gap-3 lg:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px] h-12 px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap">
-                  <Filter className="h-4 w-4 mr-2 text-[#1E1E1E]" />
+                <SelectTrigger className="!w-[200px] !h-12 px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E]">
+                  <Filter className="h-5 w-5 mr-2 text-[#1E1E1E]" />
                   <SelectValue placeholder="Filtrar" />
                 </SelectTrigger>
                 <SelectContent>
@@ -134,7 +134,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
               {/* Botão Novo Cliente */}
               <Button 
                 onClick={() => setIsModalOpen(true)}
-                className="w-[180px] bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold shadow-lg hover:shadow-xl transition-all h-12 px-6 rounded-lg whitespace-nowrap"
+                className="!w-[200px] !h-12 bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold shadow-lg hover:shadow-xl transition-all px-6 rounded-lg whitespace-nowrap"
               >
                 <Plus className="h-5 w-5 mr-2" />
                 Novo Cliente
