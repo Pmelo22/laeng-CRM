@@ -5,9 +5,10 @@ import type { Cliente } from "@/lib/types"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react"
+import { User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Pencil } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
+import { ClienteEditModal } from "@/components/cliente-edit-modal"
 
 interface ClientesTableProps {
   clientes: Cliente[]
@@ -23,6 +24,18 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
   const [sortDirection, setSortDirection] = useState<SortDirection>('none')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(20)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
+
+  const handleEditCliente = (cliente: Cliente) => {
+    setSelectedCliente(cliente)
+    setIsEditModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsEditModalOpen(false)
+    setSelectedCliente(null)
+  }
 
   // Filtrar clientes pela busca
   const filteredClientes = useMemo(() => {
@@ -289,16 +302,23 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
                 <span className="text-sm text-green-700">{formatCurrency(cliente.valor_total || 0)}</span>
               </TableCell>
               <TableCell className="py-3">
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleEditCliente(cliente)}
+                    className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
+                    title="Editar Cliente"
+                  >
+                    <Pencil className="h-4 w-4 text-[#1E1E1E]" />
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => router.push(`/dashboard/clientes/${cliente.id}`)}
-                    className="border-2 border-gray-300 hover:border-[#F5C800] hover:bg-[#F5C800]/10 h-9 px-4 transition-colors"
+                    className="border-2 border-gray-300 hover:border-[#F5C800] hover:bg-[#F5C800]/10 h-9 w-9 p-0 transition-colors"
                     title="Ver Perfil"
                   >
-                    <User className="h-4 w-4 mr-2" />
-                    <span className="font-semibold">Perfil</span>
+                    <User className="h-4 w-4" />
                   </Button>
                 </div>
               </TableCell>
@@ -379,6 +399,13 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
           </div>
         </div>
       </div>
+
+      {/* Modal de Edição */}
+      <ClienteEditModal 
+        isOpen={isEditModalOpen}
+        onClose={handleCloseModal}
+        cliente={selectedCliente || undefined}
+      />
     </div>
   )
 }

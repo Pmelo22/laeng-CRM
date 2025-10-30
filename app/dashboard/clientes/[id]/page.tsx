@@ -40,14 +40,6 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
   // Calcular estatísticas
   // Valor Contratual = soma dos valores totais das obras
   const valorContratual = obras?.reduce((sum, obra) => sum + (obra.valor_total || 0), 0) || 0;
-  
-  // Valor da Obra (custo real) = soma de terreno + entrada + subsidio
-  const valorDaObra = obras?.reduce((sum, obra) => {
-    const terreno = obra.valor_terreno || 0;
-    const entrada = obra.entrada || 0;
-    const subsidio = obra.subsidio || 0;
-    return sum + terreno + entrada + subsidio;
-  }, 0) || 0;
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -208,14 +200,14 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
             </CardTitle>
           </CardHeader>
           <CardContent className="py-2">
-            {/* Grid com 6 cards de valores financeiros - Mais compacto */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            {/* Grid com 5 cards de valores financeiros - Mais compacto */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
               {/* Card 1: Valor Contratual */}
-              <Card className="border border-[#F5C800] bg-[#F5C800]">
-                <CardContent className="pt-2 pb-2 px-3">
+              <Card className="border border-yellow-200 bg-yellow-200">
+                <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-medium text-[#1E1E1E] uppercase">VALOR CONTRATUAL</p>
-                    <p className="text-sm sm:text-base font-bold text-[#1E1E1E]">
+                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">VALOR CONTRATUAL</p>
+                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
@@ -225,27 +217,12 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                 </CardContent>
               </Card>
 
-              {/* Card 2: Valor da Obra */}
+              {/* Card 2: Terreno */}
               <Card className="border border-red-600 bg-red-600">
-                <CardContent className="pt-2 pb-2 px-3">
+                <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-medium text-white uppercase">VALOR DA OBRA</p>
-                    <p className="text-sm sm:text-base font-bold text-white">
-                      {new Intl.NumberFormat('pt-BR', { 
-                        style: 'currency', 
-                        currency: 'BRL' 
-                      }).format(valorDaObra)}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card 3: Terreno */}
-              <Card className="border border-red-600 bg-red-600">
-                <CardContent className="pt-2 pb-2 px-3">
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-medium text-white uppercase">TERRENO</p>
-                    <p className="text-sm sm:text-base font-bold text-white">
+                    <p className="text-xs font-medium text-white uppercase">TERRENO</p>
+                    <p className="text-lg sm:text-xl font-bold text-white">
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
@@ -255,12 +232,12 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                 </CardContent>
               </Card>
 
-              {/* Card 4: Entrada */}
-              <Card className="border border-green-600 bg-green-600">
-                <CardContent className="pt-2 pb-2 px-3">
+              {/* Card 3: Entrada */}
+              <Card className="border border-red-600 bg-red-600">
+                <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-medium text-white uppercase">ENTRADA</p>
-                    <p className="text-sm sm:text-base font-bold text-white">
+                    <p className="text-xs font-medium text-white uppercase">ENTRADA</p>
+                    <p className="text-lg sm:text-xl font-bold text-white">
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
@@ -270,12 +247,12 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                 </CardContent>
               </Card>
 
-              {/* Card 5: Valor Financiado */}
-              <Card className="border border-green-600 bg-green-600">
-                <CardContent className="pt-2 pb-2 px-3">
+              {/* Card 4: Valor Financiado */}
+              <Card className="border border-red-600 bg-red-600">
+                <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-medium text-white uppercase">VALOR FINANCIADO</p>
-                    <p className="text-sm sm:text-base font-bold text-white">
+                    <p className="text-xs font-medium text-white uppercase">VALOR FINANCIADO</p>
+                    <p className="text-lg sm:text-xl font-bold text-white">
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
@@ -285,12 +262,12 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                 </CardContent>
               </Card>
 
-              {/* Card 6: Subsídio */}
-              <Card className="border border-green-600 bg-green-600">
-                <CardContent className="pt-2 pb-2 px-3">
+              {/* Card 5: Subsídio */}
+              <Card className="border border-red-600 bg-red-600">
+                <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-medium text-white uppercase">SUBSÍDIO</p>
-                    <p className="text-sm sm:text-base font-bold text-white">
+                    <p className="text-xs font-medium text-white uppercase">SUBSÍDIO</p>
+                    <p className="text-lg sm:text-xl font-bold text-white">
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
