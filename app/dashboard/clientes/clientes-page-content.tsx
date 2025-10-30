@@ -104,27 +104,27 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
             {/* Filtro e botão com mesma altura e largura */}
             <div className="flex gap-3 lg:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="!w-[220px] !h-12 px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E]">
+                <SelectTrigger className="!w-[240px] !h-12 px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E]">
                   <Filter className="h-5 w-5 mr-2 text-[#1E1E1E]" />
                   <SelectValue placeholder="Filtrar" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os Status</SelectItem>
                   <SelectItem value="FINALIZADO">
-                    <div className="flex items-center">
-                      <CheckCircle2 className="h-4 w-4 mr-2 text-green-600" />
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-green-600" />
                       Finalizado
                     </div>
                   </SelectItem>
                   <SelectItem value="EM ANDAMENTO">
-                    <div className="flex items-center">
-                      <Clock className="h-4 w-4 mr-2 text-[#F5C800]" />
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-red-600" />
                       Em Andamento
                     </div>
                   </SelectItem>
                   <SelectItem value="PENDENTE">
-                    <div className="flex items-center">
-                      <XCircle className="h-4 w-4 mr-2 text-gray-500" />
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-[#F5C800]" />
                       Pendente
                     </div>
                   </SelectItem>
