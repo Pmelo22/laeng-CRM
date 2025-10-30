@@ -20,6 +20,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { Toaster } from "@/components/ui/toaster";
 
 const menuItems = [
   {
@@ -289,6 +290,7 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
+      <Toaster />
     </div>
   );
 }
