@@ -113,22 +113,23 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
     try {
       const { data, error } = await supabase
         .from("obras")
-        .select("id, codigo, valor_terreno, entrada, valor_financiado, subsidio, valor_total")
+        .select("*")
         .eq("cliente_id", cliente.id);
 
       if (error) throw error;
 
-      setObras(data || []);
+      const obrasFormatadas = (data || []) as Obra[];
+      setObras(obrasFormatadas);
       
       // Inicializar obrasData com os valores das obras
       const initialObrasData: Record<string, ObraData> = {};
-      (data || []).forEach((obra: Obra) => {
+      obrasFormatadas.forEach((obra) => {
         initialObrasData[obra.id] = {
-          valor_terreno: obra.valor_terreno || 0,
-          entrada: obra.entrada || 0,
-          valor_financiado: obra.valor_financiado || 0,
-          subsidio: obra.subsidio || 0,
-          valor_total: obra.valor_total || 0,
+          valor_terreno: Number(obra.valor_terreno) || 0,
+          entrada: Number(obra.entrada) || 0,
+          valor_financiado: Number(obra.valor_financiado) || 0,
+          subsidio: Number(obra.subsidio) || 0,
+          valor_total: Number(obra.valor_total) || 0,
         };
       });
       setObrasData(initialObrasData);
@@ -205,6 +206,13 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         // Atualizar valores financeiros de cada obra
         for (const obraId of Object.keys(obrasData)) {
           const obraValues = obrasData[obraId];
+          // Calcular valor contratual = terreno + entrada + financiado + subsidio
+          const valorContratual = 
+            (obraValues.valor_terreno || 0) + 
+            (obraValues.entrada || 0) + 
+            (obraValues.valor_financiado || 0) + 
+            (obraValues.subsidio || 0);
+          
           const { error: obraError } = await supabase
             .from("obras")
             .update({
@@ -212,7 +220,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
               entrada: obraValues.entrada,
               valor_financiado: obraValues.valor_financiado,
               subsidio: obraValues.subsidio,
-              valor_total: obraValues.valor_total,
+              valor_total: valorContratual,
               updated_at: new Date().toISOString()
             })
             .eq("id", obraId);
@@ -494,162 +502,131 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
               </div>
 
               <div className="space-y-6">
-                {obras.map((obra) => (
-                  <div key={obra.id} className="space-y-4">
+                {obras.map((obra) => {
+                  // Calcular valores em tempo real
+                  const terreno = obrasData[obra.id]?.valor_terreno || 0;
+                  const entrada = obrasData[obra.id]?.entrada || 0;
+                  const financiado = obrasData[obra.id]?.valor_financiado || 0;
+                  const subsidio = obrasData[obra.id]?.subsidio || 0;
+                  
+                  // Valor Contratual = Terreno + Entrada + Financiado + Subsídio
+                  const valorContratual = terreno + entrada + financiado + subsidio;
 
-                    {/* Terreno */}
-                    <div className="space-y-2">
-                      <Label htmlFor={`terreno_${obra.id}`}>Terreno (R$)</Label>
-                      <Input
-                        id={`terreno_${obra.id}`}
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={obrasData[obra.id]?.valor_terreno || 0}
-                        onChange={(e) => {
-                          const newValue = Number(e.target.value) || 0;
-                          setObrasData(prev => ({
-                            ...prev,
-                            [obra.id]: {
-                              ...prev[obra.id],
-                              valor_terreno: newValue,
-                            }
-                          }));
-                        }}
-                        disabled={isLoading}
-                        className="border-2 focus:border-[#F5C800]"
-                        placeholder="0.00"
-                      />
-                    </div>
+                  return (
+                    <div key={obra.id} className="space-y-4">
+                      {/* Primeira linha: 3 campos */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                          <Label htmlFor={`terreno_${obra.id}`} className="text-sm font-medium">Terreno (R$)</Label>
+                          <Input
+                            id={`terreno_${obra.id}`}
+                            type="text"
+                            value={terreno.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            onChange={(e) => {
+                              const numericValue = e.target.value.replace(/\D/g, '');
+                              const newValue = Number(numericValue) / 100;
+                              setObrasData(prev => ({
+                                ...prev,
+                                [obra.id]: {
+                                  ...prev[obra.id],
+                                  valor_terreno: newValue,
+                                }
+                              }));
+                            }}
+                            disabled={isLoading}
+                            className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                            placeholder="0,00"
+                          />
+                        </div>
 
-                    {/* Grid com 3 campos: Entrada, Financiado, Subsídio */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor={`entrada_${obra.id}`}>Entrada (R$)</Label>
-                        <Input
-                          id={`entrada_${obra.id}`}
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={obrasData[obra.id]?.entrada || 0}
-                          onChange={(e) => {
-                            const newValue = Number(e.target.value) || 0;
-                            setObrasData(prev => {
-                              const updated = {
+                        <div className="space-y-1">
+                          <Label htmlFor={`entrada_${obra.id}`} className="text-sm font-medium">Entrada (R$)</Label>
+                          <Input
+                            id={`entrada_${obra.id}`}
+                            type="text"
+                            value={entrada.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            onChange={(e) => {
+                              const numericValue = e.target.value.replace(/\D/g, '');
+                              const newValue = Number(numericValue) / 100;
+                              setObrasData(prev => ({
                                 ...prev,
                                 [obra.id]: {
                                   ...prev[obra.id],
                                   entrada: newValue,
                                 }
-                              };
-                              // Calcular total automaticamente
-                              const entrada = newValue;
-                              const financiado = prev[obra.id]?.valor_financiado || 0;
-                              const subsidio = prev[obra.id]?.subsidio || 0;
-                              updated[obra.id].valor_total = entrada + financiado + subsidio;
-                              return updated;
-                            });
-                          }}
-                          disabled={isLoading}
-                          className="border-2 focus:border-[#F5C800]"
-                          placeholder="0.00"
-                        />
-                      </div>
+                              }));
+                            }}
+                            disabled={isLoading}
+                            className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                            placeholder="0,00"
+                          />
+                        </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`financiado_${obra.id}`}>Valor Financiado (R$)</Label>
-                        <Input
-                          id={`financiado_${obra.id}`}
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={obrasData[obra.id]?.valor_financiado || 0}
-                          onChange={(e) => {
-                            const newValue = Number(e.target.value) || 0;
-                            setObrasData(prev => {
-                              const updated = {
-                                ...prev,
-                                [obra.id]: {
-                                  ...prev[obra.id],
-                                  valor_financiado: newValue,
-                                }
-                              };
-                              // Calcular total automaticamente
-                              const entrada = prev[obra.id]?.entrada || 0;
-                              const financiado = newValue;
-                              const subsidio = prev[obra.id]?.subsidio || 0;
-                              updated[obra.id].valor_total = entrada + financiado + subsidio;
-                              return updated;
-                            });
-                          }}
-                          disabled={isLoading}
-                          className="border-2 focus:border-[#F5C800]"
-                          placeholder="0.00"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor={`subsidio_${obra.id}`}>Subsídio (R$)</Label>
-                        <Input
-                          id={`subsidio_${obra.id}`}
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={obrasData[obra.id]?.subsidio || 0}
-                          onChange={(e) => {
-                            const newValue = Number(e.target.value) || 0;
-                            setObrasData(prev => {
-                              const updated = {
+                        <div className="space-y-1">
+                          <Label htmlFor={`subsidio_${obra.id}`} className="text-sm font-medium">Subsídio (R$)</Label>
+                          <Input
+                            id={`subsidio_${obra.id}`}
+                            type="text"
+                            value={subsidio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            onChange={(e) => {
+                              const numericValue = e.target.value.replace(/\D/g, '');
+                              const newValue = Number(numericValue) / 100;
+                              setObrasData(prev => ({
                                 ...prev,
                                 [obra.id]: {
                                   ...prev[obra.id],
                                   subsidio: newValue,
                                 }
-                              };
-                              // Calcular total automaticamente
-                              const entrada = prev[obra.id]?.entrada || 0;
-                              const financiado = prev[obra.id]?.valor_financiado || 0;
-                              const subsidio = newValue;
-                              updated[obra.id].valor_total = entrada + financiado + subsidio;
-                              return updated;
-                            });
-                          }}
-                          disabled={isLoading}
-                          className="border-2 focus:border-[#F5C800]"
-                          placeholder="0.00"
-                        />
+                              }));
+                            }}
+                            disabled={isLoading}
+                            className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                            placeholder="0,00"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Segunda linha: 1 campo */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <Label htmlFor={`financiado_${obra.id}`} className="text-sm font-medium">Valor Financiado (R$)</Label>
+                          <Input
+                            id={`financiado_${obra.id}`}
+                            type="text"
+                            value={financiado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            onChange={(e) => {
+                              const numericValue = e.target.value.replace(/\D/g, '');
+                              const newValue = Number(numericValue) / 100;
+                              setObrasData(prev => ({
+                                ...prev,
+                                [obra.id]: {
+                                  ...prev[obra.id],
+                                  valor_financiado: newValue,
+                                }
+                              }));
+                            }}
+                            disabled={isLoading}
+                            className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                            placeholder="0,00"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Valor Contratual - Destaque embaixo */}
+                      <div className="bg-[#F5C800] p-6 rounded-lg">
+                        <p className="text-sm font-semibold text-[#1E1E1E] mb-2">
+                          Valor Contratual
+                        </p>
+                        <p className="text-3xl font-bold text-[#1E1E1E]">
+                          R$ {valorContratual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-xs text-[#1E1E1E]/70 mt-2">
+                          = Terreno + Entrada + Financiado + Subsídio
+                        </p>
                       </div>
                     </div>
-
-                    {/* Valor Total */}
-                    <div className="space-y-2">
-                      <Label htmlFor={`total_${obra.id}`}>Valor Total (R$)</Label>
-                      <Input
-                        id={`total_${obra.id}`}
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={obrasData[obra.id]?.valor_total || 0}
-                        onChange={(e) => {
-                          const newValue = Number(e.target.value) || 0;
-                          setObrasData(prev => ({
-                            ...prev,
-                            [obra.id]: {
-                              ...prev[obra.id],
-                              valor_total: newValue,
-                            }
-                          }));
-                        }}
-                        disabled={isLoading}
-                        className="border-2 focus:border-[#F5C800] font-semibold"
-                        placeholder="0.00"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Calculado automaticamente: Entrada + Financiado + Subsídio
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           )}
