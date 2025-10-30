@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Plus, Search, CheckCircle2, Clock, XCircle, Filter } from "lucide-react"
 import { ClientesTable } from "@/components/clientes-table"
-import { ClienteModal } from "@/components/cliente-modal"
+import { ClienteEditModal } from "@/components/cliente-edit-modal"
 import type { Cliente } from "@/lib/types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
@@ -64,13 +64,13 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
                 <span className="ml-1">Cadastrados</span>
               </Badge>
               <span className="text-[#F5C800]">•</span>
-              <Badge variant="secondary" className="bg-white/10 text-white border-white/20 hover:bg-white/20 px-3 py-1.5 font-semibold">
+              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-3 py-1.5 font-semibold">
                 <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
                 <span className="font-semibold">{metrics.finalizados}</span>
                 <span className="ml-1">Finalizados</span>
               </Badge>
               <span className="text-[#F5C800]">•</span>
-              <Badge variant="secondary" className="bg-[#F5C800]/20 text-[#F5C800] border-[#F5C800]/40 hover:bg-[#F5C800]/30 px-3 py-1.5 font-semibold">
+              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold">
                 <Clock className="h-3.5 w-3.5 mr-1.5" />
                 <span className="font-semibold">{metrics.emAndamento}</span>
                 <span className="ml-1">Em Andamento</span>
@@ -78,7 +78,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
               {metrics.pendentes > 0 && (
                 <>
                   <span className="text-[#F5C800]">•</span>
-                  <Badge variant="secondary" className="bg-gray-700/50 text-gray-300 border-gray-600 hover:bg-gray-700/70 px-3 py-1.5 font-semibold">
+                  <Badge variant="secondary" className="bg-yellow-500 text-black border-yellow-500 hover:bg-yellow-600 px-3 py-1.5 font-semibold">
                     <XCircle className="h-3.5 w-3.5 mr-1.5" />
                     <span className="font-semibold">{metrics.pendentes}</span>
                     <span className="ml-1">Pendentes</span>
@@ -104,7 +104,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
             {/* Filtro e botão com mesma altura e largura */}
             <div className="flex gap-3 lg:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="!w-[200px] !h-12 px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E]">
+                <SelectTrigger className="!w-[220px] !h-12 px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E]">
                   <Filter className="h-5 w-5 mr-2 text-[#1E1E1E]" />
                   <SelectValue placeholder="Filtrar" />
                 </SelectTrigger>
@@ -154,7 +154,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
       </div>
 
       {/* Modal para Novo Cliente */}
-      <ClienteModal 
+      <ClienteEditModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
