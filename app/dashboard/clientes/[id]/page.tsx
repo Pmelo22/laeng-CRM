@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -115,80 +115,87 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
               </div>
             </div>
 
-            {/* DADOS COMPLEMENTARES */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {/* Responsável */}
-              {cliente.responsavel_contato && (
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">RESPONSÁVEL</span>
-                  <p className="text-sm text-foreground">{cliente.responsavel_contato}</p>
-                </div>
-              )}
+            {/* LINHA 2: Responsável, CPF, Email e Telefone */}
+            {(cliente.responsavel_contato || cliente.cpf_cnpj || cliente.email || cliente.telefone) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-4">
+                {/* Responsável */}
+                {cliente.responsavel_contato && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">RESPONSÁVEL</span>
+                    <p className="text-sm text-foreground">{cliente.responsavel_contato}</p>
+                  </div>
+                )}
 
-              {/* CPF/CNPJ */}
-              {cliente.cpf_cnpj && (
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">CPF/CNPJ</span>
-                  <p className="text-sm font-mono text-foreground">{cliente.cpf_cnpj}</p>
-                </div>
-              )}
+                {/* CPF/CNPJ */}
+                {cliente.cpf_cnpj && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">CPF/CNPJ</span>
+                    <p className="text-sm font-mono text-foreground">{cliente.cpf_cnpj}</p>
+                  </div>
+                )}
 
-              {/* Telefone */}
-              {cliente.telefone && (
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">TELEFONE</span>
-                  <p className="text-sm text-foreground">{cliente.telefone}</p>
-                </div>
-              )}
+                {/* Email */}
+                {cliente.email && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">EMAIL</span>
+                    <p className="text-sm text-foreground break-all">{cliente.email}</p>
+                  </div>
+                )}
 
-              {/* Email */}
-              {cliente.email && (
-                <div className="flex flex-col gap-2 col-span-2">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">EMAIL</span>
-                  <p className="text-sm text-foreground break-all">{cliente.email}</p>
-                </div>
-              )}
+                {/* Telefone */}
+                {cliente.telefone && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">TELEFONE</span>
+                    <p className="text-sm text-foreground">{cliente.telefone}</p>
+                  </div>
+                )}
+              </div>
+            )}
 
-              {/* Endereço */}
-              {cliente.endereco && (
-                <div className="flex flex-col gap-2 col-span-2">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">ENDEREÇO</span>
-                  <p className="text-sm text-foreground">{cliente.endereco}</p>
-                </div>
-              )}
+            {/* LINHA 3: CEP, Endereço, Cidade e Estado */}
+            {(cliente.cep || cliente.endereco || cliente.cidade || cliente.estado) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-4">
+                {/* CEP */}
+                {cliente.cep && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">CEP</span>
+                    <p className="text-sm font-mono text-foreground">{cliente.cep}</p>
+                  </div>
+                )}
 
-              {/* Cidade */}
-              {cliente.cidade && (
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">CIDADE</span>
-                  <p className="text-sm text-foreground">{cliente.cidade}</p>
-                </div>
-              )}
+                {/* Endereço */}
+                {cliente.endereco && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">ENDEREÇO</span>
+                    <p className="text-sm text-foreground">{cliente.endereco}</p>
+                  </div>
+                )}
 
-              {/* Estado */}
-              {cliente.estado && (
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">ESTADO</span>
-                  <p className="text-sm text-foreground">{cliente.estado}</p>
-                </div>
-              )}
+                {/* Cidade */}
+                {cliente.cidade && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">CIDADE</span>
+                    <p className="text-sm text-foreground">{cliente.cidade}</p>
+                  </div>
+                )}
 
-              {/* CEP */}
-              {cliente.cep && (
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">CEP</span>
-                  <p className="text-sm font-mono text-foreground">{cliente.cep}</p>
-                </div>
-              )}
+                {/* Estado */}
+                {cliente.estado && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">ESTADO</span>
+                    <p className="text-sm text-foreground">{cliente.estado}</p>
+                  </div>
+                )}
+              </div>
+            )}
 
-              {/* Observações */}
-              {cliente.observacoes && (
-                <div className="flex flex-col gap-2 col-span-full">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">OBSERVAÇÕES</span>
-                  <p className="text-sm text-muted-foreground">{cliente.observacoes}</p>
-                </div>
-              )}
-            </div>
+            {/* LINHA 4: Observações */}
+            {cliente.observacoes && (
+              <div className="flex flex-col gap-2">
+                <span className="text-xs text-muted-foreground font-semibold uppercase block">OBSERVAÇÕES</span>
+                <p className="text-sm text-muted-foreground">{cliente.observacoes}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
