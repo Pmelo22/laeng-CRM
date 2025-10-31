@@ -203,7 +203,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
             {/* Grid com 5 cards de valores financeiros - Mais compacto */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
               {/* Card 1: Valor Contratual */}
-              <Card className="border border-yellow-200 bg-yellow-200">
+              <Card className="border border-[#F5C800] bg-[#F5C800]">
                 <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
                     <p className="text-xs font-medium text-[#1E1E1E] uppercase">VALOR CONTRATUAL</p>
@@ -218,11 +218,11 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
               </Card>
 
               {/* Card 2: Terreno */}
-              <Card className="border border-red-600 bg-red-600">
+              <Card className="border border-yellow-200 bg-yellow-200">
                 <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-white uppercase">TERRENO</p>
-                    <p className="text-lg sm:text-xl font-bold text-white">
+                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">TERRENO</p>
+                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
@@ -233,11 +233,11 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
               </Card>
 
               {/* Card 3: Entrada */}
-              <Card className="border border-red-600 bg-red-600">
+              <Card className="border border-yellow-200 bg-yellow-200">
                 <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-white uppercase">ENTRADA</p>
-                    <p className="text-lg sm:text-xl font-bold text-white">
+                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">ENTRADA</p>
+                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
@@ -248,11 +248,11 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
               </Card>
 
               {/* Card 4: Valor Financiado */}
-              <Card className="border border-red-600 bg-red-600">
+              <Card className="border border-yellow-200 bg-yellow-200">
                 <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-white uppercase">VALOR FINANCIADO</p>
-                    <p className="text-lg sm:text-xl font-bold text-white">
+                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">VALOR FINANCIADO</p>
+                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
@@ -263,11 +263,11 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
               </Card>
 
               {/* Card 5: Subsídio */}
-              <Card className="border border-red-600 bg-red-600">
+              <Card className="border border-yellow-200 bg-yellow-200">
                 <CardContent className="pt-3 pb-3 px-4">
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-white uppercase">SUBSÍDIO</p>
-                    <p className="text-lg sm:text-xl font-bold text-white">
+                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">SUBSÍDIO</p>
+                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
