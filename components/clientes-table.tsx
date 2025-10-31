@@ -5,10 +5,10 @@ import type { Cliente } from "@/lib/types"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Edit, User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, CheckCircle2, Clock, AlertCircle } from "lucide-react"
-import Link from "next/link"
+import { User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Pencil } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ClienteModal } from "@/components/cliente-modal"
+import { useRouter } from "next/navigation"
+import { ClienteEditModal } from "@/components/cliente-edit-modal"
 
 interface ClientesTableProps {
   clientes: Cliente[]
@@ -19,12 +19,23 @@ type SortField = 'codigo' | 'nome' | 'status' | 'endereco' | 'data_cadastro'
 type SortDirection = 'asc' | 'desc' | 'none'
 
 export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps) {
+  const router = useRouter()
   const [sortField, setSortField] = useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>('none')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(20)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedCliente, setSelectedCliente] = useState<Cliente | undefined>(undefined)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
+
+  const handleEditCliente = (cliente: Cliente) => {
+    setSelectedCliente(cliente)
+    setIsEditModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsEditModalOpen(false)
+    setSelectedCliente(null)
+  }
 
   // Filtrar clientes pela busca
   const filteredClientes = useMemo(() => {
@@ -156,16 +167,6 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
     return pages
   }
 
-  const handleEdit = (cliente: Cliente) => {
-    setSelectedCliente(cliente)
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedCliente(undefined)
-  }
-
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -181,29 +182,24 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       "FINALIZADO": { 
-        color: "bg-green-500 text-white border-green-600 hover:bg-green-600", 
-        icon: CheckCircle2,
+        color: "bg-green-100 text-green-700 border-green-300", 
         label: "Finalizado"
       },
       "EM ANDAMENTO": { 
-        color: "bg-red-500 text-white border-red-600 hover:bg-red-600", 
-        icon: Clock,
+        color: "bg-red-100 text-red-700 border-red-300", 
         label: "Em Andamento"
       },
       "PENDENTE": { 
-        color: "bg-yellow-500 text-white border-yellow-600 hover:bg-yellow-600", 
-        icon: AlertCircle,
+        color: "bg-yellow-100 text-yellow-600 border-yellow-300", 
         label: "Pendente"
       },
     }
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig["PENDENTE"]
-    const Icon = config.icon
 
     return (
-      <Badge variant="outline" className={`${config.color} border font-medium px-2 py-0.5 transition-colors text-xs`}>
-        <Icon className="h-3 w-3 mr-1" />
-        {config.label}
+      <Badge variant="outline" className={`${config.color} border font-medium px-2 py-1 text-xs`}>
+        <span className="font-bold">{config.label}</span>
       </Badge>
     )
   }
@@ -215,8 +211,9 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
   return (
     <div className="space-y-4">
       <div className="rounded-md border-2 border-[#F5C800]/20 overflow-hidden">
+        <div className="overflow-x-auto relative">
         <Table>
-        <TableHeader>
+        <TableHeader className="sticky top-0 z-10 bg-[#1E1E1E] shadow-md">
           <TableRow className="bg-[#1E1E1E] hover:bg-[#1E1E1E]">
             <TableHead 
               className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
@@ -243,15 +240,6 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               <div className="flex items-center">
                 STATUS
                 {getSortIcon('status')}
-              </div>
-            </TableHead>
-            <TableHead 
-              className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-              onClick={() => handleSort('endereco')}
-            >
-              <div className="flex items-center">
-                ENDEREÇO
-                {getSortIcon('endereco')}
               </div>
             </TableHead>
             <TableHead 
@@ -295,9 +283,6 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               <TableCell className="py-3">
                 {getStatusBadge(cliente.status || "PENDENTE")}
               </TableCell>
-              <TableCell className="py-3">
-                <span className="text-sm">{cliente.endereco || "-"}</span>
-              </TableCell>
               <TableCell className="text-center py-3">
                 <span className="text-sm">{formatDate(cliente.data_cadastro)}</span>
               </TableCell>
@@ -318,30 +303,30 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               </TableCell>
               <TableCell className="py-3">
                 <div className="flex items-center justify-center gap-2">
-                  <Button 
-                    size="sm" 
-                    onClick={() => handleEdit(cliente)}
-                    className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 h-9 w-9 p-0"
+                  <Button
+                    size="sm"
+                    onClick={() => handleEditCliente(cliente)}
+                    className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
                     title="Editar Cliente"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Pencil className="h-4 w-4 text-[#1E1E1E]" />
                   </Button>
-                  <Link href={`/dashboard/clientes/${cliente.id}`}>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-2 border-gray-300 hover:border-[#F5C800] hover:bg-[#F5C800]/10 h-9 w-9 p-0"
-                      title="Ver Perfil Completo"
-                    >
-                      <User className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => router.push(`/dashboard/clientes/${cliente.id}`)}
+                    className="border-2 border-gray-300 hover:border-[#F5C800] hover:bg-[#F5C800]/10 h-9 w-9 p-0 transition-colors"
+                    title="Ver Perfil"
+                  >
+                    <User className="h-4 w-4" />
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+      </div>
       </div>
 
       {/* Controles de Paginação */}
@@ -416,10 +401,10 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
       </div>
 
       {/* Modal de Edição */}
-      <ClienteModal 
-        cliente={selectedCliente}
-        isOpen={isModalOpen}
+      <ClienteEditModal 
+        isOpen={isEditModalOpen}
         onClose={handleCloseModal}
+        cliente={selectedCliente || undefined}
       />
     </div>
   )

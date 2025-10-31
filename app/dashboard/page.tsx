@@ -9,25 +9,21 @@ export const dynamic = 'force-dynamic';
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  // Buscar estatísticas de clientes
-  const { count: clientesCount } = await supabase
-    .from("clientes")
-    .select("*", { count: "exact", head: true });
-
-  // Buscar estatísticas de obras
-  const { data: obras } = await supabase
-    .from("obras")
-    .select("*");
+  // Buscar estatísticas em paralelo para melhor performance
+  const [
+    { count: clientesCount },
+    { data: obras },
+    { count: contratosCount }
+  ] = await Promise.all([
+    supabase.from("clientes").select("*", { count: "exact", head: true }),
+    supabase.from("obras").select("*"),
+    supabase.from("contratos").select("*", { count: "exact", head: true })
+  ]);
 
   const obrasAtivas = obras?.filter(o => o.status === 'EM ANDAMENTO').length || 0;
 
   // Calcular receita total
   const receitaTotal = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
-
-  // Buscar estatísticas de contratos
-  const { count: contratosCount } = await supabase
-    .from("contratos")
-    .select("*", { count: "exact", head: true });
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">

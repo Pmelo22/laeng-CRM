@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Cliente } from "@/lib/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, DollarSign } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ClienteModalProps {
   cliente?: Cliente;
@@ -20,6 +21,7 @@ interface ClienteModalProps {
 export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
   const router = useRouter();
   const supabase = createClient();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,6 +39,45 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     observacoes: "",
     data_cadastro: new Date().toISOString().split('T')[0],
   });
+
+  const [loadingCep, setLoadingCep] = useState(false);
+
+  // Função para buscar endereço pelo CEP
+  const buscarCep = async (cep: string) => {
+    const cepLimpo = cep.replace(/\D/g, '');
+    
+    if (cepLimpo.length !== 8) return;
+
+    setLoadingCep(true);
+    
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setFormData(prev => ({
+          ...prev,
+          endereco: prev.endereco || data.logradouro || "",
+          cidade: prev.cidade || data.localidade || "",
+          estado: prev.estado || data.uf || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+    } finally {
+      setLoadingCep(false);
+    }
+  };
+
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCep = e.target.value;
+    setFormData({ ...formData, cep: newCep });
+    
+    const cepLimpo = newCep.replace(/\D/g, '');
+    if (cepLimpo.length === 8) {
+      buscarCep(newCep);
+    }
+  };
 
   // Atualizar formData quando o modal abrir ou o cliente mudar
   useEffect(() => {
@@ -84,27 +125,113 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     setError(null);
 
     try {
+      // Preparar dados base para envio - APENAS campos que existem na tabela clientes
+      // Os valores financeiros são agregados das obras, não são salvos diretamente no cliente
+      const baseData = {
+        nome: formData.nome.trim() || "",
+        cpf_cnpj: formData.cpf_cnpj?.trim() || null,
+        telefone: formData.telefone?.trim() || null,
+        email: formData.email?.trim() || null,
+        status: formData.status,
+        endereco: formData.endereco?.trim() || "",
+        cidade: formData.cidade?.trim() || null,
+        estado: formData.estado?.trim() || null,
+        cep: formData.cep?.trim() || null,
+        responsavel_contato: formData.responsavel_contato?.trim() || null,
+        observacoes: formData.observacoes?.trim() || null,
+        data_cadastro: formData.data_cadastro,
+      };
+
       if (cliente) {
-        // Atualizar cliente existente
+        // Atualizar cliente existente - não precisa do código
         const { error } = await supabase
           .from("clientes")
-          .update({ ...formData, updated_at: new Date().toISOString() })
+          .update({ ...baseData, updated_at: new Date().toISOString() })
           .eq("id", cliente.id);
 
-        if (error) throw error;
-      } else {
-        // Criar novo cliente
-        const { error } = await supabase.from("clientes").insert([formData]);
+        if (error) {
+          console.error("Erro ao atualizar cliente:", error);
+          throw error;
+        }
 
-        if (error) throw error;
+        // Sucesso - mostrar toast
+        toast({
+          title: "✅ Cliente atualizado!",
+          description: `Os dados de ${formData.nome} foram atualizados com sucesso.`,
+          duration: 3000,
+        });
+      } else {
+        // Criar novo cliente - precisa gerar o código
+        // Buscar o último código usado
+        const { data: ultimoCliente, error: erroConsulta } = await supabase
+          .from("clientes")
+          .select("codigo")
+          .order("codigo", { ascending: false })
+          .limit(1)
+          .single();
+
+        if (erroConsulta && erroConsulta.code !== 'PGRST116') {
+          // PGRST116 = nenhum registro encontrado (primeira inserção)
+          console.error("Erro ao buscar último código:", erroConsulta);
+          throw erroConsulta;
+        }
+
+        // Gerar novo código
+        const novoCodigo = ultimoCliente ? ultimoCliente.codigo + 1 : 1;
+
+        // Adicionar código aos dados
+        const dataToSave = {
+          ...baseData,
+          codigo: novoCodigo,
+        };
+
+        const { error } = await supabase.from("clientes").insert([dataToSave]);
+
+        if (error) {
+          console.error("Erro ao criar cliente:", error);
+          throw error;
+        }
+
+        // Sucesso - mostrar toast
+        toast({
+          title: "✅ Cliente cadastrado!",
+          description: `${formData.nome} foi cadastrado com sucesso.`,
+          duration: 3000,
+        });
       }
 
-      router.refresh();
-      onClose();
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Erro ao salvar cliente");
-    } finally {
+      // APENAS SE CHEGOU AQUI (sem erro) - Fechar modal e recarregar
       setIsLoading(false);
+      onClose();
+      
+      // Aguardar um momento para garantir que o Supabase processou
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Forçar refresh da página para recarregar os dados do servidor
+      router.refresh();
+      
+      // Como fallback, recarregar a página completamente
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
+      }, 500);
+    } catch (error: unknown) {
+      // Erro - manter modal aberto e mostrar mensagem
+      const errorMessage = error instanceof Error ? error.message : "Erro ao salvar cliente";
+      console.error("Erro completo:", error);
+      
+      setError(errorMessage);
+      setIsLoading(false);
+      
+      toast({
+        title: "❌ Erro ao salvar",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000,
+      });
+      
+      // NÃO fechar o modal - usuário pode corrigir os dados
     }
   };
 
@@ -117,8 +244,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b">
           <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
             {cliente ? "Editar Cliente" : "Novo Cliente"}
           </DialogTitle>
@@ -129,7 +256,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin pr-4">
           {/* Nome */}
           <div className="space-y-2">
             <Label htmlFor="nome" className="text-sm font-semibold">
@@ -244,6 +372,23 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             </div>
           </div>
 
+          {/* CEP */}
+          <div className="space-y-2">
+            <Label htmlFor="cep" className="text-sm font-semibold">
+              CEP
+            </Label>
+            <Input
+              id="cep"
+              value={formData.cep}
+              onChange={handleCepChange}
+              placeholder="00000-000"
+              maxLength={9}
+              disabled={isLoading}
+              className="border-2 focus:border-[#F5C800]"
+            />
+            {loadingCep && <p className="text-xs text-muted-foreground">Buscando endereço...</p>}
+          </div>
+
           {/* Endereço */}
           <div className="space-y-2">
             <Label htmlFor="endereco" className="text-sm font-semibold">
@@ -260,8 +405,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             />
           </div>
 
-          {/* Cidade, Estado e CEP */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Cidade e Estado */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="cidade" className="text-sm font-semibold">
                 Cidade
@@ -282,22 +427,9 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
               <Input
                 id="estado"
                 value={formData.estado}
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, estado: e.target.value.toUpperCase() })}
                 placeholder="UF"
                 maxLength={2}
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cep" className="text-sm font-semibold">
-                CEP
-              </Label>
-              <Input
-                id="cep"
-                value={formData.cep}
-                onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
-                placeholder="00000-000"
                 disabled={isLoading}
                 className="border-2 focus:border-[#F5C800]"
               />
@@ -335,13 +467,31 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             />
           </div>
 
+          {/* Informação sobre valores financeiros */}
+          <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+            <div className="flex items-start gap-3">
+              <DollarSign className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-blue-900 mb-1">
+                  💡 Valores Financeiros
+                </p>
+                <p className="text-xs text-blue-700">
+                  Os valores financeiros (terreno, entrada, financiamento, subsídio) são calculados automaticamente 
+                  com base nas <strong>obras vinculadas</strong> a este cliente. Para alterar valores, edite as obras 
+                  individualmente.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {error && (
             <div className="p-3 text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-md">
               {error}
             </div>
           )}
+          </div>
 
-          <DialogFooter className="gap-2 sm:gap-0 pt-4">
+          <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t bg-gray-50">
             <Button
               type="button"
               variant="outline"
