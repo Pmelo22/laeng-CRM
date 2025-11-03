@@ -12,6 +12,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Loader2 } from "lucide-react";
 import { Cliente } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { buscarCepViaCep, calcularValorContratual, formatMoneyInput, parseMoneyInput } from "@/lib/utils";
+import { getNextCode } from "@/lib/supabase-utils";
 
 interface Obra {
   id: string;
@@ -138,17 +140,15 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
     }
   };
 
-  const buscarCep = async (cep: string) => {
-    const cepLimpo = cep.replace(/\D/g, '');
-    if (cepLimpo.length !== 8) return;
-
-    setLoadingCep(true);
+  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCep = e.target.value;
+    setFormData({ ...formData, cep: newCep });
     
-    try {
-      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-      const data = await response.json();
-
-      if (!data.erro) {
+    const cepLimpo = newCep.replace(/\D/g, '');
+    if (cepLimpo.length === 8) {
+      setLoadingCep(true);
+      const data = await buscarCepViaCep(newCep);
+      if (data && !data.erro) {
         setFormData(prev => ({
           ...prev,
           endereco: prev.endereco || data.logradouro || "",
@@ -156,20 +156,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
           estado: prev.estado || data.uf || "",
         }));
       }
-    } catch (error) {
-      console.error("Erro ao buscar CEP:", error);
-    } finally {
       setLoadingCep(false);
-    }
-  };
-
-  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newCep = e.target.value;
-    setFormData({ ...formData, cep: newCep });
-    
-    const cepLimpo = newCep.replace(/\D/g, '');
-    if (cepLimpo.length === 8) {
-      buscarCep(newCep);
     }
   };
 
@@ -206,12 +193,12 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         // Atualizar valores financeiros de cada obra
         for (const obraId of Object.keys(obrasData)) {
           const obraValues = obrasData[obraId];
-          // Calcular valor contratual = terreno + entrada + financiado + subsidio
-          const valorContratual = 
-            (obraValues.valor_terreno || 0) + 
-            (obraValues.entrada || 0) + 
-            (obraValues.valor_financiado || 0) + 
-            (obraValues.subsidio || 0);
+          // Calcular valor contratual
+          const valorContratual = calcularValorContratual(
+            obraValues.entrada,
+            obraValues.valor_financiado,
+            obraValues.subsidio
+          );
           
           const { error: obraError } = await supabase
             .from("obras")
@@ -235,19 +222,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         });
       } else {
         // Criar novo cliente - gerar código
-        const { data: ultimoCliente, error: erroConsulta } = await supabase
-          .from("clientes")
-          .select("codigo")
-          .order("codigo", { ascending: false })
-          .limit(1)
-          .single();
-
-        if (erroConsulta && erroConsulta.code !== 'PGRST116') {
-          console.error("Erro ao buscar último código:", erroConsulta);
-          throw erroConsulta;
-        }
-
-        const novoCodigo = ultimoCliente ? ultimoCliente.codigo + 1 : 1;
+        const novoCodigo = await getNextCode(supabase, "clientes");
 
         const dataToSave = {
           ...baseData,
@@ -509,8 +484,8 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                   const financiado = obrasData[obra.id]?.valor_financiado || 0;
                   const subsidio = obrasData[obra.id]?.subsidio || 0;
                   
-                  // Valor Contratual = Terreno + Entrada + Financiado + Subsídio
-                  const valorContratual = terreno + entrada + financiado + subsidio;
+                  // Valor Contratual = Entrada + Financiado + Subsídio (SEM terreno)
+                  const valorContratual = entrada + financiado + subsidio;
 
                   return (
                     <div key={obra.id} className="space-y-4">
@@ -521,15 +496,13 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                           <Input
                             id={`terreno_${obra.id}`}
                             type="text"
-                            value={terreno.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            value={formatMoneyInput(terreno)}
                             onChange={(e) => {
-                              const numericValue = e.target.value.replace(/\D/g, '');
-                              const newValue = Number(numericValue) / 100;
                               setObrasData(prev => ({
                                 ...prev,
                                 [obra.id]: {
                                   ...prev[obra.id],
-                                  valor_terreno: newValue,
+                                  valor_terreno: parseMoneyInput(e.target.value),
                                 }
                               }));
                             }}
@@ -544,15 +517,13 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                           <Input
                             id={`entrada_${obra.id}`}
                             type="text"
-                            value={entrada.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            value={formatMoneyInput(entrada)}
                             onChange={(e) => {
-                              const numericValue = e.target.value.replace(/\D/g, '');
-                              const newValue = Number(numericValue) / 100;
                               setObrasData(prev => ({
                                 ...prev,
                                 [obra.id]: {
                                   ...prev[obra.id],
-                                  entrada: newValue,
+                                  entrada: parseMoneyInput(e.target.value),
                                 }
                               }));
                             }}
@@ -567,15 +538,13 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                           <Input
                             id={`subsidio_${obra.id}`}
                             type="text"
-                            value={subsidio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            value={formatMoneyInput(subsidio)}
                             onChange={(e) => {
-                              const numericValue = e.target.value.replace(/\D/g, '');
-                              const newValue = Number(numericValue) / 100;
                               setObrasData(prev => ({
                                 ...prev,
                                 [obra.id]: {
                                   ...prev[obra.id],
-                                  subsidio: newValue,
+                                  subsidio: parseMoneyInput(e.target.value),
                                 }
                               }));
                             }}
@@ -593,15 +562,13 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                           <Input
                             id={`financiado_${obra.id}`}
                             type="text"
-                            value={financiado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            value={formatMoneyInput(financiado)}
                             onChange={(e) => {
-                              const numericValue = e.target.value.replace(/\D/g, '');
-                              const newValue = Number(numericValue) / 100;
                               setObrasData(prev => ({
                                 ...prev,
                                 [obra.id]: {
                                   ...prev[obra.id],
-                                  valor_financiado: newValue,
+                                  valor_financiado: parseMoneyInput(e.target.value),
                                 }
                               }));
                             }}
@@ -618,10 +585,10 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                           Valor Contratual
                         </p>
                         <p className="text-3xl font-bold text-[#1E1E1E]">
-                          R$ {valorContratual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          R$ {formatMoneyInput(valorContratual)}
                         </p>
                         <p className="text-xs text-[#1E1E1E]/70 mt-2">
-                          = Terreno + Entrada + Financiado + Subsídio
+                          = Entrada + Financiado + Subsídio
                         </p>
                       </div>
                     </div>

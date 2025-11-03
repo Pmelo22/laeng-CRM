@@ -1,31 +1,38 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { Building2, Edit } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ExternalLink } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface Obra {
   id: string
-  codigo?: number
-  endereco?: string
-  status?: string
-  data_inicio?: string
-  valor_terreno?: number
-  entrada?: number
-  valor_financiado?: number
-  subsidio?: number
-  valor_total?: number
+  codigo: number | null
+  cliente_nome: string
+  responsavel: string
+  status: string
+  empreiteiro: number | null
+  empreiteiro_nome: string | null
+  terceirizado: number | null
+  material: number | null
+  valor_total: number | null
 }
 
-interface ObrasTableProps {
-  clienteId: string
+interface ObrasTableClienteProps {
   obras: Obra[]
 }
 
-export function ObrasTable({ clienteId, obras }: ObrasTableProps) {
+export function ObrasTableCliente({ obras }: ObrasTableClienteProps) {
+  const router = useRouter()
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value)
+  }
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       "FINALIZADO": { 
@@ -33,142 +40,102 @@ export function ObrasTable({ clienteId, obras }: ObrasTableProps) {
         label: "Finalizado"
       },
       "EM ANDAMENTO": { 
-        color: "bg-yellow-100 text-yellow-700 border-yellow-300", 
+        color: "bg-orange-100 text-orange-700 border-orange-300", 
         label: "Em Andamento"
       },
-      "PENDENTE": { 
-        color: "bg-gray-100 text-gray-600 border-gray-300", 
-        label: "Pendente"
-      },
-    };
+    }
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig["PENDENTE"];
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig["EM ANDAMENTO"]
 
     return (
       <Badge variant="outline" className={`${config.color} border font-medium px-2 py-1 text-xs`}>
         <span className="font-bold">{config.label}</span>
       </Badge>
-    );
-  };
+    )
+  }
 
-  if (!obras || obras.length === 0) {
+  const handleVerObra = (obraId: string) => {
+    // Redireciona para a página de obras com a obra específica em destaque
+    router.push(`/dashboard/obras?highlight=${obraId}`)
+  }
+
+  if (obras.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base sm:text-xl uppercase">
-            <Building2 className="h-5 w-5 text-[#F5C800]" />
-            CONTROLE DE OBRAS
-          </CardTitle>
-          <CardDescription className="mt-1 text-sm">
-            Todas as obras vinculadas a este cliente
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12">
-            <Building2 className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <p className="text-muted-foreground mb-4">Nenhuma obra cadastrada para este cliente</p>
-            <Button asChild className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90">
-              <Link href={`/dashboard/obras/novo?cliente_id=${clienteId}`}>
-                Cadastrar Primeira Obra
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="text-center py-8 text-muted-foreground">
+        Nenhuma obra cadastrada para este cliente.
+      </div>
     )
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-base sm:text-xl uppercase">
-              <Building2 className="h-5 w-5 text-[#F5C800]" />
-              CONTROLE DE OBRAS
-            </CardTitle>
-            <CardDescription className="mt-1 text-sm">
-              {obras.length} obra(s) cadastrada(s)
-            </CardDescription>
-          </div>
-          <Button asChild className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 self-start sm:self-auto">
-            <Link href={`/dashboard/obras/novo?cliente_id=${clienteId}`}>
-              <Building2 className="h-4 w-4 mr-2" />
-              Nova Obra
-            </Link>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border-2 border-[#F5C800]/20 overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-[#1E1E1E] hover:bg-[#1E1E1E]">
-                <TableHead className="text-[#F5C800] font-bold py-3 text-xs sm:text-sm">CÓD.</TableHead>
-                <TableHead className="text-[#F5C800] font-bold py-3 text-xs sm:text-sm">STATUS</TableHead>
-                <TableHead className="text-[#F5C800] font-bold py-3 text-xs sm:text-sm whitespace-nowrap">ENDEREÇO</TableHead>
-                <TableHead className="text-[#F5C800] font-bold py-3 text-xs sm:text-sm">DATA</TableHead>
-                <TableHead className="text-right text-[#F5C800] font-bold py-3 text-xs sm:text-sm whitespace-nowrap">TERRENO</TableHead>
-                <TableHead className="text-right text-[#F5C800] font-bold py-3 text-xs sm:text-sm whitespace-nowrap">ENTRADA</TableHead>
-                <TableHead className="text-right text-[#F5C800] font-bold py-3 text-xs sm:text-sm whitespace-nowrap">FINANCIADO</TableHead>
-                <TableHead className="text-right text-[#F5C800] font-bold py-3 text-xs sm:text-sm whitespace-nowrap">SUBSÍDIO</TableHead>
-                <TableHead className="text-right text-[#F5C800] font-bold py-3 text-xs sm:text-sm whitespace-nowrap">TOTAL</TableHead>
-                <TableHead className="text-center text-[#F5C800] font-bold py-3 text-xs sm:text-sm">AÇÕES</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {obras.map((obra) => (
-                <TableRow key={obra.id} className="hover:bg-muted/30">
-                  <TableCell className="font-mono font-semibold text-xs sm:text-sm">
-                    #{String(obra.codigo || 0).padStart(3, '0')}
+    <div className="rounded-md border-2 border-[#F5C800]/20 overflow-hidden">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader className="bg-[#1E1E1E]">
+            <TableRow className="hover:bg-[#1E1E1E]">
+              <TableHead className="text-[#F5C800] font-bold py-3">CÓD.</TableHead>
+              <TableHead className="text-[#F5C800] font-bold py-3">CLIENTE</TableHead>
+              <TableHead className="text-[#F5C800] font-bold py-3">STATUS</TableHead>
+              <TableHead className="text-center text-[#F5C800] font-bold py-3">EMPREITEIRO</TableHead>
+              <TableHead className="text-center text-[#F5C800] font-bold py-3">MATERIAL (R$)</TableHead>
+              <TableHead className="text-center text-[#F5C800] font-bold py-3">TERCEIRIZADO (R$)</TableHead>
+              <TableHead className="text-center text-[#F5C800] font-bold py-3">VALOR TOTAL (R$)</TableHead>
+              <TableHead className="text-center text-[#F5C800] font-bold py-3">AÇÕES</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {obras.map((obra) => {
+              const valorEmpreiteiro = obra.empreiteiro || 0
+              const totalTerceirizado = obra.terceirizado || 0
+              const valorTotalObra = valorEmpreiteiro + (obra.material || 0) + totalTerceirizado
+              
+              return (
+                <TableRow key={obra.id} className="hover:bg-[#F5C800]/5 border-b">
+                  <TableCell className="py-3">
+                    <Badge className="font-mono bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold text-xs px-2 py-1">
+                      #{String(obra.codigo || 0).padStart(3, '0')}
+                    </Badge>
                   </TableCell>
-                  <TableCell>
-                    {getStatusBadge(obra.status || "PENDENTE")}
+                  <TableCell className="font-medium py-3">
+                    <span className="font-semibold text-sm">{obra.cliente_nome}</span>
                   </TableCell>
-                  <TableCell>{obra.endereco || '-'}</TableCell>
-                  <TableCell>
-                    {obra.data_inicio 
-                      ? new Date(obra.data_inicio).toLocaleDateString('pt-BR')
-                      : '-'}
+                  <TableCell className="py-3">
+                    {getStatusBadge(obra.status)}
                   </TableCell>
-                  <TableCell className="text-right">
-                    {obra.valor_terreno 
-                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.valor_terreno)
-                      : '-'}
+                  <TableCell className="text-center py-3">
+                    <div className="text-left">
+                      <div className="text-sm font-semibold">{obra.empreiteiro_nome || 'SEM EMPREITEIRO'}</div>
+                      <div className="text-xs font-bold text-black">{formatCurrency(valorEmpreiteiro)}</div>
+                    </div>
                   </TableCell>
-                  <TableCell className="text-right">
-                    {obra.entrada 
-                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.entrada)
-                      : '-'}
+                  <TableCell className="text-center py-3 font-bold">
+                    <span className="text-sm text-black">{formatCurrency(obra.material || 0)}</span>
                   </TableCell>
-                  <TableCell className="text-right">
-                    {obra.valor_financiado 
-                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.valor_financiado)
-                      : '-'}
+                  <TableCell className="text-center py-3">
+                    <span className="text-sm font-bold text-black">{formatCurrency(totalTerceirizado)}</span>
                   </TableCell>
-                  <TableCell className="text-right">
-                    {obra.subsidio 
-                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.subsidio)
-                      : '-'}
+                  <TableCell className="text-center py-3 font-bold">
+                    <span className="text-sm text-green-700">{formatCurrency(valorTotalObra)}</span>
                   </TableCell>
-                  <TableCell className="text-right font-bold">
-                    {obra.valor_total 
-                      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.valor_total)
-                      : '-'}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link href={`/dashboard/obras/${obra.id}/editar`}>
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                  <TableCell className="py-3">
+                    <div className="flex items-center justify-center">
+                      <Button
+                        size="sm"
+                        onClick={() => handleVerObra(obra.id)}
+                        className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 px-3 gap-2 transition-colors"
+                        title="Ver obra completa"
+                      >
+                        <ExternalLink className="h-4 w-4 text-[#1E1E1E]" />
+                        <span className="text-[#1E1E1E] font-semibold text-xs">Ver Obra</span>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   )
 }

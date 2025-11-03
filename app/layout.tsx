@@ -3,8 +3,8 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Setor Escritório - Sistema de Gestão',
-  description: 'Sistema de gestão para escritório de engenharia',
+  title: 'LA Engenharia - Sistema de Gestão',
+  description: 'Sistema de gestão da LA Engenharia',
   generator: 'Next.js',
 }
 
