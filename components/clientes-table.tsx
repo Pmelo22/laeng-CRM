@@ -9,6 +9,8 @@ import { User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Penci
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
 import { ClienteEditModal } from "@/components/cliente-edit-modal"
+import { formatCurrency, formatDate } from "@/lib/utils"
+import { getClienteStatusBadge } from "@/lib/status-utils"
 
 interface ClientesTableProps {
   clientes: Cliente[]
@@ -169,43 +171,6 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
     return pages
   }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value)
-  }
-
-  const formatDate = (date: string | null | undefined) => {
-    if (!date) return "-"
-    return new Date(date).toLocaleDateString('pt-BR')
-  }
-
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      "FINALIZADO": { 
-        color: "bg-green-100 text-green-700 border-green-300", 
-        label: "Finalizado"
-      },
-      "EM ANDAMENTO": { 
-        color: "bg-red-100 text-red-700 border-red-300", 
-        label: "Em Andamento"
-      },
-      "PENDENTE": { 
-        color: "bg-yellow-100 text-yellow-600 border-yellow-300", 
-        label: "Pendente"
-      },
-    }
-
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig["PENDENTE"]
-
-    return (
-      <Badge variant="outline" className={`${config.color} border font-medium px-2 py-1 text-xs`}>
-        <span className="font-bold">{config.label}</span>
-      </Badge>
-    )
-  }
-
   if (clientes.length === 0) {
     return <div className="text-center py-8 text-muted-foreground">Nenhum cliente cadastrado ainda.</div>
   }
@@ -283,7 +248,7 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
                 <span className="font-semibold text-sm">{cliente.nome}</span>
               </TableCell>
               <TableCell className="py-3">
-                {getStatusBadge(cliente.status || "PENDENTE")}
+                {getClienteStatusBadge(cliente.status || "PENDENTE")}
               </TableCell>
               <TableCell className="text-center py-3">
                 <span className="text-sm">{formatDate(cliente.data_cadastro)}</span>

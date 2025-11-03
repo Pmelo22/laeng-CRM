@@ -9,6 +9,8 @@ import { User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Penci
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
 import { ObraEditModal } from "@/components/obra-edit-modal"
+import { formatCurrency } from "@/lib/utils"
+import { getObraStatusBadge } from "@/lib/status-utils"
 
 interface ObrasTableFullProps {
   obras: ObraComCliente[]
@@ -186,34 +188,6 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
     return pages
   }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value)
-  }
-
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      "FINALIZADO": { 
-        color: "bg-green-100 text-green-700 border-green-300", 
-        label: "Finalizado"
-      },
-      "EM ANDAMENTO": { 
-        color: "bg-orange-100 text-orange-700 border-orange-300", 
-        label: "Em Andamento"
-      },
-    }
-
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig["EM ANDAMENTO"]
-
-    return (
-      <Badge variant="outline" className={`${config.color} border font-medium px-2 py-1 text-xs`}>
-        <span className="font-bold">{config.label}</span>
-      </Badge>
-    )
-  }
-
   if (obras.length === 0) {
     return <div className="text-center py-8 text-muted-foreground">Nenhuma obra cadastrada ainda.</div>
   }
@@ -324,7 +298,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                         <span className="font-semibold text-sm">{obra.cliente_nome}</span>
                       </TableCell>
                       <TableCell className="py-3">
-                        {getStatusBadge(obra.status)}
+                        {getObraStatusBadge(obra.status)}
                       </TableCell>
                       <TableCell className="text-center py-3">
                         <div className="flex items-center justify-center gap-2">

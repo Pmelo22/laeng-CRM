@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast"
 import { createClient } from "@/lib/supabase/client"
 import type { ObraComCliente } from "@/lib/types"
 import { useRouter } from "next/navigation"
+import { formatMoneyInput, parseMoneyInput } from "@/lib/utils"
 
 interface ObraEditModalProps {
   isOpen: boolean
@@ -117,16 +118,10 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
   }
 
   const handleInputChange = (field: keyof ObraFinancialData, value: string) => {
-    const numericValue = value.replace(/\D/g, '')
-    const newValue = Number(numericValue) / 100
     setObraData(prev => ({
       ...prev,
-      [field]: newValue
+      [field]: parseMoneyInput(value)
     }))
-  }
-
-  const formatValue = (value: number) => {
-    return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
   // Calcular total = Empreiteiro + Material + Terceirizado (com especialistas)
@@ -169,7 +164,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="empreiteiro"
                   type="text"
-                  value={formatValue(obraData.empreiteiro)}
+                  value={formatMoneyInput(obraData.empreiteiro)}
                   onChange={(e) => handleInputChange('empreiteiro', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
@@ -185,7 +180,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="terceirizado"
                   type="text"
-                  value={formatValue(obraData.terceirizado)}
+                  value={formatMoneyInput(obraData.terceirizado)}
                   onChange={(e) => handleInputChange('terceirizado', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
@@ -201,7 +196,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="material"
                   type="text"
-                  value={formatValue(obraData.material)}
+                  value={formatMoneyInput(obraData.material)}
                   onChange={(e) => handleInputChange('material', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
@@ -241,7 +236,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="empreiteiro_valor_pago"
                   type="text"
-                  value={formatValue(obraData.empreiteiro_valor_pago)}
+                  value={formatMoneyInput(obraData.empreiteiro_valor_pago)}
                   onChange={(e) => handleInputChange('empreiteiro_valor_pago', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
@@ -257,7 +252,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="empreiteiro_saldo"
                   type="text"
-                  value={formatValue(obraData.empreiteiro - obraData.empreiteiro_valor_pago)}
+                  value={formatMoneyInput(obraData.empreiteiro - obraData.empreiteiro_valor_pago)}
                   disabled
                   className="border-2 bg-gray-100 font-mono text-lg h-12 px-4 text-gray-600"
                   placeholder="0,00"
@@ -280,7 +275,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="pintor"
                   type="text"
-                  value={formatValue(obraData.pintor)}
+                  value={formatMoneyInput(obraData.pintor)}
                   onChange={(e) => handleInputChange('pintor', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
@@ -296,7 +291,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="eletricista"
                   type="text"
-                  value={formatValue(obraData.eletricista)}
+                  value={formatMoneyInput(obraData.eletricista)}
                   onChange={(e) => handleInputChange('eletricista', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
@@ -312,7 +307,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="gesseiro"
                   type="text"
-                  value={formatValue(obraData.gesseiro)}
+                  value={formatMoneyInput(obraData.gesseiro)}
                   onChange={(e) => handleInputChange('gesseiro', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
@@ -328,7 +323,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="azulejista"
                   type="text"
-                  value={formatValue(obraData.azulejista)}
+                  value={formatMoneyInput(obraData.azulejista)}
                   onChange={(e) => handleInputChange('azulejista', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
@@ -344,7 +339,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 <Input
                   id="manutencao"
                   type="text"
-                  value={formatValue(obraData.manutencao)}
+                  value={formatMoneyInput(obraData.manutencao)}
                   onChange={(e) => handleInputChange('manutencao', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"

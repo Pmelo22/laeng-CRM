@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Plus, Search, CheckCircle2, Clock, XCircle, Filter } from "lucide-react"
 import { ClientesTable } from "@/components/clientes-table"
-import { ClienteEditModal } from "@/components/cliente-edit-modal"
+import { ClienteModal } from "@/components/cliente-modal"
 import type { Cliente } from "@/lib/types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
@@ -58,30 +58,30 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3 tracking-tight uppercase">
               Gestão de Clientes
             </h1>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
-              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-2 sm:px-3 py-1 sm:py-1.5 font-bold">
-                <span className="font-bold">{metrics.total}</span>
-                <span className="ml-1 hidden xs:inline">Cadastrados</span>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-3 py-1.5 font-bold text-sm">
+                <span>{metrics.total}</span>
+                <span className="ml-1.5">Cadastrados</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-2 sm:px-3 py-1 sm:py-1.5 font-semibold">
-                <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />
-                <span className="font-semibold">{metrics.finalizados}</span>
-                <span className="ml-1 hidden xs:inline">Finalizados</span>
+              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-3 py-1.5 font-semibold text-sm">
+                <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                <span>{metrics.finalizados}</span>
+                <span className="ml-1.5">Finalizados</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-2 sm:px-3 py-1 sm:py-1.5 font-semibold">
-                <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />
-                <span className="font-semibold">{metrics.emAndamento}</span>
-                <span className="ml-1 hidden xs:inline">Em Andamento</span>
+              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold text-sm">
+                <Clock className="h-4 w-4 mr-1.5" />
+                <span>{metrics.emAndamento}</span>
+                <span className="ml-1.5">Em Andamento</span>
               </Badge>
               {metrics.pendentes > 0 && (
                 <>
                   <span className="text-[#F5C800] hidden sm:inline">•</span>
-                  <Badge variant="secondary" className="bg-yellow-500 text-black border-yellow-500 hover:bg-yellow-600 px-2 sm:px-3 py-1 sm:py-1.5 font-semibold">
-                    <XCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />
-                    <span className="font-semibold">{metrics.pendentes}</span>
-                    <span className="ml-1 hidden xs:inline">Pendentes</span>
+                  <Badge variant="secondary" className="bg-yellow-500 text-black border-yellow-500 hover:bg-yellow-600 px-3 py-1.5 font-semibold text-sm">
+                    <XCircle className="h-4 w-4 mr-1.5" />
+                    <span>{metrics.pendentes}</span>
+                    <span className="ml-1.5">Pendentes</span>
                   </Badge>
                 </>
               )}
@@ -155,7 +155,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
       </div>
 
       {/* Modal para Novo Cliente */}
-      <ClienteEditModal 
+      <ClienteModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

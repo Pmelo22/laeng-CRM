@@ -81,21 +81,21 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3 tracking-tight uppercase">
               GESTÃO DE OBRAS
             </h1>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
-              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-2 sm:px-3 py-1 sm:py-1.5 font-bold">
-                <Building2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1 sm:mr-1.5" />
-                <span className="font-bold">{metrics.total}</span>
-                <span className="ml-1">Obras</span>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-3 py-1.5 font-bold text-sm">
+                <Building2 className="h-4 w-4 mr-1.5" />
+                <span>{metrics.total}</span>
+                <span className="ml-1.5">Obras</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-2 sm:px-3 py-1 sm:py-1.5 font-semibold">
-                <span className="font-semibold">{metrics.finalizadas}</span>
-                <span className="ml-1">Finalizadas</span>
+              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-3 py-1.5 font-semibold text-sm">
+                <span>{metrics.finalizadas}</span>
+                <span className="ml-1.5">Finalizadas</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-orange-600 text-white border-orange-600 hover:bg-orange-700 px-2 sm:px-3 py-1 sm:py-1.5 font-semibold">
-                <span className="font-semibold">{metrics.emAndamento}</span>
-                <span className="ml-1">Em Andamento</span>
+              <Badge variant="secondary" className="bg-orange-600 text-white border-orange-600 hover:bg-orange-700 px-3 py-1.5 font-semibold text-sm">
+                <span>{metrics.emAndamento}</span>
+                <span className="ml-1.5">Em Andamento</span>
               </Badge>
             </div>
           </div>
