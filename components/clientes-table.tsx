@@ -41,11 +41,13 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
   const filteredClientes = useMemo(() => {
     if (!searchTerm) return clientes
     
-    const term = searchTerm.toLowerCase()
-    return clientes.filter(cliente => 
-      cliente.codigo?.toString().includes(term) ||
-      cliente.nome?.toLowerCase().includes(term)
-    )
+    const term = searchTerm.toLowerCase().replace('#', '')
+    return clientes.filter(cliente => {
+      const codigoFormatado = String(cliente.codigo || 0).padStart(3, '0')
+      return codigoFormatado.includes(term) ||
+        cliente.codigo?.toString().includes(term) ||
+        cliente.nome?.toLowerCase().includes(term)
+    })
   }, [clientes, searchTerm])
 
   // Função para alternar ordenação (3 estados: asc → desc → none)
@@ -251,19 +253,19 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
                 {getSortIcon('data_cadastro')}
               </div>
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               TERRENO (R$)
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               ENTRADA (R$)
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               VALOR FINANCIADO (R$)
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               SUBSÍDIO (R$)
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               VALOR TOTAL (R$)
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">AÇÕES</TableHead>
@@ -274,7 +276,7 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
             <TableRow key={cliente.id} className="hover:bg-[#F5C800]/5 border-b">
               <TableCell className="py-3">
                 <Badge className="font-mono bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold text-xs px-2 py-1">
-                  {cliente.codigo || 0}
+                  #{String(cliente.codigo || 0).padStart(3, '0')}
                 </Badge>
               </TableCell>
               <TableCell className="font-medium py-3">
@@ -286,19 +288,19 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               <TableCell className="text-center py-3">
                 <span className="text-sm">{formatDate(cliente.data_cadastro)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
-                <span className="text-sm">{formatCurrency(cliente.valor_terreno || 0)}</span>
+              <TableCell className="text-center py-3 font-bold">
+                <span className="text-sm text-black">{formatCurrency(cliente.valor_terreno || 0)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
-                <span className="text-sm">{formatCurrency(cliente.entrada || 0)}</span>
+              <TableCell className="text-center py-3 font-bold">
+                <span className="text-sm text-black">{formatCurrency(cliente.entrada || 0)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
-                <span className="text-sm">{formatCurrency(cliente.valor_financiado || 0)}</span>
+              <TableCell className="text-center py-3 font-bold">
+                <span className="text-sm text-black">{formatCurrency(cliente.valor_financiado || 0)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
-                <span className="text-sm">{formatCurrency(cliente.subsidio || 0)}</span>
+              <TableCell className="text-center py-3 font-bold">
+                <span className="text-sm text-black">{formatCurrency(cliente.subsidio || 0)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-bold">
+              <TableCell className="text-center py-3 font-bold">
                 <span className="text-sm text-green-700">{formatCurrency(cliente.valor_total || 0)}</span>
               </TableCell>
               <TableCell className="py-3">

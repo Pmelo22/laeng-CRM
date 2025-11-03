@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 import { 
   ArrowLeft, 
@@ -12,6 +11,7 @@ import {
   DollarSign
 } from "lucide-react";
 import { ClienteActions, ClienteStatusBadge, DeleteClienteButton } from "./cliente-actions";
+import { ObrasTableCliente } from "@/components/obras-table-cliente";
 
 export const dynamic = 'force-dynamic';
 
@@ -280,107 +280,16 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
           </CardContent>
         </Card>
 
-        {/* Seção de Gestão de Obras - Tabela com Novas Colunas */}
+        {/* Seção de Gestão de Obras - Tabela Simplificada */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-xl uppercase">
               <Building2 className="h-5 w-5 text-[#F5C800]" />
-              CONTROLE DE OBRAS
+              GESTÃO DE OBRAS
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {obras && obras.length > 0 ? (
-              <div className="rounded-md border-2 border-[#F5C800]/20 overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-[#1E1E1E] hover:bg-[#1E1E1E]">
-                      <TableHead className="text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs">CÓD.</TableHead>
-                      <TableHead className="text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">NOME</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">EMPREITEIRO</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">TERCEIRIZADO</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">MATERIAL</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">MÃO-DE-OBRA</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">PINTOR</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">ELETRICISTA</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">GESSEIRO</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">AZULEJISTA</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">MANUTENÇÃO</TableHead>
-                      <TableHead className="text-right text-[#F5C800] font-bold py-2 text-[10px] sm:text-xs whitespace-nowrap">VALOR TOTAL</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {obras.map((obra) => (
-                      <TableRow key={obra.id} className="hover:bg-muted/30">
-                        <TableCell className="font-mono font-semibold text-[10px] sm:text-xs py-2">
-                          #{String(obra.codigo || 0).padStart(3, '0')}
-                        </TableCell>
-                        <TableCell className="font-medium text-[10px] sm:text-xs py-2">{obra.nome}</TableCell>
-                        <TableCell className="text-right text-[10px] sm:text-xs py-2">
-                          {obra.empreiteiro 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.empreiteiro)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] sm:text-xs py-2">
-                          {obra.terceirizado 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.terceirizado)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] sm:text-xs py-2">
-                          {obra.material 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.material)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] sm:text-xs py-2">
-                          {obra.mao_de_obra 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.mao_de_obra)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] sm:text-xs py-2">
-                          {obra.pintor 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.pintor)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] sm:text-xs py-2">
-                          {obra.eletricista 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.eletricista)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] sm:text-xs py-2">
-                          {obra.gesseiro 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.gesseiro)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] sm:text-xs py-2">
-                          {obra.azulejista 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.azulejista)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                        <TableCell className="text-right text-[10px] sm:text-xs py-2">
-                          {obra.manutencao 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.manutencao)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                        <TableCell className="text-right font-bold text-[10px] sm:text-xs py-2">
-                          {obra.valor_total 
-                            ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(obra.valor_total)
-                            : 'R$ 0,00'}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <Building2 className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <p className="text-muted-foreground mb-4">Nenhuma obra cadastrada para este cliente</p>
-                <Button asChild className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90">
-                  <Link href={`/dashboard/obras/novo?cliente_id=${id}`}>
-                    Cadastrar Primeira Obra
-                  </Link>
-                </Button>
-              </div>
-            )}
+            <ObrasTableCliente obras={obras || []} />
           </CardContent>
         </Card>
       </div>

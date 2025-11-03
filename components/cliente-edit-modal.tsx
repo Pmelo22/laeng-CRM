@@ -206,9 +206,8 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         // Atualizar valores financeiros de cada obra
         for (const obraId of Object.keys(obrasData)) {
           const obraValues = obrasData[obraId];
-          // Calcular valor contratual = terreno + entrada + financiado + subsidio
+          // Calcular valor contratual = entrada + financiado + subsidio (SEM terreno)
           const valorContratual = 
-            (obraValues.valor_terreno || 0) + 
             (obraValues.entrada || 0) + 
             (obraValues.valor_financiado || 0) + 
             (obraValues.subsidio || 0);
@@ -509,8 +508,8 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                   const financiado = obrasData[obra.id]?.valor_financiado || 0;
                   const subsidio = obrasData[obra.id]?.subsidio || 0;
                   
-                  // Valor Contratual = Terreno + Entrada + Financiado + Subsídio
-                  const valorContratual = terreno + entrada + financiado + subsidio;
+                  // Valor Contratual = Entrada + Financiado + Subsídio (SEM terreno)
+                  const valorContratual = entrada + financiado + subsidio;
 
                   return (
                     <div key={obra.id} className="space-y-4">
@@ -621,7 +620,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                           R$ {valorContratual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </p>
                         <p className="text-xs text-[#1E1E1E]/70 mt-2">
-                          = Terreno + Entrada + Financiado + Subsídio
+                          = Entrada + Financiado + Subsídio
                         </p>
                       </div>
                     </div>

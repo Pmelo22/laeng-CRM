@@ -53,6 +53,20 @@ export interface Obra {
   valor_total: number; // Entrada + Financiado + Subsídio
   data_conclusao?: string; // Data de conclusão da obra
   valor_terreno: number; // Valor do terreno
+  // Campos de custos detalhados
+  empreiteiro?: number;
+  empreiteiro_nome?: string;
+  empreiteiro_valor_pago?: number;
+  empreiteiro_saldo?: number;
+  empreiteiro_percentual?: number;
+  terceirizado?: number;
+  material?: number;
+  mao_de_obra?: number;
+  pintor?: number;
+  eletricista?: number;
+  gesseiro?: number;
+  azulejista?: number;
+  manutencao?: number;
   ano_obra?: number;
   local_obra?: string;
   fase?: string;

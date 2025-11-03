@@ -26,31 +26,31 @@ export default async function DashboardPage() {
   const receitaTotal = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8">
+    <div className="p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 md:space-y-8">
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent uppercase">
+      <div className="space-y-1 sm:space-y-2">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent uppercase">
           DASHBOARD
         </h1>
-        <p className="text-muted-foreground text-sm md:text-base">
+        <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
           Bem-vindo ao sistema de gestão de engenharia
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white overflow-hidden relative group hover:shadow-xl transition-all">
           <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-white/90 uppercase">TOTAL DE CLIENTES</CardTitle>
-            <div className="p-2 bg-white/20 rounded-lg">
-              <Users className="h-4 w-4" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 relative z-10">
+            <CardTitle className="text-xs sm:text-sm font-medium text-white/90 uppercase">TOTAL DE CLIENTES</CardTitle>
+            <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-3xl font-bold">{clientesCount || 0}</div>
-            <p className="text-xs text-white/80 mt-1 flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
+            <div className="text-2xl sm:text-3xl font-bold">{clientesCount || 0}</div>
+            <p className="text-[10px] sm:text-xs text-white/80 mt-0.5 sm:mt-1 flex items-center gap-1">
+              <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
               Clientes cadastrados
             </p>
           </CardContent>

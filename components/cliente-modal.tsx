@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Cliente } from "@/lib/types";
-import { Loader2, DollarSign } from "lucide-react";
+import { Loader2, Building2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ClienteModalProps {
@@ -38,6 +38,16 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     responsavel_contato: "",
     observacoes: "",
     data_cadastro: new Date().toISOString().split('T')[0],
+  });
+
+  // Dados da obra
+  const [obraData, setObraData] = useState({
+    endereco_obra: "",
+    valor_terreno: 0,
+    entrada: 0,
+    valor_financiado: 0,
+    subsidio: 0,
+    empreiteiro_nome: "",
   });
 
   const [loadingCep, setLoadingCep] = useState(false);
@@ -114,6 +124,14 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           observacoes: "",
           data_cadastro: new Date().toISOString().split('T')[0],
         });
+        setObraData({
+          endereco_obra: "",
+          valor_terreno: 0,
+          entrada: 0,
+          valor_financiado: 0,
+          subsidio: 0,
+          empreiteiro_nome: "",
+        });
       }
       setError(null);
     }
@@ -176,26 +194,84 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           throw erroConsulta;
         }
 
-        // Gerar novo código
-        const novoCodigo = ultimoCliente ? ultimoCliente.codigo + 1 : 1;
+        // Gerar novo código do cliente
+        const novoCodigoCliente = ultimoCliente ? ultimoCliente.codigo + 1 : 1;
 
         // Adicionar código aos dados
         const dataToSave = {
           ...baseData,
-          codigo: novoCodigo,
+          codigo: novoCodigoCliente,
         };
 
-        const { error } = await supabase.from("clientes").insert([dataToSave]);
+        const { data: clienteCriado, error } = await supabase
+          .from("clientes")
+          .insert([dataToSave])
+          .select()
+          .single();
 
         if (error) {
           console.error("Erro ao criar cliente:", error);
           throw error;
         }
 
+        // Criar a obra associada ao cliente
+        // Buscar o último código de obra
+        const { data: ultimaObra, error: erroConsultaObra } = await supabase
+          .from("obras")
+          .select("codigo")
+          .order("codigo", { ascending: false })
+          .limit(1)
+          .single();
+
+        if (erroConsultaObra && erroConsultaObra.code !== 'PGRST116') {
+          console.error("Erro ao buscar último código de obra:", erroConsultaObra);
+          throw erroConsultaObra;
+        }
+
+        const novoCodigoObra = ultimaObra ? ultimaObra.codigo + 1 : 1;
+
+        // Calcular valor contratual = entrada + financiado + subsidio (SEM terreno)
+        const valorContratual = 
+          (obraData.entrada || 0) + 
+          (obraData.valor_financiado || 0) + 
+          (obraData.subsidio || 0);
+
+        const obraToSave = {
+          codigo: novoCodigoObra,
+          cliente_id: clienteCriado.id,
+          cliente_nome: formData.nome,
+          endereco: obraData.endereco_obra || formData.endereco,
+          status: formData.status,
+          valor_terreno: obraData.valor_terreno,
+          entrada: obraData.entrada,
+          valor_financiado: obraData.valor_financiado,
+          subsidio: obraData.subsidio,
+          valor_total: valorContratual,
+          empreiteiro_nome: obraData.empreiteiro_nome || null,
+          // Inicializar outros campos com 0
+          empreiteiro: 0,
+          material: 0,
+          terceirizado: 0,
+          mao_de_obra: 0,
+          pintor: 0,
+          eletricista: 0,
+          gesseiro: 0,
+          azulejista: 0,
+          manutencao: 0,
+          empreiteiro_valor_pago: 0,
+        };
+
+        const { error: obraError } = await supabase.from("obras").insert([obraToSave]);
+
+        if (obraError) {
+          console.error("Erro ao criar obra:", obraError);
+          throw obraError;
+        }
+
         // Sucesso - mostrar toast
         toast({
-          title: "✅ Cliente cadastrado!",
-          description: `${formData.nome} foi cadastrado com sucesso.`,
+          title: "✅ Cliente e Obra cadastrados!",
+          description: `${formData.nome} e sua obra foram cadastrados com sucesso.`,
           duration: 3000,
         });
       }
@@ -467,20 +543,147 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             />
           </div>
 
-          {/* Informação sobre valores financeiros */}
-          <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-            <div className="flex items-start gap-3">
-              <DollarSign className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm font-semibold text-blue-900 mb-1">
-                  💡 Valores Financeiros
-                </p>
-                <p className="text-xs text-blue-700">
-                  Os valores financeiros (terreno, entrada, financiamento, subsídio) são calculados automaticamente 
-                  com base nas <strong>obras vinculadas</strong> a este cliente. Para alterar valores, edite as obras 
-                  individualmente.
-                </p>
+          {/* Separador de Seção - Dados da Obra */}
+          <div className="pt-6 border-t-2 border-gray-200">
+            <div className="flex items-center gap-2 mb-4">
+              <Building2 className="h-5 w-5 text-[#F5C800]" />
+              <h3 className="text-base font-bold text-[#1E1E1E]">Dados da Obra</h3>
+            </div>
+          </div>
+
+          {/* Endereço da Obra */}
+          <div className="space-y-2">
+            <Label htmlFor="endereco_obra" className="text-sm font-semibold">
+              Endereço da Obra *
+            </Label>
+            <Input
+              id="endereco_obra"
+              required
+              value={obraData.endereco_obra}
+              onChange={(e) => setObraData({ ...obraData, endereco_obra: e.target.value })}
+              placeholder="Se vazio, usará o endereço do cliente"
+              disabled={isLoading}
+              className="border-2 focus:border-[#F5C800]"
+            />
+            <p className="text-xs text-muted-foreground">
+              Se não preencher, o endereço do cliente será usado
+            </p>
+          </div>
+
+          {/* Valores Financeiros da Obra */}
+          <div>
+            <h4 className="text-sm font-semibold mb-3 text-gray-700">Valores Financeiros</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Terreno */}
+              <div className="space-y-1">
+                <Label htmlFor="valor_terreno" className="text-sm font-medium">
+                  Terreno (R$)
+                </Label>
+                <Input
+                  id="valor_terreno"
+                  type="text"
+                  value={obraData.valor_terreno.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  onChange={(e) => {
+                    const numericValue = e.target.value.replace(/\D/g, '');
+                    const newValue = Number(numericValue) / 100;
+                    setObraData({ ...obraData, valor_terreno: newValue });
+                  }}
+                  disabled={isLoading}
+                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                  placeholder="0,00"
+                />
               </div>
+
+              {/* Entrada */}
+              <div className="space-y-1">
+                <Label htmlFor="entrada" className="text-sm font-medium">
+                  Entrada (R$)
+                </Label>
+                <Input
+                  id="entrada"
+                  type="text"
+                  value={obraData.entrada.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  onChange={(e) => {
+                    const numericValue = e.target.value.replace(/\D/g, '');
+                    const newValue = Number(numericValue) / 100;
+                    setObraData({ ...obraData, entrada: newValue });
+                  }}
+                  disabled={isLoading}
+                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                  placeholder="0,00"
+                />
+              </div>
+
+              {/* Subsídio */}
+              <div className="space-y-1">
+                <Label htmlFor="subsidio" className="text-sm font-medium">
+                  Subsídio (R$)
+                </Label>
+                <Input
+                  id="subsidio"
+                  type="text"
+                  value={obraData.subsidio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  onChange={(e) => {
+                    const numericValue = e.target.value.replace(/\D/g, '');
+                    const newValue = Number(numericValue) / 100;
+                    setObraData({ ...obraData, subsidio: newValue });
+                  }}
+                  disabled={isLoading}
+                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+
+            {/* Valor Financiado */}
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label htmlFor="valor_financiado" className="text-sm font-medium">
+                  Valor Financiado (R$)
+                </Label>
+                <Input
+                  id="valor_financiado"
+                  type="text"
+                  value={obraData.valor_financiado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  onChange={(e) => {
+                    const numericValue = e.target.value.replace(/\D/g, '');
+                    const newValue = Number(numericValue) / 100;
+                    setObraData({ ...obraData, valor_financiado: newValue });
+                  }}
+                  disabled={isLoading}
+                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                  placeholder="0,00"
+                />
+              </div>
+
+              {/* Nome do Empreiteiro */}
+              <div className="space-y-1">
+                <Label htmlFor="empreiteiro_nome" className="text-sm font-medium">
+                  Nome do Empreiteiro
+                </Label>
+                <Input
+                  id="empreiteiro_nome"
+                  type="text"
+                  value={obraData.empreiteiro_nome}
+                  onChange={(e) => setObraData({ ...obraData, empreiteiro_nome: e.target.value })}
+                  disabled={isLoading}
+                  className="border-2 focus:border-[#F5C800] text-lg h-12 px-4"
+                  placeholder="Nome do empreiteiro"
+                />
+              </div>
+            </div>
+
+            {/* Valor Contratual - Destaque */}
+            <div className="mt-4 bg-[#F5C800] p-6 rounded-lg">
+              <p className="text-sm font-semibold text-[#1E1E1E] mb-2">
+                Valor Contratual
+              </p>
+              <p className="text-3xl font-bold text-[#1E1E1E]">
+                R$ {(obraData.entrada + obraData.valor_financiado + obraData.subsidio).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <p className="text-xs text-[#1E1E1E]/70 mt-2">
+                = Entrada + Financiado + Subsídio
+              </p>
             </div>
           </div>
 
