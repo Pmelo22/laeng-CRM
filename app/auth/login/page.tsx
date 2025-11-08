@@ -2,10 +2,10 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -48,15 +48,20 @@ export default function LoginPage() {
         <Card className="border-0 shadow-2xl">
           <CardHeader className="space-y-4 pb-8">
             <div className="flex items-center justify-center">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#F5C800] to-yellow-400 flex items-center justify-center shadow-lg shadow-yellow-500/30 transform hover:scale-105 transition-transform">
-                <span className="text-5xl font-black text-black">A</span>
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#F5C800] to-yellow-400 flex items-center justify-center shadow-lg shadow-yellow-500/30 transform hover:scale-105 transition-transform">
+                <Image 
+                  src="/icon.jpg" 
+                  alt="LA Engenharia Logo" 
+                  width={90}
+                  height={90}
+                  className="w-27 h-27"
+                />
               </div>
             </div>
             <div className="text-center space-y-2">
-              <CardTitle className="text-3xl font-bold tracking-tight">Setor Escritório</CardTitle>
-              <CardDescription className="text-base">
-                Sistema de Gestão de Engenharia
-              </CardDescription>
+              <CardTitle className="text-3xl font-bold tracking-tight" style={{ fontFamily: "'Engravers Gothic BT', sans-serif" }}>
+                LA Engenharia
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="pb-8">
@@ -110,9 +115,22 @@ export default function LoginPage() {
             </form>
           </CardContent>
         </Card>
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          © 2025 Setor Escritório - Gestão de Engenharia
-        </p>
+        <div className="text-center mt-6 space-y-2">
+          <p className="text-sm text-muted-foreground">
+            © 2025 LA Engenharia
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Desenvolvido por{" "}
+            <a 
+              href="https://www.linkedin.com/in/pmelo22" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="font-semibold text-[#F5C800] hover:text-yellow-400 transition-colors underline"
+            >
+              Patrick Albuquerque
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

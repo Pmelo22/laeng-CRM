@@ -1,3 +1,6 @@
+/* Fonte Engravers Gothic */
+@import url('https://fonts.cdnfonts.com/css/engravers-gothic-bt');
+
 @import 'tailwindcss';
 @import 'leaflet/dist/leaflet.css';
 
@@ -60,6 +63,11 @@ body {
   padding: 0;
 }
 
+/* TODAS AS LETRAS EM MAIÚSCULO - Aplicado globalmente */
+body, body * {
+  text-transform: uppercase !important;
+}
+
 /* Scrollbar customizada - fina e discreta */
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
@@ -82,4 +90,18 @@ body {
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: #d1d5db transparent;
+}
+
+/* Animação de highlight para obras */
+@keyframes highlight-pulse {
+  0%, 100% {
+    background-color: rgba(245, 200, 0, 0.2);
+  }
+  50% {
+    background-color: rgba(245, 200, 0, 0.4);
+  }
+}
+
+.highlight-pulse {
+  animation: highlight-pulse 1s ease-in-out 3;
 }

@@ -9,6 +9,8 @@ import { User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Penci
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
 import { ClienteEditModal } from "@/components/cliente-edit-modal"
+import { formatCurrency, formatDate } from "@/lib/utils"
+import { getClienteStatusBadge } from "@/lib/status-utils"
 
 interface ClientesTableProps {
   clientes: Cliente[]
@@ -41,11 +43,13 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
   const filteredClientes = useMemo(() => {
     if (!searchTerm) return clientes
     
-    const term = searchTerm.toLowerCase()
-    return clientes.filter(cliente => 
-      cliente.codigo?.toString().includes(term) ||
-      cliente.nome?.toLowerCase().includes(term)
-    )
+    const term = searchTerm.toLowerCase().replace('#', '')
+    return clientes.filter(cliente => {
+      const codigoFormatado = String(cliente.codigo || 0).padStart(3, '0')
+      return codigoFormatado.includes(term) ||
+        cliente.codigo?.toString().includes(term) ||
+        cliente.nome?.toLowerCase().includes(term)
+    })
   }, [clientes, searchTerm])
 
   // Função para alternar ordenação (3 estados: asc → desc → none)
@@ -167,43 +171,6 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
     return pages
   }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value)
-  }
-
-  const formatDate = (date: string | null | undefined) => {
-    if (!date) return "-"
-    return new Date(date).toLocaleDateString('pt-BR')
-  }
-
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      "FINALIZADO": { 
-        color: "bg-green-100 text-green-700 border-green-300", 
-        label: "Finalizado"
-      },
-      "EM ANDAMENTO": { 
-        color: "bg-red-100 text-red-700 border-red-300", 
-        label: "Em Andamento"
-      },
-      "PENDENTE": { 
-        color: "bg-yellow-100 text-yellow-600 border-yellow-300", 
-        label: "Pendente"
-      },
-    }
-
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig["PENDENTE"]
-
-    return (
-      <Badge variant="outline" className={`${config.color} border font-medium px-2 py-1 text-xs`}>
-        <span className="font-bold">{config.label}</span>
-      </Badge>
-    )
-  }
-
   if (clientes.length === 0) {
     return <div className="text-center py-8 text-muted-foreground">Nenhum cliente cadastrado ainda.</div>
   }
@@ -251,19 +218,19 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
                 {getSortIcon('data_cadastro')}
               </div>
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               TERRENO (R$)
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               ENTRADA (R$)
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               VALOR FINANCIADO (R$)
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               SUBSÍDIO (R$)
             </TableHead>
-            <TableHead className="text-center text-[#F5C800] font-bold py-3 bg-yellow-900/20">
+            <TableHead className="text-center text-[#F5C800] font-bold py-3">
               VALOR TOTAL (R$)
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">AÇÕES</TableHead>
@@ -274,31 +241,31 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
             <TableRow key={cliente.id} className="hover:bg-[#F5C800]/5 border-b">
               <TableCell className="py-3">
                 <Badge className="font-mono bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold text-xs px-2 py-1">
-                  {cliente.codigo || 0}
+                  #{String(cliente.codigo || 0).padStart(3, '0')}
                 </Badge>
               </TableCell>
               <TableCell className="font-medium py-3">
                 <span className="font-semibold text-sm">{cliente.nome}</span>
               </TableCell>
               <TableCell className="py-3">
-                {getStatusBadge(cliente.status || "PENDENTE")}
+                {getClienteStatusBadge(cliente.status || "PENDENTE")}
               </TableCell>
               <TableCell className="text-center py-3">
                 <span className="text-sm">{formatDate(cliente.data_cadastro)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
-                <span className="text-sm">{formatCurrency(cliente.valor_terreno || 0)}</span>
+              <TableCell className="text-center py-3 font-bold">
+                <span className="text-sm text-black">{formatCurrency(cliente.valor_terreno || 0)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
-                <span className="text-sm">{formatCurrency(cliente.entrada || 0)}</span>
+              <TableCell className="text-center py-3 font-bold">
+                <span className="text-sm text-black">{formatCurrency(cliente.entrada || 0)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
-                <span className="text-sm">{formatCurrency(cliente.valor_financiado || 0)}</span>
+              <TableCell className="text-center py-3 font-bold">
+                <span className="text-sm text-black">{formatCurrency(cliente.valor_financiado || 0)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-semibold">
-                <span className="text-sm">{formatCurrency(cliente.subsidio || 0)}</span>
+              <TableCell className="text-center py-3 font-bold">
+                <span className="text-sm text-black">{formatCurrency(cliente.subsidio || 0)}</span>
               </TableCell>
-              <TableCell className="text-center py-3 bg-yellow-50 font-bold">
+              <TableCell className="text-center py-3 font-bold">
                 <span className="text-sm text-green-700">{formatCurrency(cliente.valor_total || 0)}</span>
               </TableCell>
               <TableCell className="py-3">

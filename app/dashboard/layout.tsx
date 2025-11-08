@@ -14,6 +14,7 @@ import {
   User
 } from 'lucide-react';
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -55,16 +56,25 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     <div className="flex items-center justify-center h-16 border-b border-gray-800 bg-[#1E1E1E]">
       {collapsed ? (
         <div className="w-10 h-10 rounded-lg bg-[#F5C800] flex items-center justify-center">
-          <span className="text-2xl font-black text-black">A</span>
+          <Image 
+            src="/icon.jpg" 
+            alt="LA" 
+            width={40}
+            height={40}
+          />
         </div>
       ) : (
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-[#F5C800] flex items-center justify-center shadow-lg">
-            <span className="text-3xl font-black text-[#1E1E1E]">A</span>
+            <Image 
+              src="/icon.jpg" 
+              alt="LA Engenharia" 
+              width={50}
+              height={50}
+            />
           </div>
           <div className="flex flex-col">
-            <span className="text-xl font-black text-white">LA Engenharia</span>
-            <span className="text-xs text-[#F5C800] font-medium">Sistema de Gestão</span>
+            <span className="text-xl font-black text-white" style={{ fontFamily: "'Engravers Gothic BT', sans-serif" }}>LA Engenharia</span>
           </div>
         </div>
       )}
@@ -170,6 +180,23 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
           </Button>
         </form>
       </div>
+
+      {/* Créditos do Desenvolvedor */}
+      {!collapsed && (
+        <div className="border-t border-gray-800 p-3 bg-[#2A2A2A]">
+          <p className="text-xs text-center text-gray-400">
+            Desenvolvido por{" "}
+            <a 
+              href="https://www.linkedin.com/in/pmelo22" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#F5C800] hover:text-yellow-400 transition-colors"
+            >
+              Patrick Albuquerque
+            </a>
+          </p>
+        </div>
+      )}
     </aside>
   );
 }
@@ -201,7 +228,7 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
       {/* Sidebar */}
       <aside 
         className={cn(
-          "fixed top-0 left-0 h-full w-72 bg-[#1E1E1E] border-r border-gray-800 z-50 lg:hidden transition-transform duration-300 ease-in-out",
+          "fixed top-0 left-0 h-full w-72 bg-[#1E1E1E] border-r border-gray-800 z-50 lg:hidden transition-transform duration-300 ease-in-out flex flex-col",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -215,7 +242,7 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
           </button>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 128px)' }}>
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -249,6 +276,21 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             </Button>
           </form>
         </div>
+
+        {/* Créditos do Desenvolvedor */}
+        <div className="border-t border-gray-800 p-3 bg-[#2A2A2A]">
+          <p className="text-xs text-center text-gray-400">
+            Desenvolvido por{" "}
+            <a 
+              href="https://www.linkedin.com/in/pmelo22" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#F5C800] hover:text-yellow-400 transition-colors"
+            >
+              Patrick Albuquerque
+            </a>
+          </p>
+        </div>
       </aside>
     </>
   );
@@ -278,9 +320,14 @@ export default function DashboardLayout({
           </button>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#F5C800] flex items-center justify-center">
-              <span className="text-lg font-black text-black">A</span>
+              <Image 
+                src="/icon.jpg" 
+                alt="LA" 
+                width={32}
+                height={32}
+              />
             </div>
-            <span className="text-sm font-bold">Setor Escritório</span>
+            <span className="text-sm font-bold" style={{ fontFamily: "'Engravers Gothic BT', sans-serif" }}>LA ENGENHARIA</span>
           </div>
         </header>
 

@@ -1,43 +1,45 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Construction, ArrowLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { redirect } from "next/navigation"
+import { createClient } from "@/lib/supabase/server"
+import type { ObraComCliente } from "@/lib/types"
+import ObrasPageContent from "./obras-page-content"
 
 export const dynamic = 'force-dynamic';
 
 export default async function ObrasPage() {
-  return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
-      <div className="container mx-auto px-4 py-8">
-        <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link href="/dashboard">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar ao Dashboard
-          </Link>
-        </Button>
+  const supabase = await createClient()
 
-        <div className="flex items-center justify-center min-h-[70vh]">
-          <Card className="max-w-md w-full border-0 shadow-lg">
-            <CardHeader className="text-center pb-4">
-              <div className="flex justify-center mb-4">
-                <div className="p-4 bg-orange-100 rounded-full">
-                  <Construction className="h-12 w-12 text-orange-600" />
-                </div>
-              </div>
-              <CardTitle className="text-2xl">Em Manutenção</CardTitle>
-              <CardDescription className="text-base mt-2">
-                Esta página está temporariamente indisponível
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Estamos trabalhando para melhorar esta funcionalidade.
-                Por favor, acesse a seção de <strong>Clientes</strong> através do menu lateral.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  )
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
+  if (error || !user) {
+    redirect("/auth/login")
+  }
+
+  // Buscar obras com informações do cliente
+  const { data: obrasData } = await supabase
+    .from("obras")
+    .select(`
+      *,
+      clientes:cliente_id (
+        nome,
+        endereco,
+        cidade,
+        telefone,
+        email
+      )
+    `)
+    .order("codigo", { ascending: true })
+
+  // Transformar dados para incluir informações do cliente
+  const obras: ObraComCliente[] = (obrasData || []).map((obra) => ({
+    ...obra,
+    cliente_nome: (obra.clientes as { nome?: string })?.nome || 'Cliente não encontrado',
+    cliente_endereco: (obra.clientes as { endereco?: string })?.endereco || '',
+    cliente_cidade: (obra.clientes as { cidade?: string })?.cidade || '',
+    cliente_telefone: (obra.clientes as { telefone?: string })?.telefone || '',
+    cliente_email: (obra.clientes as { email?: string })?.email || '',
+  }))
+
+  return <ObrasPageContent obras={obras} />
 }
