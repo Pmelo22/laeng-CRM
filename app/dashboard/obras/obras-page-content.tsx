@@ -42,12 +42,14 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
   const metrics = useMemo(() => {
     const finalizadas = obras.filter(o => o.status === 'FINALIZADO').length
     const emAndamento = obras.filter(o => o.status === 'EM ANDAMENTO').length
+    const pendentes = obras.filter(o => o.status === 'PENDENTE' || !o.status).length
     const valorTotal = obras.reduce((sum, o) => sum + (o.valor_total || 0), 0)
     
     return {
       total: obras.length,
       finalizadas,
       emAndamento,
+      pendentes,
       valorTotal
     }
   }, [obras])
@@ -97,6 +99,11 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
                 <span>{metrics.emAndamento}</span>
                 <span className="ml-1.5">Em Andamento</span>
               </Badge>
+              <span className="text-[#F5C800] hidden sm:inline">•</span>
+              <Badge variant="secondary" className="bg-yellow-500 text-black border-yellow-500 hover:bg-yellow-600 px-3 py-1.5 font-semibold text-sm">
+                <span>{metrics.pendentes}</span>
+                <span className="ml-1.5">Pendentes</span>
+              </Badge>
             </div>
           </div>
 
@@ -116,7 +123,7 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
             {/* Filtro */}
             <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:!w-[220px] !h-10 sm:!h-12 px-4 sm:px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E] text-sm sm:text-base">
+                <SelectTrigger className="w-full sm:!w-[250px] !h-10 sm:!h-12 px-4 sm:px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E] text-sm sm:text-base">
                   <Filter className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-[#1E1E1E]" />
                   <SelectValue placeholder="Filtrar" />
                 </SelectTrigger>
@@ -132,6 +139,12 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 rounded-full bg-orange-600" />
                       Em Andamento
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="PENDENTE">
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                      Pendente
                     </div>
                   </SelectItem>
                 </SelectContent>

@@ -37,7 +37,7 @@ export interface Obra {
   endereco_obra?: string;
   cidade_obra?: string;
   estado_obra?: string;
-  status: 'FINALIZADO' | 'EM ANDAMENTO';
+  status: 'FINALIZADO' | 'EM ANDAMENTO' | 'PENDENTE';
   entrada: number; // Valor pago na entrada
   valor_financiado: number; // Valor financiado pela instituição
   subsidio: number; // Subsídio/incentivo fiscal

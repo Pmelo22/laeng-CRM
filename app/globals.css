@@ -63,6 +63,11 @@ body {
   padding: 0;
 }
 
+/* TODAS AS LETRAS EM MAIÚSCULO - Aplicado globalmente */
+body, body * {
+  text-transform: uppercase !important;
+}
+
 /* Scrollbar customizada - fina e discreta */
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
