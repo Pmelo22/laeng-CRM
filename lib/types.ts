@@ -37,7 +37,7 @@ export interface Obra {
   endereco_obra?: string;
   cidade_obra?: string;
   estado_obra?: string;
-  status: 'FINALIZADO' | 'EM ANDAMENTO';
+  status: 'FINALIZADO' | 'EM ANDAMENTO' | 'PENDENTE';
   entrada: number; // Valor pago na entrada
   valor_financiado: number; // Valor financiado pela instituição
   subsidio: number; // Subsídio/incentivo fiscal
@@ -74,4 +74,70 @@ export interface ObraComCliente extends Obra {
   cliente_cidade: string;
   cliente_telefone?: string;
   cliente_email?: string;
+}
+
+// ============ TIPOS FINANCEIROS ============
+
+export interface Medicao {
+  id: string;
+  obra_id: string;
+  numero_medicao: number; // 1 a 5
+  valor: number;
+  data_pagamento: string;
+  forma_pagamento?: 'DINHEIRO' | 'PIX' | 'TRANSFERENCIA' | 'CHEQUE' | 'BOLETO';
+  observacoes?: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FluxoCaixa {
+  id: string;
+  tipo: 'ENTRADA' | 'SAIDA';
+  categoria: string;
+  valor: number;
+  data_movimentacao: string;
+  obra_id?: string;
+  cliente_id?: string;
+  descricao: string;
+  forma_pagamento?: string;
+  observacoes?: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ObraFinanceiro {
+  id: string;
+  codigo: number;
+  cliente_nome: string;
+  status: string;
+  valor_total: number;
+  custo_total: number;
+  resultado: number;
+  margem_lucro: number;
+  total_medicoes_pagas: number;
+  saldo_pendente: number;
+  percentual_pago: number;
+}
+
+export interface DashboardFinanceiro {
+  total_obras: number;
+  obras_finalizadas: number;
+  obras_em_andamento: number;
+  obras_pendentes: number;
+  receita_total: number;
+  custo_total: number;
+  lucro_total: number;
+  margem_media: number;
+  obras_com_lucro: number;
+  obras_com_prejuizo: number;
+  obras_empate: number;
+}
+
+export interface FluxoResumo {
+  mes: string;
+  total_entradas: number;
+  total_saidas: number;
+  saldo_periodo: number;
 }
