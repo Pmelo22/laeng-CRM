@@ -354,7 +354,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                 <SelectContent>
                   <SelectItem value="PENDENTE">
                     <div className="flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
                       <span>PENDENTE</span>
                     </div>
                   </SelectItem>

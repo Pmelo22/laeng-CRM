@@ -18,7 +18,7 @@ const clienteStatusConfig: Record<ClienteStatus, StatusConfig> = {
     label: "Em Andamento"
   },
   "PENDENTE": { 
-    color: "bg-yellow-100 text-yellow-600 border-yellow-300", 
+    color: "bg-blue-100 text-blue-700 border-blue-300", 
     label: "Pendente"
   },
 }

@@ -64,7 +64,7 @@ export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
       default:
         return (
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
             <span className="text-sm">PENDENTE</span>
           </div>
         );
@@ -93,7 +93,7 @@ export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
         <SelectContent className="!z-[9999] bg-white border-2 shadow-xl" style={{ zIndex: 9999 }}>
           <SelectItem value="PENDENTE">
             <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
               <span>PENDENTE</span>
             </div>
           </SelectItem>
