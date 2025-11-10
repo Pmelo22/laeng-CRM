@@ -99,7 +99,7 @@ export default function FinanceiraPageContent({ obras }: FinanceiraPageContentPr
                 <span className="ml-1.5">Obras Ativas</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-orange-600 text-white border-orange-600 hover:bg-orange-700 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold text-sm">
                 <Clock className="h-4 w-4 mr-1.5" />
                 <span>{metrics.emAndamento}</span>
                 <span className="ml-1.5">Em Andamento</span>
@@ -135,7 +135,7 @@ export default function FinanceiraPageContent({ obras }: FinanceiraPageContentPr
                   <SelectItem value="all">Todos os Status</SelectItem>
                   <SelectItem value="EM ANDAMENTO">
                     <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-orange-600" />
+                      <div className="h-3 w-3 rounded-full bg-red-600" />
                       Em Andamento
                     </div>
                   </SelectItem>
