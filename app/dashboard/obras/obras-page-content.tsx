@@ -100,7 +100,7 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
                 <span className="ml-1.5">Em Andamento</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-yellow-500 text-black border-yellow-500 hover:bg-yellow-600 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 px-3 py-1.5 font-semibold text-sm">
                 <span>{metrics.pendentes}</span>
                 <span className="ml-1.5">Pendentes</span>
               </Badge>
@@ -143,7 +143,7 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
                   </SelectItem>
                   <SelectItem value="PENDENTE">
                     <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                      <div className="h-3 w-3 rounded-full bg-blue-600" />
                       Pendente
                     </div>
                   </SelectItem>
