@@ -95,7 +95,7 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
                 <span className="ml-1.5">Finalizadas</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-orange-600 text-white border-orange-600 hover:bg-orange-700 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold text-sm">
                 <span>{metrics.emAndamento}</span>
                 <span className="ml-1.5">Em Andamento</span>
               </Badge>
