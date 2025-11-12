@@ -66,25 +66,25 @@ export default function FinanceiraPageContent({ obras }: FinanceiraPageContentPr
               GESTÃO FINANCEIRA
             </h1>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-3 py-1.5 font-bold text-sm">
+              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-3 py-1.5 font-bold text-sm whitespace-nowrap">
                 <Building2 className="h-4 w-4 mr-1.5" />
                 <span>{metrics.total}</span>
                 <span className="ml-1.5">Obras</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-3 py-1.5 font-semibold text-sm whitespace-nowrap">
                 <CheckCircle2 className="h-4 w-4 mr-1.5" />
                 <span>{metrics.finalizadas}</span>
                 <span className="ml-1.5">Finalizadas</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold text-sm whitespace-nowrap">
                 <Clock className="h-4 w-4 mr-1.5" />
                 <span>{metrics.emAndamento}</span>
                 <span className="ml-1.5">Em Andamento</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 px-3 py-1.5 font-semibold text-sm whitespace-nowrap">
                 <span>{metrics.pendentes}</span>
                 <span className="ml-1.5">Pendentes</span>
               </Badge>
@@ -110,7 +110,7 @@ export default function FinanceiraPageContent({ obras }: FinanceiraPageContentPr
                   <SelectValue placeholder="Filtrar" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos os Status</SelectItem>
+                  <SelectItem value="all">STATUS</SelectItem>
                   <SelectItem value="FINALIZADO">
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 rounded-full bg-green-600" />

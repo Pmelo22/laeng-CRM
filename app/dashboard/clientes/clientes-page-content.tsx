@@ -68,18 +68,18 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
               Gestão de Clientes
             </h1>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-3 py-1.5 font-bold text-sm">
+              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-3 py-1.5 font-bold text-sm whitespace-nowrap">
                 <span>{metrics.total}</span>
                 <span className="ml-1.5">Clientes</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-3 py-1.5 font-semibold text-sm whitespace-nowrap">
                 <CheckCircle2 className="h-4 w-4 mr-1.5" />
                 <span>{metrics.finalizados}</span>
                 <span className="ml-1.5">Finalizados</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold text-sm whitespace-nowrap">
                 <Clock className="h-4 w-4 mr-1.5" />
                 <span>{metrics.emAndamento}</span>
                 <span className="ml-1.5">Em Andamento</span>
@@ -87,7 +87,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
               {metrics.pendentes > 0 && (
                 <>
                   <span className="text-[#F5C800] hidden sm:inline">•</span>
-                  <Badge variant="secondary" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 px-3 py-1.5 font-semibold text-sm">
+                  <Badge variant="secondary" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 px-3 py-1.5 font-semibold text-sm whitespace-nowrap">
                     <XCircle className="h-4 w-4 mr-1.5" />
                     <span>{metrics.pendentes}</span>
                     <span className="ml-1.5">Pendentes</span>
@@ -113,12 +113,12 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
             {/* Filtro e botão com mesma altura e largura */}
             <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="flex-1 sm:!w-[180px] !h-10 sm:!h-12 px-4 sm:px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E] text-sm sm:text-base">
+                <SelectTrigger className="flex-1 sm:!w-[180spx] !h-10 sm:!h-12 px-4 sm:px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E] text-sm sm:text-base">
                   <Filter className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-[#1E1E1E]" />
                   <SelectValue placeholder="Filtrar" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos os Status</SelectItem>
+                  <SelectItem value="all">STATUS</SelectItem>
                   <SelectItem value="FINALIZADO">
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 rounded-full bg-green-600" />
