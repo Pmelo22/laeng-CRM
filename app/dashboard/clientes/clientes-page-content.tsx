@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Plus, Search, CheckCircle2, Clock, XCircle, Filter } from "lucide-react"
+import { Plus, Search, CheckCircle2, Clock, XCircle, Filter, Eye, EyeOff } from "lucide-react"
 import { ClientesTable } from "@/components/clientes-table"
 import { ClienteModal } from "@/components/cliente-modal"
 import type { Cliente } from "@/lib/types"
@@ -18,7 +18,16 @@ interface ClientesPageContentProps {
 export default function ClientesPageContent({ clientes }: ClientesPageContentProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [showFinalizados, setShowFinalizados] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // Filtrar clientes baseado no toggle de finalizados
+  const clientesVisiveis = useMemo(() => {
+    if (showFinalizados) {
+      return clientes
+    }
+    return clientes.filter(c => c.status !== 'FINALIZADO')
+  }, [clientes, showFinalizados])
 
   // Calcular métricas
   const metrics = useMemo(() => {
@@ -36,7 +45,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
 
   // Filtrar clientes
   const filteredClientes = useMemo(() => {
-    return clientes.filter(cliente => {
+    return clientesVisiveis.filter(cliente => {
       const matchesSearch = !searchTerm || 
         cliente.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         cliente.codigo?.toString().includes(searchTerm) ||
@@ -46,7 +55,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
       
       return matchesSearch && matchesStatus
     })
-  }, [clientes, searchTerm, statusFilter])
+  }, [clientesVisiveis, searchTerm, statusFilter])
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
@@ -59,18 +68,18 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
               Gestão de Clientes
             </h1>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-3 py-1.5 font-bold text-sm">
+              <Badge variant="secondary" className="bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90 px-3 py-1.5 font-bold text-sm whitespace-nowrap">
                 <span>{metrics.total}</span>
-                <span className="ml-1.5">Cadastrados</span>
+                <span className="ml-1.5">Clientes</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-green-600 text-white border-green-600 hover:bg-green-700 px-3 py-1.5 font-semibold text-sm whitespace-nowrap">
                 <CheckCircle2 className="h-4 w-4 mr-1.5" />
                 <span>{metrics.finalizados}</span>
                 <span className="ml-1.5">Finalizados</span>
               </Badge>
               <span className="text-[#F5C800] hidden sm:inline">•</span>
-              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold text-sm">
+              <Badge variant="secondary" className="bg-red-600 text-white border-red-600 hover:bg-red-700 px-3 py-1.5 font-semibold text-sm whitespace-nowrap">
                 <Clock className="h-4 w-4 mr-1.5" />
                 <span>{metrics.emAndamento}</span>
                 <span className="ml-1.5">Em Andamento</span>
@@ -78,7 +87,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
               {metrics.pendentes > 0 && (
                 <>
                   <span className="text-[#F5C800] hidden sm:inline">•</span>
-                  <Badge variant="secondary" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 px-3 py-1.5 font-semibold text-sm">
+                  <Badge variant="secondary" className="bg-blue-600 text-white border-blue-600 hover:bg-blue-700 px-3 py-1.5 font-semibold text-sm whitespace-nowrap">
                     <XCircle className="h-4 w-4 mr-1.5" />
                     <span>{metrics.pendentes}</span>
                     <span className="ml-1.5">Pendentes</span>
@@ -104,12 +113,12 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
             {/* Filtro e botão com mesma altura e largura */}
             <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="flex-1 sm:!w-[240px] !h-10 sm:!h-12 px-3 sm:px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E] text-sm sm:text-base">
+                <SelectTrigger className="flex-1 sm:!w-[180spx] !h-10 sm:!h-12 px-4 sm:px-6 bg-white border-[#F5C800]/30 rounded-lg shadow-sm hover:border-[#F5C800] transition-colors whitespace-nowrap font-semibold text-[#1E1E1E] text-sm sm:text-base">
                   <Filter className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-[#1E1E1E]" />
                   <SelectValue placeholder="Filtrar" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos os Status</SelectItem>
+                  <SelectItem value="all">STATUS</SelectItem>
                   <SelectItem value="FINALIZADO">
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 rounded-full bg-green-600" />
@@ -118,7 +127,7 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
                   </SelectItem>
                   <SelectItem value="EM ANDAMENTO">
                     <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-red-600" />
+                      <div className="h-3 w-3 rounded-full bg-orange-600" />
                       Em Andamento
                     </div>
                   </SelectItem>
@@ -131,10 +140,34 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
                 </SelectContent>
               </Select>
 
+              <Button
+                onClick={() => setShowFinalizados(!showFinalizados)}
+                variant="outline"
+                className={`flex-1 sm:!w-[220px] !h-10 sm:!h-12 px-3 sm:px-6 rounded-lg font-semibold text-sm sm:text-base transition-all ${
+                  showFinalizados
+                    ? 'bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90'
+                    : 'bg-white text-[#1E1E1E] border-[#F5C800]/30 hover:border-[#F5C800]'
+                }`}
+              >
+                {showFinalizados ? (
+                  <>
+                    <Eye className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
+                    <span className="hidden xs:inline">Finalizados Visíveis</span>
+                    <span className="xs:hidden">Visível</span>
+                  </>
+                ) : (
+                  <>
+                    <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
+                    <span className="hidden xs:inline">Mostrar Finalizados</span>
+                    <span className="xs:hidden">Mostrar</span>
+                  </>
+                )}
+              </Button>
+
               {/* Botão Novo Cliente */}
               <Button 
                 onClick={() => setIsModalOpen(true)}
-                className="flex-1 sm:!w-[200px] !h-10 sm:!h-12 bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold shadow-lg hover:shadow-xl transition-all px-3 sm:px-6 rounded-lg whitespace-nowrap text-sm sm:text-base"
+                className="flex-1 sm:!w-[180px] !h-10 sm:!h-12 bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold shadow-lg hover:shadow-xl transition-all px-3 sm:px-6 rounded-lg whitespace-nowrap text-sm sm:text-base"
               >
                 <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                 <span className="hidden xs:inline">Novo Cliente</span>
