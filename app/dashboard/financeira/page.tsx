@@ -37,11 +37,11 @@ export default async function FinanceiraPage() {
     obras_empate: 0,
   }
 
-  // Buscar obras com dados financeiros
+  // Buscar TODAS as obras com dados financeiros (incluindo finalizadas)
   const { data: obrasData } = await supabase
     .from("vw_obras_financeiro")
     .select("*")
-    .order("resultado", { ascending: false })
+    .order("codigo", { ascending: true })
 
   const obras = (obrasData as unknown as ObraFinanceiro[]) || []
 
