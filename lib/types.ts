@@ -119,6 +119,11 @@ export interface ObraFinanceiro {
   total_medicoes_pagas: number;
   saldo_pendente: number;
   percentual_pago: number;
+  medicao_01?: number;
+  medicao_02?: number;
+  medicao_03?: number;
+  medicao_04?: number;
+  medicao_05?: number;
 }
 
 export interface DashboardFinanceiro {
