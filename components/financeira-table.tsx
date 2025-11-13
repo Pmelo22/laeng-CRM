@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import React, { useState, useMemo } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { 
   ChevronDown,
   ChevronUp,
@@ -13,8 +15,13 @@ import {
   ArrowDown,
   ChevronLeft,
   ChevronRight,
+  X,
 } from "lucide-react"
 import type { ObraFinanceiro } from "@/lib/types"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
+import { formatMoneyInput, parseMoneyInput } from "@/lib/utils"
 
 interface FinanceiraTableProps {
   obras: ObraFinanceiro[]
@@ -23,12 +30,24 @@ interface FinanceiraTableProps {
 type SortField = 'codigo' | 'cliente_nome' | 'status' | 'valor_total' | 'total_medicoes_pagas' | 'saldo_pendente' | 'custo_total' | 'resultado' | 'percentual_pago'
 type SortDirection = 'asc' | 'desc' | 'none'
 
+interface MedicaoData {
+  numero: number
+  valor: number
+  dataComputacao?: string
+}
+
 export function FinanceiraTable({ obras }: FinanceiraTableProps) {
+  const router = useRouter()
+  const { toast } = useToast()
+  const supabase = createClient()
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [sortField, setSortField] = useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>('none')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(20)
+  const [medicaoEditando, setMedicaoEditando] = useState<MedicaoData | null>(null)
+  const [obraIdEditando, setObraIdEditando] = useState<string | null>(null)
+  const [isLoadingMedicao, setIsLoadingMedicao] = useState(false)
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -168,6 +187,80 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
     setCurrentPage(1)
   }
 
+  const abrirEditorMedicao = (obraId: string, numeroMedicao: number, valorAtual: number, dataComputacao?: string) => {
+    setObraIdEditando(obraId)
+    setMedicaoEditando({
+      numero: numeroMedicao,
+      valor: valorAtual,
+      dataComputacao: dataComputacao || undefined,
+    })
+  }
+
+  const fecharEditorMedicao = () => {
+    setMedicaoEditando(null)
+    setObraIdEditando(null)
+  }
+
+  const salvarMedicao = async () => {
+    if (!medicaoEditando || !obraIdEditando) return
+
+    setIsLoadingMedicao(true)
+    try {
+      const obraEncontrada = obras.find(o => o.id === obraIdEditando)
+      if (!obraEncontrada) throw new Error("Obra não encontrada")
+
+      const dataComputacao = new Date().toISOString()
+      const numeroMedicao = medicaoEditando.numero
+      const campoMedicao = `medicao_0${numeroMedicao}`
+      const campoDataComputacao = `medicao_0${numeroMedicao}_data_computacao`
+
+      // Criar objeto de atualização dinamicamente
+      const updateData: Record<string, any> = {
+        [campoMedicao]: medicaoEditando.valor,
+        [campoDataComputacao]: dataComputacao,
+        updated_at: new Date().toISOString(),
+      }
+
+      // Atualizar a obra no Supabase
+      const { error } = await supabase
+        .from("obras")
+        .update(updateData)
+        .eq("id", obraIdEditando)
+
+      if (error) throw error
+
+      toast({
+        title: "✅ Medição salva!",
+        description: `Medição ${medicaoEditando.numero} atualizada com sucesso.`,
+        duration: 3000,
+      })
+
+      fecharEditorMedicao()
+      
+      // Recarregar dados do servidor após um pequeno delay
+      // para garantir que o banco de dados foi atualizado
+      setTimeout(() => {
+        router.refresh()
+      }, 500)
+    } catch (error) {
+      console.error("Erro ao salvar medição:", error)
+      toast({
+        title: "❌ Erro ao salvar",
+        description: "Ocorreu um erro ao salvar a medição. Tente novamente.",
+        variant: "destructive",
+        duration: 3000,
+      })
+    } finally {
+      setIsLoadingMedicao(false)
+    }
+  }
+
+  const formatarDataComputacao = (dataIso?: string) => {
+    if (!dataIso) return ""
+    const data = new Date(dataIso)
+    return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' })
+  }
+
   return (
     <div className="rounded-md border-2 border-[#F5C800]/20 overflow-hidden">
       <div className="overflow-x-auto relative">
@@ -264,8 +357,8 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                 const resultado = obra.resultado || 0
                 
                 return (
-                  <>
-                    <TableRow key={obra.id} className="hover:bg-[#F5C800]/5 border-b">
+                  <React.Fragment key={obra.id}>
+                    <TableRow className="hover:bg-[#F5C800]/5 border-b">
                       {/* Código */}
                       <TableCell className="py-3">
                         <Badge className="font-mono bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold text-xs px-2 py-1">
@@ -284,7 +377,7 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                           variant="secondary"
                           className={
                             obra.status === 'EM ANDAMENTO'
-                              ? 'bg-orange-100 text-orange-700 border-orange-200'
+                              ? 'bg-red-100 text-red-700 border-red-200 font-bold'
                               : obra.status === 'FINALIZADO'
                               ? 'bg-green-100 text-green-700 border-green-200'
                               : 'bg-blue-100 text-blue-700 border-blue-200'
@@ -382,50 +475,100 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                             </h4>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                               {/* Medição 01 */}
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 01</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">
-                                  {formatCurrency(obra.medicao_01 || 0)}
-                                </p>
-                              </div>
+                              <button
+                                onClick={() => abrirEditorMedicao(obra.id, 1, obra.medicao_01 || 0, obra.medicao_01_data_computacao)}
+                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
+                              >
+                                <div className="text-left">
+                                  <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 01</p>
+                                  <p className="text-base font-bold text-[#1E1E1E]">
+                                    {formatCurrency(obra.medicao_01 || 0)}
+                                  </p>
+                                  {obra.medicao_01_data_computacao && (
+                                    <p className="text-xs text-[#1E1E1E] font-semibold mt-2 opacity-75">
+                                      {formatarDataComputacao(obra.medicao_01_data_computacao)}
+                                    </p>
+                                  )}
+                                </div>
+                              </button>
                               
                               {/* Medição 02 */}
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 02</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">
-                                  {formatCurrency(obra.medicao_02 || 0)}
-                                </p>
-                              </div>
+                              <button
+                                onClick={() => abrirEditorMedicao(obra.id, 2, obra.medicao_02 || 0, obra.medicao_02_data_computacao)}
+                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
+                              >
+                                <div className="text-left">
+                                  <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 02</p>
+                                  <p className="text-base font-bold text-[#1E1E1E]">
+                                    {formatCurrency(obra.medicao_02 || 0)}
+                                  </p>
+                                  {obra.medicao_02_data_computacao && (
+                                    <p className="text-xs text-[#1E1E1E] font-semibold mt-2 opacity-75">
+                                      {formatarDataComputacao(obra.medicao_02_data_computacao)}
+                                    </p>
+                                  )}
+                                </div>
+                              </button>
                               
                               {/* Medição 03 */}
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 03</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">
-                                  {formatCurrency(obra.medicao_03 || 0)}
-                                </p>
-                              </div>
+                              <button
+                                onClick={() => abrirEditorMedicao(obra.id, 3, obra.medicao_03 || 0, obra.medicao_03_data_computacao)}
+                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
+                              >
+                                <div className="text-left">
+                                  <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 03</p>
+                                  <p className="text-base font-bold text-[#1E1E1E]">
+                                    {formatCurrency(obra.medicao_03 || 0)}
+                                  </p>
+                                  {obra.medicao_03_data_computacao && (
+                                    <p className="text-xs text-[#1E1E1E] font-semibold mt-2 opacity-75">
+                                      {formatarDataComputacao(obra.medicao_03_data_computacao)}
+                                    </p>
+                                  )}
+                                </div>
+                              </button>
                               
                               {/* Medição 04 */}
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 04</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">
-                                  {formatCurrency(obra.medicao_04 || 0)}
-                                </p>
-                              </div>
+                              <button
+                                onClick={() => abrirEditorMedicao(obra.id, 4, obra.medicao_04 || 0, obra.medicao_04_data_computacao)}
+                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
+                              >
+                                <div className="text-left">
+                                  <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 04</p>
+                                  <p className="text-base font-bold text-[#1E1E1E]">
+                                    {formatCurrency(obra.medicao_04 || 0)}
+                                  </p>
+                                  {obra.medicao_04_data_computacao && (
+                                    <p className="text-xs text-[#1E1E1E] font-semibold mt-2 opacity-75">
+                                      {formatarDataComputacao(obra.medicao_04_data_computacao)}
+                                    </p>
+                                  )}
+                                </div>
+                              </button>
                               
                               {/* Medição 05 */}
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 05</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">
-                                  {formatCurrency(obra.medicao_05 || 0)}
-                                </p>
-                              </div>
+                              <button
+                                onClick={() => abrirEditorMedicao(obra.id, 5, obra.medicao_05 || 0, obra.medicao_05_data_computacao)}
+                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
+                              >
+                                <div className="text-left">
+                                  <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 05</p>
+                                  <p className="text-base font-bold text-[#1E1E1E]">
+                                    {formatCurrency(obra.medicao_05 || 0)}
+                                  </p>
+                                  {obra.medicao_05_data_computacao && (
+                                    <p className="text-xs text-[#1E1E1E] font-semibold mt-2 opacity-75">
+                                      {formatarDataComputacao(obra.medicao_05_data_computacao)}
+                                    </p>
+                                  )}
+                                </div>
+                              </button>
                             </div>
                           </div>
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </React.Fragment>
                 )
               })
             ) : (
@@ -512,6 +655,68 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
           </div>
         </div>
       </div>
+
+      {/* Modal de Edição de Medição */}
+      <Dialog open={medicaoEditando !== null} onOpenChange={(open) => !open && fecharEditorMedicao()}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
+              Editar Medição {medicaoEditando?.numero}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#1E1E1E]">
+                Valor da Medição (R$)
+              </label>
+              <Input
+                type="text"
+                value={formatMoneyInput(medicaoEditando?.valor || 0)}
+                onChange={(e) => {
+                  const valor = parseMoneyInput(e.target.value)
+                  if (medicaoEditando) {
+                    setMedicaoEditando({
+                      ...medicaoEditando,
+                      valor: valor,
+                    })
+                  }
+                }}
+                placeholder="0,00"
+                className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+              />
+            </div>
+
+            {medicaoEditando?.dataComputacao && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-xs text-blue-700 font-semibold mb-1">Última computação:</p>
+                <p className="text-sm font-bold text-blue-900">
+                  {formatarDataComputacao(medicaoEditando.dataComputacao)}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={fecharEditorMedicao}
+              disabled={isLoadingMedicao}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={salvarMedicao}
+              disabled={isLoadingMedicao}
+              className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold"
+            >
+              {isLoadingMedicao ? "Salvando..." : "Salvar Medição"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

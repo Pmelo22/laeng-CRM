@@ -4,15 +4,12 @@ export interface Cliente {
   nome: string;
   status?: 'FINALIZADO' | 'EM ANDAMENTO' | 'PENDENTE'; // Status do cliente
   endereco?: string; // Endereço ou cidade
-  data_cadastro?: string; // Data de cadastro do cliente
-  responsavel_contato?: string; // Responsável pelo contato (LA, DERLANE, ANINHA, etc)
+  data_contrato?: string; // Data do contrato do cliente
   cpf_cnpj?: string;
   telefone?: string;
-  email?: string;
   cidade?: string;
   estado?: string;
   cep?: string;
-  observacoes?: string;
   created_by?: string;
   created_by_name?: string;
   updated_by_name?: string;
@@ -61,6 +58,17 @@ export interface Obra {
   ano_obra?: number;
   local_obra?: string;
   fase?: string;
+  // Campos de medições
+  medicao_01?: number;
+  medicao_02?: number;
+  medicao_03?: number;
+  medicao_04?: number;
+  medicao_05?: number;
+  medicao_01_data_computacao?: string;
+  medicao_02_data_computacao?: string;
+  medicao_03_data_computacao?: string;
+  medicao_04_data_computacao?: string;
+  medicao_05_data_computacao?: string;
   created_by?: string;
   created_by_name?: string;
   updated_by_name?: string;
@@ -73,7 +81,6 @@ export interface ObraComCliente extends Obra {
   cliente_endereco: string;
   cliente_cidade: string;
   cliente_telefone?: string;
-  cliente_email?: string;
 }
 
 // ============ TIPOS FINANCEIROS ============
@@ -124,6 +131,11 @@ export interface ObraFinanceiro {
   medicao_03?: number;
   medicao_04?: number;
   medicao_05?: number;
+  medicao_01_data_computacao?: string;
+  medicao_02_data_computacao?: string;
+  medicao_03_data_computacao?: string;
+  medicao_04_data_computacao?: string;
+  medicao_05_data_computacao?: string;
 }
 
 export interface DashboardFinanceiro {

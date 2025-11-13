@@ -25,8 +25,7 @@ export default async function ObrasPage() {
         nome,
         endereco,
         cidade,
-        telefone,
-        email
+        telefone
       )
     `)
     .order("codigo", { ascending: true })
@@ -38,7 +37,6 @@ export default async function ObrasPage() {
     cliente_endereco: (obra.clientes as { endereco?: string })?.endereco || '',
     cliente_cidade: (obra.clientes as { cidade?: string })?.cidade || '',
     cliente_telefone: (obra.clientes as { telefone?: string })?.telefone || '',
-    cliente_email: (obra.clientes as { email?: string })?.email || '',
   }))
 
   return <ObrasPageContent obras={obras} />

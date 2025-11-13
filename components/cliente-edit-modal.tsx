@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
@@ -51,15 +50,12 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
     nome: "",
     cpf_cnpj: "",
     telefone: "",
-    email: "",
     status: "PENDENTE" as "FINALIZADO" | "EM ANDAMENTO" | "PENDENTE",
     endereco: "",
     cidade: "",
     estado: "",
     cep: "",
-    responsavel_contato: "",
-    observacoes: "",
-    data_cadastro: new Date().toISOString().split('T')[0],
+    data_contrato: new Date().toISOString().split('T')[0],
   });
 
   const [obrasData, setObrasData] = useState<Record<string, ObraData>>({});
@@ -72,15 +68,12 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         nome: cliente.nome || "",
         cpf_cnpj: cliente.cpf_cnpj || "",
         telefone: cliente.telefone || "",
-        email: cliente.email || "",
         status: cliente.status || "PENDENTE",
         endereco: cliente.endereco || "",
         cidade: cliente.cidade || "",
         estado: cliente.estado || "",
         cep: cliente.cep || "",
-        responsavel_contato: cliente.responsavel_contato || "",
-        observacoes: cliente.observacoes || "",
-        data_cadastro: cliente.data_cadastro || new Date().toISOString().split('T')[0],
+        data_contrato: cliente.data_contrato || new Date().toISOString().split('T')[0],
       });
     } else {
       // Reset para novo cliente
@@ -88,15 +81,12 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         nome: "",
         cpf_cnpj: "",
         telefone: "",
-        email: "",
         status: "PENDENTE",
         endereco: "",
         cidade: "",
         estado: "",
         cep: "",
-        responsavel_contato: "",
-        observacoes: "",
-        data_cadastro: new Date().toISOString().split('T')[0],
+        data_contrato: new Date().toISOString().split('T')[0],
       });
     }
   }, [cliente]);
@@ -170,15 +160,12 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         nome: formData.nome.trim() || "",
         cpf_cnpj: formData.cpf_cnpj?.trim() || null,
         telefone: formData.telefone?.trim() || null,
-        email: formData.email?.trim() || null,
         status: formData.status,
         endereco: formData.endereco?.trim() || "",
         cidade: formData.cidade?.trim() || null,
         estado: formData.estado?.trim() || null,
         cep: formData.cep?.trim() || null,
-        responsavel_contato: formData.responsavel_contato?.trim() || null,
-        observacoes: formData.observacoes?.trim() || null,
-        data_cadastro: formData.data_cadastro,
+        data_contrato: formData.data_contrato,
       };
 
       if (cliente) {
@@ -326,19 +313,6 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
             </div>
           </div>
 
-          {/* Email */}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              disabled={isLoading}
-              className="border-2 focus:border-[#F5C800]"
-            />
-          </div>
-
           {/* Status e Data */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -374,13 +348,13 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="data_cadastro">Data de Cadastro *</Label>
+              <Label htmlFor="data_contrato">Data do Contrato *</Label>
               <Input
-                id="data_cadastro"
+                id="data_contrato"
                 type="date"
                 required
-                value={formData.data_cadastro}
-                onChange={(e) => setFormData({ ...formData, data_cadastro: e.target.value })}
+                value={formData.data_contrato}
+                onChange={(e) => setFormData({ ...formData, data_contrato: e.target.value })}
                 disabled={isLoading}
                 className="border-2 focus:border-[#F5C800]"
               />
@@ -439,32 +413,6 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                 className="border-2 focus:border-[#F5C800]"
               />
             </div>
-          </div>
-
-          {/* Responsável pelo Contato */}
-          <div className="space-y-2">
-            <Label htmlFor="responsavel_contato">Responsável pelo Contato</Label>
-            <Input
-              id="responsavel_contato"
-              value={formData.responsavel_contato}
-              onChange={(e) => setFormData({ ...formData, responsavel_contato: e.target.value })}
-              disabled={isLoading}
-              placeholder="Ex: LA, DERLANE, ANINHA"
-              className="border-2 focus:border-[#F5C800]"
-            />
-          </div>
-
-          {/* Observações */}
-          <div className="space-y-2">
-            <Label htmlFor="observacoes">Observações</Label>
-            <Textarea
-              id="observacoes"
-              value={formData.observacoes}
-              onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-              disabled={isLoading}
-              rows={3}
-              className="border-2 focus:border-[#F5C800] resize-none"
-            />
           </div>
 
           {/* Seção de Valores Financeiros - Apenas se for edição e tiver obras */}

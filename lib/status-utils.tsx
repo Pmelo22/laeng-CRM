@@ -29,7 +29,7 @@ const obraStatusConfig: Record<ObraStatus, StatusConfig> = {
     label: "Finalizado"
   },
   "EM ANDAMENTO": { 
-    color: "bg-orange-100 text-orange-700 border-orange-300", 
+    color: "bg-red-100 text-red-700 border-red-300", 
     label: "Em Andamento"
   },
 }
