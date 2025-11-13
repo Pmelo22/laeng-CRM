@@ -17,7 +17,7 @@ interface ClientesTableProps {
   searchTerm?: string
 }
 
-type SortField = 'codigo' | 'nome' | 'status' | 'endereco' | 'data_cadastro'
+type SortField = 'codigo' | 'nome' | 'status' | 'endereco' | 'data_contrato'
 type SortDirection = 'asc' | 'desc' | 'none'
 
 export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps) {
@@ -111,9 +111,9 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
           aValue = a.endereco?.toLowerCase() || ''
           bValue = b.endereco?.toLowerCase() || ''
           break
-        case 'data_cadastro':
-          aValue = a.data_cadastro || ''
-          bValue = b.data_cadastro || ''
+        case 'data_contrato':
+          aValue = a.data_contrato || ''
+          bValue = b.data_contrato || ''
           break
         default:
           return 0
@@ -211,11 +211,11 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
             </TableHead>
             <TableHead 
               className="text-center text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-              onClick={() => handleSort('data_cadastro')}
+              onClick={() => handleSort('data_contrato')}
             >
               <div className="flex items-center justify-center">
                 DATA
-                {getSortIcon('data_cadastro')}
+                {getSortIcon('data_contrato')}
               </div>
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
@@ -251,7 +251,7 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
                 {getClienteStatusBadge(cliente.status || "PENDENTE")}
               </TableCell>
               <TableCell className="text-center py-3">
-                <span className="text-sm">{formatDate(cliente.data_cadastro)}</span>
+                <span className="text-sm">{formatDate(cliente.data_contrato)}</span>
               </TableCell>
               <TableCell className="text-center py-3 font-bold">
                 <span className="text-sm text-black font-bold">{formatCurrency(cliente.valor_terreno || 0)}</span>

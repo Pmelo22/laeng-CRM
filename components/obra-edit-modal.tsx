@@ -137,9 +137,9 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-[#1E1E1E]">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b">
+          <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
             Editar Custos da Obra
           </DialogTitle>
           {obra && (
@@ -149,13 +149,13 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
           )}
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="overflow-y-auto px-6 py-4 space-y-6 scrollbar-thin pr-4 flex-1">
           {/* Seção de Custos Principais */}
           <div>
             <h3 className="text-base font-bold text-[#1E1E1E] mb-4">
               Custos Principais
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Empreiteiro */}
               <div className="space-y-1">
                 <Label htmlFor="empreiteiro" className="text-sm font-medium">
@@ -166,22 +166,6 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                   type="text"
                   value={formatMoneyInput(obraData.empreiteiro)}
                   onChange={(e) => handleInputChange('empreiteiro', e.target.value)}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-
-              {/* Terceirizado */}
-              <div className="space-y-1">
-                <Label htmlFor="terceirizado" className="text-sm font-medium">
-                  Terceirizado (R$)
-                </Label>
-                <Input
-                  id="terceirizado"
-                  type="text"
-                  value={formatMoneyInput(obraData.terceirizado)}
-                  onChange={(e) => handleInputChange('terceirizado', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
                   placeholder="0,00"
@@ -211,7 +195,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
             <h3 className="text-base font-bold text-[#1E1E1E] mb-4">
               Demonstrativo Financeiro do Empreiteiro
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-4">
               {/* Nome do Empreiteiro */}
               <div className="space-y-1">
                 <Label htmlFor="empreiteiro_nome" className="text-sm font-medium">
@@ -228,35 +212,38 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                 />
               </div>
 
-              {/* Valor Pago */}
-              <div className="space-y-1">
-                <Label htmlFor="empreiteiro_valor_pago" className="text-sm font-medium">
-                  Valor Pago (R$)
-                </Label>
-                <Input
-                  id="empreiteiro_valor_pago"
-                  type="text"
-                  value={formatMoneyInput(obraData.empreiteiro_valor_pago)}
-                  onChange={(e) => handleInputChange('empreiteiro_valor_pago', e.target.value)}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
+              {/* Valor Pago e Saldo */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Valor Pago */}
+                <div className="space-y-1">
+                  <Label htmlFor="empreiteiro_valor_pago" className="text-sm font-medium">
+                    Valor Pago (R$)
+                  </Label>
+                  <Input
+                    id="empreiteiro_valor_pago"
+                    type="text"
+                    value={formatMoneyInput(obraData.empreiteiro_valor_pago)}
+                    onChange={(e) => handleInputChange('empreiteiro_valor_pago', e.target.value)}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                    placeholder="0,00"
+                  />
+                </div>
 
-              {/* Saldo */}
-              <div className="space-y-1">
-                <Label htmlFor="empreiteiro_saldo" className="text-sm font-medium">
-                  Saldo (R$)
-                </Label>
-                <Input
-                  id="empreiteiro_saldo"
-                  type="text"
-                  value={formatMoneyInput(obraData.empreiteiro - obraData.empreiteiro_valor_pago)}
-                  disabled
-                  className="border-2 bg-gray-100 font-mono text-lg h-12 px-4 text-gray-600"
-                  placeholder="0,00"
-                />
+                {/* Saldo */}
+                <div className="space-y-1">
+                  <Label htmlFor="empreiteiro_saldo" className="text-sm font-medium">
+                    Saldo (R$)
+                  </Label>
+                  <Input
+                    id="empreiteiro_saldo"
+                    type="text"
+                    value={formatMoneyInput(obraData.empreiteiro - obraData.empreiteiro_valor_pago)}
+                    disabled
+                    className="border-2 bg-gray-100 font-mono text-lg h-12 px-4 text-gray-600"
+                    placeholder="0,00"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -266,85 +253,91 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
             <h3 className="text-base font-bold text-[#1E1E1E] mb-4">
               Terceirizados Especializados
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Pintor */}
-              <div className="space-y-1">
-                <Label htmlFor="pintor" className="text-sm font-medium">
-                  Pintor (R$)
-                </Label>
-                <Input
-                  id="pintor"
-                  type="text"
-                  value={formatMoneyInput(obraData.pintor)}
-                  onChange={(e) => handleInputChange('pintor', e.target.value)}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
+            <div className="space-y-4">
+              {/* Primeira linha: Pintor, Eletricista, Gesseiro */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Pintor */}
+                <div className="space-y-1">
+                  <Label htmlFor="pintor" className="text-sm font-medium">
+                    Pintor (R$)
+                  </Label>
+                  <Input
+                    id="pintor"
+                    type="text"
+                    value={formatMoneyInput(obraData.pintor)}
+                    onChange={(e) => handleInputChange('pintor', e.target.value)}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                    placeholder="0,00"
+                  />
+                </div>
+
+                {/* Eletricista */}
+                <div className="space-y-1">
+                  <Label htmlFor="eletricista" className="text-sm font-medium">
+                    Eletricista (R$)
+                  </Label>
+                  <Input
+                    id="eletricista"
+                    type="text"
+                    value={formatMoneyInput(obraData.eletricista)}
+                    onChange={(e) => handleInputChange('eletricista', e.target.value)}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                    placeholder="0,00"
+                  />
+                </div>
+
+                {/* Gesseiro */}
+                <div className="space-y-1">
+                  <Label htmlFor="gesseiro" className="text-sm font-medium">
+                    Gesseiro (R$)
+                  </Label>
+                  <Input
+                    id="gesseiro"
+                    type="text"
+                    value={formatMoneyInput(obraData.gesseiro)}
+                    onChange={(e) => handleInputChange('gesseiro', e.target.value)}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                    placeholder="0,00"
+                  />
+                </div>
               </div>
 
-              {/* Eletricista */}
-              <div className="space-y-1">
-                <Label htmlFor="eletricista" className="text-sm font-medium">
-                  Eletricista (R$)
-                </Label>
-                <Input
-                  id="eletricista"
-                  type="text"
-                  value={formatMoneyInput(obraData.eletricista)}
-                  onChange={(e) => handleInputChange('eletricista', e.target.value)}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
+              {/* Segunda linha: Azulejista, Manutenção */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Azulejista */}
+                <div className="space-y-1">
+                  <Label htmlFor="azulejista" className="text-sm font-medium">
+                    Azulejista (R$)
+                  </Label>
+                  <Input
+                    id="azulejista"
+                    type="text"
+                    value={formatMoneyInput(obraData.azulejista)}
+                    onChange={(e) => handleInputChange('azulejista', e.target.value)}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                    placeholder="0,00"
+                  />
+                </div>
 
-              {/* Gesseiro */}
-              <div className="space-y-1">
-                <Label htmlFor="gesseiro" className="text-sm font-medium">
-                  Gesseiro (R$)
-                </Label>
-                <Input
-                  id="gesseiro"
-                  type="text"
-                  value={formatMoneyInput(obraData.gesseiro)}
-                  onChange={(e) => handleInputChange('gesseiro', e.target.value)}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-
-              {/* Azulejista */}
-              <div className="space-y-1">
-                <Label htmlFor="azulejista" className="text-sm font-medium">
-                  Azulejista (R$)
-                </Label>
-                <Input
-                  id="azulejista"
-                  type="text"
-                  value={formatMoneyInput(obraData.azulejista)}
-                  onChange={(e) => handleInputChange('azulejista', e.target.value)}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-
-              {/* Manutenção */}
-              <div className="space-y-1">
-                <Label htmlFor="manutencao" className="text-sm font-medium">
-                  Manutenção (R$)
-                </Label>
-                <Input
-                  id="manutencao"
-                  type="text"
-                  value={formatMoneyInput(obraData.manutencao)}
-                  onChange={(e) => handleInputChange('manutencao', e.target.value)}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
+                {/* Manutenção */}
+                <div className="space-y-1">
+                  <Label htmlFor="manutencao" className="text-sm font-medium">
+                    Manutenção (R$)
+                  </Label>
+                  <Input
+                    id="manutencao"
+                    type="text"
+                    value={formatMoneyInput(obraData.manutencao)}
+                    onChange={(e) => handleInputChange('manutencao', e.target.value)}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                    placeholder="0,00"
+                  />
+                </div>
               </div>
             </div>
           </div>

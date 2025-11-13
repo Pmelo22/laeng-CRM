@@ -7,11 +7,9 @@ import Link from "next/link";
 import { 
   ArrowLeft, 
   User, 
-  Building2, 
   DollarSign
 } from "lucide-react";
 import { ClienteActions, ClienteStatusBadge, DeleteClienteButton } from "./cliente-actions";
-import { ObrasTableCliente } from "@/components/obras-table-cliente";
 
 export const dynamic = 'force-dynamic';
 
@@ -107,30 +105,13 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
               </div>
             </div>
 
-            {/* LINHA 2: Responsável, CPF, Email e Telefone */}
-            {(cliente.responsavel_contato || cliente.cpf_cnpj || cliente.email || cliente.telefone) && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-4">
-                {/* Responsável */}
-                {cliente.responsavel_contato && (
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs text-muted-foreground font-semibold uppercase block">RESPONSÁVEL</span>
-                    <p className="text-sm text-foreground">{cliente.responsavel_contato}</p>
-                  </div>
-                )}
-
-                {/* CPF/CNPJ */}
+            {/* LINHA 2: CPF e Telefone */}
+            {(cliente.cpf_cnpj || cliente.telefone) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 pb-4">
                 {cliente.cpf_cnpj && (
                   <div className="flex flex-col gap-2">
                     <span className="text-xs text-muted-foreground font-semibold uppercase block">CPF/CNPJ</span>
                     <p className="text-sm font-mono text-foreground">{cliente.cpf_cnpj}</p>
-                  </div>
-                )}
-
-                {/* Email */}
-                {cliente.email && (
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs text-muted-foreground font-semibold uppercase block">EMAIL</span>
-                    <p className="text-sm text-foreground break-all">{cliente.email}</p>
                   </div>
                 )}
 
@@ -277,19 +258,6 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                 </CardContent>
               </Card>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Seção de Gestão de Obras - Tabela Simplificada */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base sm:text-xl uppercase">
-              <Building2 className="h-5 w-5 text-[#F5C800]" />
-              GESTÃO DE OBRAS
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ObrasTableCliente obras={obras || []} />
           </CardContent>
         </Card>
       </div>

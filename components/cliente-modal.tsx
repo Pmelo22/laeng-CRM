@@ -31,15 +31,12 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     nome: "",
     cpf_cnpj: "",
     telefone: "",
-    email: "",
     status: "PENDENTE" as "FINALIZADO" | "EM ANDAMENTO" | "PENDENTE",
     endereco: "",
     cidade: "",
     estado: "",
     cep: "",
-    responsavel_contato: "",
-    observacoes: "",
-    data_cadastro: new Date().toISOString().split('T')[0],
+    data_contrato: new Date().toISOString().split('T')[0],
   });
 
   // Dados da obra
@@ -96,15 +93,12 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           nome: cliente.nome || "",
           cpf_cnpj: cliente.cpf_cnpj || "",
           telefone: cliente.telefone || "",
-          email: cliente.email || "",
           status: cliente.status || "PENDENTE",
           endereco: cliente.endereco || "",
           cidade: cliente.cidade || "",
           estado: cliente.estado || "",
           cep: cliente.cep || "",
-          responsavel_contato: cliente.responsavel_contato || "",
-          observacoes: cliente.observacoes || "",
-          data_cadastro: cliente.data_cadastro || new Date().toISOString().split('T')[0],
+          data_contrato: cliente.data_contrato || new Date().toISOString().split('T')[0],
         });
       } else {
         // Modal de criação - resetar para valores padrão
@@ -112,15 +106,12 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           nome: "",
           cpf_cnpj: "",
           telefone: "",
-          email: "",
           status: "PENDENTE",
           endereco: "",
           cidade: "",
           estado: "",
           cep: "",
-          responsavel_contato: "",
-          observacoes: "",
-          data_cadastro: new Date().toISOString().split('T')[0],
+          data_contrato: new Date().toISOString().split('T')[0],
         });
         setObraData({
           endereco_obra: "",
@@ -160,15 +151,12 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
         nome: formData.nome.trim() || "",
         cpf_cnpj: formData.cpf_cnpj?.trim() || null,
         telefone: formData.telefone?.trim() || null,
-        email: formData.email?.trim() || null,
         status: formData.status,
         endereco: formData.endereco?.trim() || "",
         cidade: formData.cidade?.trim() || null,
         estado: formData.estado?.trim() || null,
         cep: formData.cep?.trim() || null,
-        responsavel_contato: formData.responsavel_contato?.trim() || null,
-        observacoes: formData.observacoes?.trim() || null,
-        data_cadastro: formData.data_cadastro,
+        data_contrato: formData.data_contrato,
       };
 
       if (cliente) {
@@ -242,7 +230,7 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           empreiteiro_valor_pago: obraData.empreiteiro_valor_pago || 0,
           empreiteiro_saldo: (obraData.empreiteiro || 0) - (obraData.empreiteiro_valor_pago || 0),
           empreiteiro_percentual: obraData.empreiteiro > 0 ? ((obraData.empreiteiro_valor_pago || 0) / obraData.empreiteiro) * 100 : 0,
-          responsavel: obraData.responsavel || formData.responsavel_contato || null,
+          responsavel: obraData.responsavel || null,
           entidade: obraData.entidade || null,
           fase: obraData.fase || null,
           ano_obra: obraData.ano_obra || new Date().getFullYear(),
@@ -380,22 +368,6 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             </div>
           </div>
 
-          {/* Email */}
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-semibold">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="cliente@email.com"
-              disabled={isLoading}
-              className="border-2 focus:border-[#F5C800]"
-            />
-          </div>
-
           {/* Status e Data de Cadastro */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -433,15 +405,15 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="data_cadastro" className="text-sm font-semibold">
-                Data de Cadastro *
+              <Label htmlFor="data_contrato" className="text-sm font-semibold">
+                Data do Contrato *
               </Label>
               <Input
-                id="data_cadastro"
+                id="data_contrato"
                 type="date"
                 required
-                value={formData.data_cadastro}
-                onChange={(e) => setFormData({ ...formData, data_cadastro: e.target.value })}
+                value={formData.data_contrato}
+                onChange={(e) => setFormData({ ...formData, data_contrato: e.target.value })}
                 disabled={isLoading}
                 className="border-2 focus:border-[#F5C800]"
               />
@@ -512,37 +484,6 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             </div>
           </div>
 
-          {/* Responsável pelo Contato */}
-          <div className="space-y-2">
-            <Label htmlFor="responsavel_contato" className="text-sm font-semibold">
-              Responsável pelo Contato
-            </Label>
-            <Input
-              id="responsavel_contato"
-              value={formData.responsavel_contato}
-              onChange={(e) => setFormData({ ...formData, responsavel_contato: e.target.value })}
-              placeholder="Ex: LA, DERLANE, ANINHA"
-              disabled={isLoading}
-              className="border-2 focus:border-[#F5C800]"
-            />
-          </div>
-
-          {/* Observações */}
-          <div className="space-y-2">
-            <Label htmlFor="observacoes" className="text-sm font-semibold">
-              Observações
-            </Label>
-            <textarea
-              id="observacoes"
-              value={formData.observacoes}
-              onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-              placeholder="Informações adicionais sobre o cliente"
-              disabled={isLoading}
-              rows={3}
-              className="w-full border-2 focus:border-[#F5C800] rounded-md px-3 py-2 text-sm resize-none"
-            />
-          </div>
-
           {/* Separador de Seção - Dados da Obra - APENAS PARA NOVO CLIENTE */}
           {!cliente && (
             <>
@@ -550,168 +491,6 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             <div className="flex items-center gap-2 mb-4">
               <Building2 className="h-5 w-5 text-[#F5C800]" />
               <h3 className="text-base font-bold text-[#1E1E1E]">Dados da Obra</h3>
-            </div>
-          </div>
-
-          {/* Endereço da Obra */}
-          <div className="space-y-2">
-            <Label htmlFor="endereco_obra" className="text-sm font-semibold">
-              Endereço da Obra
-            </Label>
-            <Input
-              id="endereco_obra"
-              value={obraData.endereco_obra}
-              onChange={(e) => setObraData({ ...obraData, endereco_obra: e.target.value })}
-              placeholder="Se vazio, usará o endereço do cliente"
-              disabled={isLoading}
-              className="border-2 focus:border-[#F5C800]"
-            />
-            <p className="text-xs text-muted-foreground">
-              Se não preencher, o endereço do cliente será usado
-            </p>
-          </div>
-
-          {/* Cidade e Estado da Obra */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="cidade_obra" className="text-sm font-semibold">
-                Cidade da Obra
-              </Label>
-              <Input
-                id="cidade_obra"
-                value={obraData.cidade_obra}
-                onChange={(e) => setObraData({ ...obraData, cidade_obra: e.target.value })}
-                placeholder="Se vazio, usará a cidade do cliente"
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="estado_obra" className="text-sm font-semibold">
-                Estado da Obra
-              </Label>
-              <Input
-                id="estado_obra"
-                value={obraData.estado_obra}
-                onChange={(e) => setObraData({ ...obraData, estado_obra: e.target.value.toUpperCase() })}
-                placeholder="UF"
-                maxLength={2}
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-          </div>
-
-          {/* Local e Tipo de Contrato */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="local_obra" className="text-sm font-semibold">
-                Local da Obra
-              </Label>
-              <Input
-                id="local_obra"
-                value={obraData.local_obra}
-                onChange={(e) => setObraData({ ...obraData, local_obra: e.target.value })}
-                placeholder="Ex: Área Rural, Centro, etc"
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tipo_contrato" className="text-sm font-semibold">
-                Tipo de Contrato
-              </Label>
-              <Select 
-                value={obraData.tipo_contrato} 
-                onValueChange={(value) => setObraData({ ...obraData, tipo_contrato: value as "PARTICULAR" | "PREFEITURA" | "CAIXA" | "FINANCIAMENTO" | "OUTRO" })}
-                disabled={isLoading}
-              >
-                <SelectTrigger className="border-2 focus:ring-[#F5C800] w-full">
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PARTICULAR">Particular</SelectItem>
-                  <SelectItem value="PREFEITURA">Prefeitura</SelectItem>
-                  <SelectItem value="CAIXA">Caixa</SelectItem>
-                  <SelectItem value="FINANCIAMENTO">Financiamento</SelectItem>
-                  <SelectItem value="OUTRO">Outro</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Responsável e Entidade */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="responsavel_obra" className="text-sm font-semibold">
-                Responsável pela Obra
-              </Label>
-              <Input
-                id="responsavel_obra"
-                value={obraData.responsavel}
-                onChange={(e) => setObraData({ ...obraData, responsavel: e.target.value })}
-                placeholder="Nome do responsável"
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="entidade" className="text-sm font-semibold">
-                Entidade
-              </Label>
-              <Input
-                id="entidade"
-                value={obraData.entidade}
-                onChange={(e) => setObraData({ ...obraData, entidade: e.target.value })}
-                placeholder="Ex: Banco, Órgão público"
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-          </div>
-
-          {/* Fase, Ano e Data de Conclusão */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="fase" className="text-sm font-semibold">
-                Fase da Obra
-              </Label>
-              <Input
-                id="fase"
-                value={obraData.fase}
-                onChange={(e) => setObraData({ ...obraData, fase: e.target.value })}
-                placeholder="Ex: Fundação, Acabamento"
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ano_obra" className="text-sm font-semibold">
-                Ano da Obra
-              </Label>
-              <Input
-                id="ano_obra"
-                type="number"
-                value={obraData.ano_obra}
-                onChange={(e) => setObraData({ ...obraData, ano_obra: parseInt(e.target.value) || new Date().getFullYear() })}
-                min={2000}
-                max={2100}
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="data_conclusao" className="text-sm font-semibold">
-                Data de Conclusão
-              </Label>
-              <Input
-                id="data_conclusao"
-                type="date"
-                value={obraData.data_conclusao}
-                onChange={(e) => setObraData({ ...obraData, data_conclusao: e.target.value })}
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800]"
-              />
             </div>
           </div>
 

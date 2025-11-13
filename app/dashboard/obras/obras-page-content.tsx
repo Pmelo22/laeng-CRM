@@ -147,7 +147,7 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
                   </SelectItem>
                   <SelectItem value="EM ANDAMENTO">
                     <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-orange-600" />
+                      <div className="h-3 w-3 rounded-full bg-red-700" />
                       Em Andamento
                     </div>
                   </SelectItem>

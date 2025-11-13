@@ -302,7 +302,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                       </TableCell>
                       <TableCell className="text-center py-3">
                         <div className="flex items-center justify-center gap-2">
-                          <div className="min-w-[120px] text-left">
+                          <div className="min-w-[120px] text-center">
                             <div className="text-sm font-semibold">{obra.empreiteiro_nome || 'SEM EMPREITEIRO'}</div>
                             <div className="text-xs font-bold text-black">{formatCurrency(valorEmpreiteiro)}</div>
                           </div>
