@@ -46,14 +46,27 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     estado_obra: "",
     local_obra: "",
     tipo_contrato: "PARTICULAR" as "PARTICULAR" | "PREFEITURA" | "CAIXA" | "FINANCIAMENTO" | "OUTRO",
+    // Valores financeiros
     valor_terreno: 0,
     entrada: 0,
     valor_financiado: 0,
     subsidio: 0,
     valor_obra: 0,
-    empreiteiro_nome: "",
+    // Custos principais
     empreiteiro: 0,
+    material: 0,
+    terceirizado: 0,
+    mao_de_obra: 0,
+    // Dados do empreiteiro
+    empreiteiro_nome: "",
     empreiteiro_valor_pago: 0,
+    // Terceirizados especializados
+    pintor: 0,
+    eletricista: 0,
+    gesseiro: 0,
+    azulejista: 0,
+    manutencao: 0,
+    // Outros dados
     responsavel: "",
     entidade: "",
     fase: "",
@@ -119,14 +132,27 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           estado_obra: "",
           local_obra: "",
           tipo_contrato: "PARTICULAR",
+          // Valores financeiros
           valor_terreno: 0,
           entrada: 0,
           valor_financiado: 0,
           subsidio: 0,
           valor_obra: 0,
-          empreiteiro_nome: "",
+          // Custos principais
           empreiteiro: 0,
+          material: 0,
+          terceirizado: 0,
+          mao_de_obra: 0,
+          // Dados do empreiteiro
+          empreiteiro_nome: "",
           empreiteiro_valor_pago: 0,
+          // Terceirizados especializados
+          pintor: 0,
+          eletricista: 0,
+          gesseiro: 0,
+          azulejista: 0,
+          manutencao: 0,
+          // Outros dados
           responsavel: "",
           entidade: "",
           fase: "",
@@ -198,68 +224,78 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           throw error;
         }
 
-        // Criar a obra associada ao cliente
+        // SEMPRE criar uma obra associada ao cliente (mesmo que com dados incompletos)
         const novoCodigoObra = await getNextCode(supabase, "obras");
 
-        // Calcular valor contratual
+        // Calcular valor contratual (mesmo que vazio)
         const valorContratual = calcularValorContratual(
-          obraData.entrada,
-          obraData.valor_financiado,
-          obraData.subsidio
+          obraData.entrada || 0,
+          obraData.valor_financiado || 0,
+          obraData.subsidio || 0
         );
 
         const obraToSave = {
           codigo: novoCodigoObra,
           cliente_id: clienteCriado.id,
-          cliente_nome: formData.nome,
-          endereco: obraData.endereco_obra || formData.endereco,
-          endereco_obra: obraData.endereco_obra || formData.endereco,
-          cidade_obra: obraData.cidade_obra || formData.cidade,
-          estado_obra: obraData.estado_obra || formData.estado,
+          endereco: obraData.endereco_obra || formData.endereco || "Não informado",
+          endereco_obra: obraData.endereco_obra || formData.endereco || "Não informado",
+          cidade_obra: obraData.cidade_obra || formData.cidade || "Não informado",
+          estado_obra: obraData.estado_obra || formData.estado || "NA",
           local_obra: obraData.local_obra || null,
-          tipo_contrato: obraData.tipo_contrato,
-          status: formData.status,
+          tipo_contrato: obraData.tipo_contrato || "PARTICULAR",
+          status: formData.status === "PENDENTE" ? "EM ANDAMENTO" : formData.status,
+          // Valores financeiros
           valor_terreno: obraData.valor_terreno || 0,
           entrada: obraData.entrada || 0,
           valor_financiado: obraData.valor_financiado || 0,
           subsidio: obraData.subsidio || 0,
           valor_total: valorContratual,
           valor_obra: obraData.valor_obra || 0,
-          empreiteiro_nome: obraData.empreiteiro_nome || null,
+          // Custos principais
           empreiteiro: obraData.empreiteiro || 0,
+          material: obraData.material || 0,
+          terceirizado: obraData.terceirizado || 0,
+          mao_de_obra: obraData.mao_de_obra || 0,
+          // Dados do empreiteiro
+          empreiteiro_nome: obraData.empreiteiro_nome || null,
           empreiteiro_valor_pago: obraData.empreiteiro_valor_pago || 0,
           empreiteiro_saldo: (obraData.empreiteiro || 0) - (obraData.empreiteiro_valor_pago || 0),
           empreiteiro_percentual: obraData.empreiteiro > 0 ? ((obraData.empreiteiro_valor_pago || 0) / obraData.empreiteiro) * 100 : 0,
-          responsavel: obraData.responsavel || null,
+          // Terceirizados especializados
+          pintor: obraData.pintor || 0,
+          eletricista: obraData.eletricista || 0,
+          gesseiro: obraData.gesseiro || 0,
+          azulejista: obraData.azulejista || 0,
+          manutencao: obraData.manutencao || 0,
+          // Outros dados
+          responsavel: obraData.responsavel || "Não informado",
           entidade: obraData.entidade || null,
           fase: obraData.fase || null,
           ano_obra: obraData.ano_obra || new Date().getFullYear(),
           data_conclusao: obraData.data_conclusao || null,
-          // Inicializar outros campos com 0
-          material: 0,
-          terceirizado: 0,
-          mao_de_obra: 0,
-          pintor: 0,
-          eletricista: 0,
-          gesseiro: 0,
-          azulejista: 0,
-          manutencao: 0,
+          // Inicializar medições com 0
+          medicao_01: 0,
+          medicao_02: 0,
+          medicao_03: 0,
+          medicao_04: 0,
+          medicao_05: 0,
         };
 
-        // Adicionar observações da obra se existirem (campo não existe na tabela obras, então remover)
-        // As observações da obra serão tratadas separadamente se necessário no futuro
+        const { data: obraCriada, error: obraError } = await supabase.from("obras").insert([obraToSave]).select().single();
 
-        const { error: obraError } = await supabase.from("obras").insert([obraToSave]);
-
+        // Se houver erro ao criar a obra, lançar erro detalhado
         if (obraError) {
           console.error("Erro ao criar obra:", obraError);
-          throw obraError;
+          console.error("Dados que tentou salvar:", obraToSave);
+          throw new Error(`Erro ao criar obra: ${obraError.message}`);
         }
+
+        console.log("Obra criada com sucesso:", obraCriada);
 
         // Sucesso - mostrar toast
         toast({
-          title: "✅ Cliente e Obra cadastrados!",
-          description: `${formData.nome} e sua obra foram cadastrados com sucesso.`,
+          title: "✅ Cliente cadastrado!",
+          description: `${formData.nome} foi cadastrado com sucesso.`,
           duration: 3000,
         });
       }
@@ -406,7 +442,7 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="data_contrato" className="text-sm font-semibold">
-                Data do Contrato *
+                DATA *
               </Label>
               <Input
                 id="data_contrato"
@@ -440,11 +476,10 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           {/* Endereço */}
           <div className="space-y-2">
             <Label htmlFor="endereco" className="text-sm font-semibold">
-              Endereço *
+              Endereço
             </Label>
             <Input
               id="endereco"
-              required
               value={formData.endereco}
               onChange={(e) => setFormData({ ...formData, endereco: e.target.value })}
               placeholder="Rua, número, bairro"
@@ -490,214 +525,254 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           <div className="pt-6 border-t-2 border-gray-200">
             <div className="flex items-center gap-2 mb-4">
               <Building2 className="h-5 w-5 text-[#F5C800]" />
-              <h3 className="text-base font-bold text-[#1E1E1E]">Dados da Obra</h3>
+              <h3 className="text-base font-bold text-[#1E1E1E]">Informações da Obra</h3>
             </div>
           </div>
 
-          {/* Valores Financeiros da Obra */}
+          {/* ========== CUSTOS PRINCIPAIS ========== */}
           <div>
-            <h4 className="text-sm font-semibold mb-3 text-gray-700">Valores Financeiros</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Terreno */}
+            <h4 className="text-sm font-bold mb-3 text-[#1E1E1E]">Custos Principais</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <Label htmlFor="valor_terreno" className="text-sm font-medium">
-                  Terreno (R$)
-                </Label>
+                <Label className="text-sm font-medium">Empreiteiro (R$)</Label>
                 <Input
-                  id="valor_terreno"
                   type="text"
-                  value={formatMoneyInput(obraData.valor_terreno)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, valor_terreno: parseMoneyInput(e.target.value) });
-                  }}
+                  value={formatMoneyInput(obraData.empreiteiro)}
+                  onChange={(e) => setObraData({ ...obraData, empreiteiro: parseMoneyInput(e.target.value) })}
                   disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                  className="border-2 focus:border-[#F5C800] font-mono"
                   placeholder="0,00"
                 />
               </div>
 
-              {/* Entrada */}
               <div className="space-y-1">
-                <Label htmlFor="entrada" className="text-sm font-medium">
-                  Entrada (R$)
-                </Label>
+                <Label className="text-sm font-medium">Material (R$)</Label>
                 <Input
-                  id="entrada"
                   type="text"
-                  value={formatMoneyInput(obraData.entrada)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, entrada: parseMoneyInput(e.target.value) });
-                  }}
+                  value={formatMoneyInput(obraData.material)}
+                  onChange={(e) => setObraData({ ...obraData, material: parseMoneyInput(e.target.value) })}
                   disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-
-              {/* Subsídio */}
-              <div className="space-y-1">
-                <Label htmlFor="subsidio" className="text-sm font-medium">
-                  Subsídio (R$)
-                </Label>
-                <Input
-                  id="subsidio"
-                  type="text"
-                  value={formatMoneyInput(obraData.subsidio)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, subsidio: parseMoneyInput(e.target.value) });
-                  }}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                  className="border-2 focus:border-[#F5C800] font-mono"
                   placeholder="0,00"
                 />
               </div>
             </div>
+          </div>
 
-            {/* Valor Financiado e Valor da Obra */}
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* ========== DEMONSTRATIVO FINANCEIRO DO EMPREITEIRO ========== */}
+          <div>
+            <h4 className="text-sm font-bold mb-3 text-[#1E1E1E]">Demonstrativo Financeiro do Empreiteiro</h4>
+            <div className="space-y-4">
               <div className="space-y-1">
-                <Label htmlFor="valor_financiado" className="text-sm font-medium">
-                  Valor Financiado (R$)
-                </Label>
+                <Label className="text-sm font-medium">Nome do Empreiteiro</Label>
                 <Input
-                  id="valor_financiado"
                   type="text"
-                  value={formatMoneyInput(obraData.valor_financiado)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, valor_financiado: parseMoneyInput(e.target.value) });
-                  }}
+                  value={obraData.empreiteiro_nome}
+                  onChange={(e) => setObraData({ ...obraData, empreiteiro_nome: e.target.value })}
                   disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
+                  className="border-2 focus:border-[#F5C800]"
+                  placeholder="Nome do empreiteiro"
                 />
               </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="valor_obra" className="text-sm font-medium">
-                  Valor da Obra (Custo) (R$)
-                </Label>
-                <Input
-                  id="valor_obra"
-                  type="text"
-                  value={formatMoneyInput(obraData.valor_obra)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, valor_obra: parseMoneyInput(e.target.value) });
-                  }}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-            </div>
-
-            {/* Valor Contratual - Destaque */}
-            <div className="mt-4 bg-[#F5C800] p-6 rounded-lg">
-              <p className="text-sm font-semibold text-[#1E1E1E] mb-2">
-                Valor Contratual
-              </p>
-              <p className="text-3xl font-bold text-[#1E1E1E]">
-                R$ {formatMoneyInput(calcularValorContratual(obraData.entrada, obraData.valor_financiado, obraData.subsidio))}
-              </p>
-              <p className="text-xs text-[#1E1E1E]/70 mt-2">
-                = Entrada + Financiado + Subsídio
-              </p>
-            </div>
-
-            {/* Dados do Empreiteiro */}
-            <div className="mt-6 border-t pt-4">
-              <h4 className="text-sm font-semibold mb-3 text-gray-700">Dados do Empreiteiro</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Nome do Empreiteiro */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <Label htmlFor="empreiteiro_nome" className="text-sm font-medium">
-                    Nome do Empreiteiro
-                  </Label>
+                  <Label className="text-sm font-medium">Valor Pago (R$)</Label>
                   <Input
-                    id="empreiteiro_nome"
-                    type="text"
-                    value={obraData.empreiteiro_nome}
-                    onChange={(e) => setObraData({ ...obraData, empreiteiro_nome: e.target.value })}
-                    disabled={isLoading}
-                    className="border-2 focus:border-[#F5C800] h-12 px-4"
-                    placeholder="Nome do empreiteiro"
-                  />
-                </div>
-
-                {/* Valor Contratado (Empreiteiro) */}
-                <div className="space-y-1">
-                  <Label htmlFor="empreiteiro" className="text-sm font-medium">
-                    Valor Contratado (R$)
-                  </Label>
-                  <Input
-                    id="empreiteiro"
-                    type="text"
-                    value={formatMoneyInput(obraData.empreiteiro)}
-                    onChange={(e) => {
-                      setObraData({ ...obraData, empreiteiro: parseMoneyInput(e.target.value) });
-                    }}
-                    disabled={isLoading}
-                    className="border-2 focus:border-[#F5C800] font-mono h-12 px-4"
-                    placeholder="0,00"
-                  />
-                </div>
-
-                {/* Valor Pago ao Empreiteiro */}
-                <div className="space-y-1">
-                  <Label htmlFor="empreiteiro_valor_pago" className="text-sm font-medium">
-                    Valor Já Pago (R$)
-                  </Label>
-                  <Input
-                    id="empreiteiro_valor_pago"
                     type="text"
                     value={formatMoneyInput(obraData.empreiteiro_valor_pago)}
-                    onChange={(e) => {
-                      setObraData({ ...obraData, empreiteiro_valor_pago: parseMoneyInput(e.target.value) });
-                    }}
+                    onChange={(e) => setObraData({ ...obraData, empreiteiro_valor_pago: parseMoneyInput(e.target.value) })}
                     disabled={isLoading}
-                    className="border-2 focus:border-[#F5C800] font-mono h-12 px-4"
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Saldo (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.empreiteiro - obraData.empreiteiro_valor_pago)}
+                    disabled
+                    className="border-2 bg-gray-100 font-mono text-gray-600"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ========== TERCEIRIZADOS ESPECIALIZADOS ========== */}
+          <div>
+            <h4 className="text-sm font-bold mb-3 text-[#1E1E1E]">Terceirizados Especializados</h4>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Pintor (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.pintor)}
+                    onChange={(e) => setObraData({ ...obraData, pintor: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Eletricista (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.eletricista)}
+                    onChange={(e) => setObraData({ ...obraData, eletricista: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Gesseiro (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.gesseiro)}
+                    onChange={(e) => setObraData({ ...obraData, gesseiro: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
                     placeholder="0,00"
                   />
                 </div>
               </div>
 
-              {/* Saldo do Empreiteiro */}
-              {obraData.empreiteiro > 0 && (
-                <div className="mt-3 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-medium text-blue-900">Saldo Pendente</p>
-                      <p className="text-2xl font-bold text-blue-900">
-                        R$ {formatMoneyInput(obraData.empreiteiro - obraData.empreiteiro_valor_pago)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-blue-900">Percentual Pago</p>
-                      <p className="text-2xl font-bold text-blue-900">
-                        {obraData.empreiteiro > 0 
-                          ? ((obraData.empreiteiro_valor_pago / obraData.empreiteiro) * 100).toFixed(1)
-                          : 0}%
-                      </p>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Azulejista (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.azulejista)}
+                    onChange={(e) => setObraData({ ...obraData, azulejista: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
                 </div>
-              )}
+
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Manutenção (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.manutencao)}
+                    onChange={(e) => setObraData({ ...obraData, manutencao: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Observações da Obra */}
-          <div className="space-y-2">
-            <Label htmlFor="observacoes_obra" className="text-sm font-semibold">
-              Observações da Obra
-            </Label>
-            <textarea
-              id="observacoes_obra"
-              value={obraData.observacoes_obra}
-              onChange={(e) => setObraData({ ...obraData, observacoes_obra: e.target.value })}
-              placeholder="Informações adicionais sobre a obra"
-              disabled={isLoading}
-              rows={3}
-              className="w-full border-2 focus:border-[#F5C800] rounded-md px-3 py-2 text-sm resize-none"
-            />
+          {/* ========== CARD VALOR TOTAL DA OBRA ========== */}
+          <div className="bg-[#F5C800] p-6 rounded-lg">
+            <p className="text-sm font-semibold text-[#1E1E1E] mb-2">
+              Valor Total da Obra (Custos)
+            </p>
+            <p className="text-3xl font-bold text-[#1E1E1E]">
+              R$ {formatMoneyInput(
+                obraData.empreiteiro + 
+                obraData.material + 
+                obraData.pintor + 
+                obraData.eletricista + 
+                obraData.gesseiro + 
+                obraData.azulejista + 
+                obraData.manutencao
+              )}
+            </p>
+            <p className="text-xs text-[#1E1E1E]/70 mt-2">
+              = Empreiteiro + Material + Terceirizados
+            </p>
+          </div>
+
+          {/* ========== VALORES FINANCEIROS ========== */}
+          <div>
+            <h4 className="text-sm font-bold mb-3 text-[#1E1E1E]">Dados Financeiros</h4>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Terreno (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.valor_terreno)}
+                    onChange={(e) => setObraData({ ...obraData, valor_terreno: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Entrada (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.entrada)}
+                    onChange={(e) => setObraData({ ...obraData, entrada: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Subsídio (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.subsidio)}
+                    onChange={(e) => setObraData({ ...obraData, subsidio: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Valor Financiado (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.valor_financiado)}
+                    onChange={(e) => setObraData({ ...obraData, valor_financiado: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium">Valor da Obra (Custo) (R$)</Label>
+                  <Input
+                    type="text"
+                    value={formatMoneyInput(obraData.valor_obra)}
+                    onChange={(e) => setObraData({ ...obraData, valor_obra: parseMoneyInput(e.target.value) })}
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800] font-mono"
+                    placeholder="0,00"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ========== CARD VALOR CONTRATUAL ========== */}
+          <div className="bg-green-500 p-6 rounded-lg">
+            <p className="text-sm font-semibold text-white mb-2">
+              Valor Contratual
+            </p>
+            <p className="text-3xl font-bold text-white">
+              R$ {formatMoneyInput(calcularValorContratual(obraData.entrada, obraData.valor_financiado, obraData.subsidio))}
+            </p>
+            <p className="text-xs text-white/90 mt-2">
+              = Entrada + Financiado + Subsídio
+            </p>
           </div>
           </>
           )}

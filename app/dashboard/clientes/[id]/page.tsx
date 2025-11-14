@@ -93,9 +93,9 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                   <ClienteStatusBadge cliente={cliente} />
                 </div>
 
-                {/* Data de Cadastro */}
+                {/* Data de Contrato */}
                 <div className="flex flex-col gap-2">
-                  <span className="text-xs text-muted-foreground font-semibold uppercase block">DATA DE CADASTRO</span>
+                  <span className="text-xs text-muted-foreground font-semibold uppercase block">DATA</span>
                   <Badge className="font-sans bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold text-sm px-3 py-1.5 w-fit">
                     {cliente.data_cadastro 
                       ? new Date(cliente.data_cadastro).toLocaleDateString('pt-BR')
