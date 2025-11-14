@@ -32,17 +32,17 @@ const menuItems = [
   {
     title: "Clientes",
     icon: Users,
-    href: "/dashboard/clientes",
+    href: "/clientes",
   },
   {
     title: "Obras",
     icon: Building2,
-    href: "/dashboard/obras",
+    href: "/obras",
   },
   {
     title: "Financeiro",
     icon: DollarSign,
-    href: "/dashboard/financeira",
+    href: "/financeira",
   },
   {
     title: "Logs",

@@ -68,7 +68,7 @@ export function DeleteClienteButton({ cliente }: ClienteActionsProps) {
       if (deleteError) throw deleteError;
 
       // Redireciona para a lista de clientes após exclusão
-      router.push("/dashboard/clientes");
+      router.push("/clientes");
       router.refresh();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Erro ao excluir cliente";

@@ -281,7 +281,7 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => router.push(`/dashboard/clientes/${cliente.id}`)}
+                    onClick={() => router.push(`/clientes/${cliente.id}`)}
                     className="border-2 border-gray-300 hover:border-[#F5C800] hover:bg-[#F5C800]/10 h-9 w-9 p-0 transition-colors"
                     title="Ver Perfil"
                   >

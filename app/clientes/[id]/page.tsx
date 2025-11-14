@@ -45,7 +45,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           <Button asChild variant="outline" size="icon">
-            <Link href="/dashboard/clientes">
+            <Link href="/clientes">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
