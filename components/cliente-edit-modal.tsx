@@ -248,6 +248,8 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
           const { error: obraError } = await supabase
             .from("obras")
             .update({
+              // SINCRONIZAÇÃO: Incluir o status do cliente
+              status: formData.status,
               // Custos
               empreiteiro: obraValues.empreiteiro,
               material: obraValues.material,
@@ -271,12 +273,19 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
             })
             .eq("id", obraId);
 
-          if (obraError) throw obraError;
+          if (obraError) {
+            console.error("❌ Erro ao atualizar obra:", obraError);
+            throw obraError;
+          }
+          
+          console.log(`✅ Obra ${obraId} atualizada com status: ${formData.status}`);
         }
+
+        console.log(`✅ Total de ${Object.keys(obrasData).length} obra(s) atualizada(s) com sucesso!`);
 
         toast({
           title: "✅ Cliente atualizado!",
-          description: `Os dados de ${formData.nome} foram atualizados com sucesso.`,
+          description: `Os dados de ${formData.nome} foram atualizados e sincronizados.`,
           duration: 3000,
         });
       }
@@ -411,7 +420,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
 
                 <div className="space-y-1">
                   <Label htmlFor="data_contrato" className="text-sm font-medium">
-                    Data do Contrato *
+                    Data *
                   </Label>
                   <Input
                     id="data_contrato"
@@ -495,306 +504,6 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
               </div>
             </div>
           </div>
-
-          {/* ==================== OBRAS EXISTENTES ==================== */}
-          {cliente && obras.length > 0 && (
-            <>
-              {obras.map((obra) => {
-                const obraValues = obrasData[obra.id] || {
-                  empreiteiro: Number(obra.empreiteiro) || 0,
-                  material: Number(obra.material) || 0,
-                  terceirizado: Number(obra.terceirizado) || 0,
-                  mao_de_obra: Number(obra.mao_de_obra) || 0,
-                  empreiteiro_nome: obra.empreiteiro_nome || "",
-                  empreiteiro_valor_pago: Number(obra.empreiteiro_valor_pago) || 0,
-                  pintor: Number(obra.pintor) || 0,
-                  eletricista: Number(obra.eletricista) || 0,
-                  gesseiro: Number(obra.gesseiro) || 0,
-                  azulejista: Number(obra.azulejista) || 0,
-                  manutencao: Number(obra.manutencao) || 0,
-                  valor_terreno: Number(obra.valor_terreno) || 0,
-                  entrada: Number(obra.entrada) || 0,
-                  subsidio: Number(obra.subsidio) || 0,
-                  valor_financiado: Number(obra.valor_financiado) || 0,
-                  valor_obra: Number(obra.valor_obra) || 0,
-                };
-
-                // Calcular valores totais
-                const totalCustos = 
-                  obraValues.empreiteiro + 
-                  obraValues.material + 
-                  obraValues.pintor + 
-                  obraValues.eletricista + 
-                  obraValues.gesseiro + 
-                  obraValues.azulejista + 
-                  obraValues.manutencao;
-
-                const valorContratual = calcularValorContratual(
-                  obraValues.entrada,
-                  obraValues.valor_financiado,
-                  obraValues.subsidio
-                );
-
-                const saldoEmpreiteiro = obraValues.empreiteiro - obraValues.empreiteiro_valor_pago;
-
-                return (
-                  <div key={obra.id} className="pt-6 border-t-2 border-gray-200">
-                    {/* Título da Obra */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <Building2 className="h-5 w-5 text-[#F5C800]" />
-                      <h3 className="text-base font-bold text-[#1E1E1E]">
-                        Obra #{String(obra.codigo).padStart(3, '0')}
-                      </h3>
-                    </div>
-
-                    <div className="space-y-6">
-                      {/* ========== CUSTOS PRINCIPAIS ========== */}
-                      <div>
-                        <h4 className="text-sm font-bold text-[#1E1E1E] mb-3">Custos Principais</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <Label className="text-sm font-medium">Empreiteiro (R$)</Label>
-                            <Input
-                              type="text"
-                              value={formatMoneyInput(obraValues.empreiteiro)}
-                              onChange={(e) => handleObraInputChange(obra.id, 'empreiteiro', e.target.value)}
-                              disabled={isLoading}
-                              className="border-2 focus:border-[#F5C800] font-mono"
-                              placeholder="0,00"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <Label className="text-sm font-medium">Material (R$)</Label>
-                            <Input
-                              type="text"
-                              value={formatMoneyInput(obraValues.material)}
-                              onChange={(e) => handleObraInputChange(obra.id, 'material', e.target.value)}
-                              disabled={isLoading}
-                              className="border-2 focus:border-[#F5C800] font-mono"
-                              placeholder="0,00"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* ========== DEMONSTRATIVO FINANCEIRO DO EMPREITEIRO ========== */}
-                      <div>
-                        <h4 className="text-sm font-bold text-[#1E1E1E] mb-3">Demonstrativo Financeiro do Empreiteiro</h4>
-                        <div className="space-y-4">
-                          <div className="space-y-1">
-                            <Label className="text-sm font-medium">Nome do Empreiteiro</Label>
-                            <Input
-                              type="text"
-                              value={obraValues.empreiteiro_nome}
-                              onChange={(e) => handleObraTextChange(obra.id, 'empreiteiro_nome', e.target.value)}
-                              disabled={isLoading}
-                              className="border-2 focus:border-[#F5C800]"
-                              placeholder="Nome do empreiteiro"
-                            />
-                          </div>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Valor Pago (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.empreiteiro_valor_pago)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'empreiteiro_valor_pago', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Saldo (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(saldoEmpreiteiro)}
-                                disabled
-                                className="border-2 bg-gray-100 font-mono text-gray-600"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* ========== TERCEIRIZADOS ESPECIALIZADOS ========== */}
-                      <div>
-                        <h4 className="text-sm font-bold text-[#1E1E1E] mb-3">Terceirizados Especializados</h4>
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Pintor (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.pintor)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'pintor', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Eletricista (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.eletricista)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'eletricista', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Gesseiro (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.gesseiro)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'gesseiro', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Azulejista (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.azulejista)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'azulejista', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Manutenção (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.manutencao)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'manutencao', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* ========== CARD VALOR TOTAL DA OBRA ========== */}
-                      <div className="bg-[#F5C800] p-6 rounded-lg">
-                        <p className="text-sm font-semibold text-[#1E1E1E] mb-2">
-                          Valor Total da Obra (Custos)
-                        </p>
-                        <p className="text-3xl font-bold text-[#1E1E1E]">
-                          R$ {totalCustos.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </p>
-                        <p className="text-xs text-[#1E1E1E]/70 mt-2">
-                          = Empreiteiro + Material + Terceirizados
-                        </p>
-                      </div>
-
-                      {/* ========== DADOS FINANCEIROS ========== */}
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <DollarSign className="h-5 w-5 text-[#F5C800]" />
-                          <h4 className="text-sm font-bold text-[#1E1E1E]">Dados Financeiros</h4>
-                        </div>
-
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Terreno (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.valor_terreno)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'valor_terreno', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Entrada (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.entrada)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'entrada', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Subsídio (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.subsidio)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'subsidio', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Valor Financiado (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.valor_financiado)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'valor_financiado', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-
-                            <div className="space-y-1">
-                              <Label className="text-sm font-medium">Valor da Obra (Custo) (R$)</Label>
-                              <Input
-                                type="text"
-                                value={formatMoneyInput(obraValues.valor_obra)}
-                                onChange={(e) => handleObraInputChange(obra.id, 'valor_obra', e.target.value)}
-                                disabled={isLoading}
-                                className="border-2 focus:border-[#F5C800] font-mono"
-                                placeholder="0,00"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* ========== CARD VALOR CONTRATUAL ========== */}
-                      <div className="bg-green-500 p-6 rounded-lg">
-                        <p className="text-sm font-semibold text-white mb-2">
-                          Valor Contratual
-                        </p>
-                        <p className="text-3xl font-bold text-white">
-                          R$ {valorContratual.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </p>
-                        <p className="text-xs text-white/90 mt-2">
-                          = Entrada + Financiado + Subsídio
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </>
-          )}
 
           {/* Mensagem de erro */}
           {error && (

@@ -34,7 +34,30 @@ export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
 
       if (error) throw error;
 
+      // SINCRONIZAR STATUS: Atualizar todas as obras associadas
+      const { data: obrasAtualizadas, error: obraError } = await supabase
+        .from("obras")
+        .update({ 
+          status: newStatus,
+          updated_at: new Date().toISOString() 
+        })
+        .eq("cliente_id", cliente.id)
+        .select();
+
+      if (obraError) {
+        console.error("❌ Erro ao sincronizar status das obras:", obraError);
+      } else {
+        console.log("✅ Status sincronizado! Obras atualizadas:", obrasAtualizadas?.length || 0);
+      }
+
       router.refresh();
+      
+      // Forçar recarregamento completo
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
+      }, 500);
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
       // Reverter para o status anterior em caso de erro

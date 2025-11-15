@@ -145,7 +145,7 @@ export function FinanceiraEditModal({ isOpen, onClose, obra }: FinanceiraEditMod
 
       toast({
         title: "✅ Dados financeiros atualizados!",
-        description: `Os dados da obra foram sincronizados em todas as páginas.`,
+        description: `Os dados foram sincronizados em todas as seções.`,
         duration: 3000,
       })
 
@@ -155,6 +155,13 @@ export function FinanceiraEditModal({ isOpen, onClose, obra }: FinanceiraEditMod
       // Recarregar dados
       await new Promise(resolve => setTimeout(resolve, 300))
       router.refresh()
+      
+      // Forçar recarregamento completo para garantir sincronização
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.location.reload()
+        }
+      }, 500)
     } catch (error) {
       console.error("Erro ao salvar:", error)
       const errorMessage = error instanceof Error ? error.message : "Erro ao salvar dados financeiros"
@@ -324,21 +331,6 @@ export function FinanceiraEditModal({ isOpen, onClose, obra }: FinanceiraEditMod
                 </div>
               ))}
             </div>
-
-            {/* Valor da Obra (Custo Total) */}
-            <div className="space-y-2">
-              <Label htmlFor="valor_obra" className="text-sm font-semibold">Valor da Obra - Custo (R$)</Label>
-              <Input
-                id="valor_obra"
-                type="text"
-                value={formatMoneyInput(data.valor_obra)}
-                onChange={(e) => setData({ ...data, valor_obra: parseMoneyInput(e.target.value) })}
-                disabled={isLoading}
-                className="border-2 focus:border-[#F5C800] font-mono"
-                placeholder="0,00"
-              />
-            </div>
-
             {/* Resumo Financeiro */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
               <div className="bg-gray-100 p-4 rounded-lg">
