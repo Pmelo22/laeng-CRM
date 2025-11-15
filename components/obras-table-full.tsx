@@ -1,35 +1,27 @@
 "use client"
 
-import { useState, useMemo, Fragment } from "react"
+import { useState, Fragment } from "react"
 import type { ObraComCliente } from "@/lib/types"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Pencil, ChevronUp, ChevronDown } from "lucide-react"
+import { User, ChevronLeft, ChevronRight, Pencil, ChevronUp, ChevronDown } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
 import { ObraEditModal } from "@/components/obra-edit-modal"
 import { formatCurrency } from "@/lib/utils"
 import { getObraStatusBadge } from "@/lib/status-utils"
+import { useSortTable, usePagination, useExpandableRows } from "@/lib/table-utils"
 
 interface ObrasTableFullProps {
   obras: ObraComCliente[]
   highlightId?: string | null
 }
 
-type SortField = 'codigo' | 'cliente_nome' | 'status' | 'empreiteiro' | 'material' | 'terceirizado' | 'valor_total'
-type SortDirection = 'asc' | 'desc' | 'none'
-
 export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
   const router = useRouter()
-  const [sortField, setSortField] = useState<SortField | null>(null)
-  const [sortDirection, setSortDirection] = useState<SortDirection>('none')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(20)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedObra, setSelectedObra] = useState<ObraComCliente | null>(null)
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
-  const [expandedEmpreiteiro, setExpandedEmpreiteiro] = useState<Set<string>>(new Set())
 
   const handleEditObra = (obra: ObraComCliente) => {
     setSelectedObra(obra)
@@ -41,152 +33,37 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
     setSelectedObra(null)
   }
 
-  const toggleRowExpansion = (obraId: string) => {
-    setExpandedRows(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(obraId)) {
-        newSet.delete(obraId)
-      } else {
-        newSet.add(obraId)
-      }
-      return newSet
-    })
-  }
+  // Comparador customizado para sorting
+  const compareFn = (a: ObraComCliente, b: ObraComCliente, field: keyof ObraComCliente, direction: 'asc' | 'desc'): number => {
+    let aValue: string | number | null
+    let bValue: string | number | null
 
-  const toggleEmpreiteiroExpansion = (obraId: string) => {
-    setExpandedEmpreiteiro(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(obraId)) {
-        newSet.delete(obraId)
-      } else {
-        newSet.add(obraId)
-      }
-      return newSet
-    })
-  }
-
-  // Função para alternar ordenação
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      if (sortDirection === 'asc') {
-        setSortDirection('desc')
-      } else if (sortDirection === 'desc') {
-        setSortDirection('none')
-        setSortField(null)
-      }
+    if (field === 'terceirizado') {
+      // Calcular total terceirizado para ordenação
+      aValue = (a.terceirizado || 0) + (a.pintor || 0) + (a.eletricista || 0) + (a.gesseiro || 0) + (a.azulejista || 0) + (a.manutencao || 0)
+      bValue = (b.terceirizado || 0) + (b.pintor || 0) + (b.eletricista || 0) + (b.gesseiro || 0) + (b.azulejista || 0) + (b.manutencao || 0)
     } else {
-      setSortField(field)
-      setSortDirection('asc')
+      const key = field as Exclude<keyof ObraComCliente, 'terceirizado'>
+      aValue = a[key] as string | number | null
+      bValue = b[key] as string | number | null
     }
+
+    aValue = aValue ?? ''
+    bValue = bValue ?? ''
+
+    if (typeof aValue === 'string') aValue = aValue.toLowerCase()
+    if (typeof bValue === 'string') bValue = bValue.toLowerCase()
+
+    if (aValue < bValue) return direction === 'asc' ? -1 : 1
+    if (aValue > bValue) return direction === 'asc' ? 1 : -1
+    return 0
   }
 
-  // Renderizar ícone de ordenação
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) {
-      return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />
-    }
-    if (sortDirection === 'asc') {
-      return <ArrowUp className="h-4 w-4 ml-1 text-[#F5C800]" />
-    }
-    if (sortDirection === 'desc') {
-      return <ArrowDown className="h-4 w-4 ml-1 text-[#F5C800]" />
-    }
-    return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />
-  }
-
-  // Obras ordenadas
-  const sortedObras = useMemo(() => {
-    if (!sortField || sortDirection === 'none') {
-      return [...obras].sort((a, b) => (a.codigo || 0) - (b.codigo || 0))
-    }
-
-    return [...obras].sort((a, b) => {
-      let aValue: string | number | null
-      let bValue: string | number | null
-
-      switch (sortField) {
-        case 'codigo':
-          aValue = a.codigo || 0
-          bValue = b.codigo || 0
-          break
-        case 'cliente_nome':
-          aValue = a.cliente_nome?.toLowerCase() || ''
-          bValue = b.cliente_nome?.toLowerCase() || ''
-          break
-        case 'status':
-          aValue = a.status?.toLowerCase() || ''
-          bValue = b.status?.toLowerCase() || ''
-          break
-        case 'empreiteiro':
-          aValue = a.empreiteiro || 0
-          bValue = b.empreiteiro || 0
-          break
-        case 'material':
-          aValue = a.material || 0
-          bValue = b.material || 0
-          break
-        case 'terceirizado':
-          // Calcular total terceirizado para ordenação
-          aValue = (a.terceirizado || 0) + (a.pintor || 0) + (a.eletricista || 0) + (a.gesseiro || 0) + (a.azulejista || 0) + (a.manutencao || 0)
-          bValue = (b.terceirizado || 0) + (b.pintor || 0) + (b.eletricista || 0) + (b.gesseiro || 0) + (b.azulejista || 0) + (b.manutencao || 0)
-          break
-        case 'valor_total':
-          aValue = a.valor_total || 0
-          bValue = b.valor_total || 0
-          break
-        default:
-          return 0
-      }
-
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
-      return 0
-    })
-  }, [obras, sortField, sortDirection])
-
-  // Calcular paginação
-  const totalPages = Math.ceil(sortedObras.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedObras = sortedObras.slice(startIndex, endIndex)
-
-  // Resetar para página 1 quando mudar itens por página
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(Number(value))
-    setCurrentPage(1)
-  }
-
-  // Gerar números de página
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = []
-    const maxPagesToShow = 5
-    
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) pages.push(i)
-        pages.push('...')
-        pages.push(totalPages)
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1)
-        pages.push('...')
-        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i)
-      } else {
-        pages.push(1)
-        pages.push('...')
-        pages.push(currentPage - 1)
-        pages.push(currentPage)
-        pages.push(currentPage + 1)
-        pages.push('...')
-        pages.push(totalPages)
-      }
-    }
-    
-    return pages
-  }
+  // Hooks centralizados
+  const { handleSort, getSortIcon, sortedData: sortedObras } = useSortTable<ObraComCliente>(obras, undefined, undefined, compareFn)
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(sortedObras, 20)
+  const { expandedRows, toggleRow: toggleRowExpansion } = useExpandableRows()
+  const { expandedRows: expandedEmpreiteiro, toggleRow: toggleEmpreiteiroExpansion } = useExpandableRows()
 
   if (obras.length === 0) {
     return <div className="text-center py-8 text-muted-foreground">Nenhuma obra cadastrada ainda.</div>
@@ -253,6 +130,11 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                     {getSortIcon('terceirizado')}
                   </div>
                 </TableHead>
+                <TableHead className="text-center text-[#F5C800] font-bold py-3">
+                  <div className="flex items-center justify-center">
+                    TERRENO
+                  </div>
+                </TableHead>
                 <TableHead 
                   className="text-center text-[#F5C800] font-bold py-3 cursor-pointer hover:bg-[#F5C800]/10 transition-colors" 
                   onClick={() => handleSort('valor_total')}
@@ -278,8 +160,8 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                 const saldo = valorEmpreiteiro - valorPago
                 const percentualPago = valorEmpreiteiro > 0 ? (valorPago / valorEmpreiteiro) * 100 : 0
                 
-                // Valor total da obra = Empreiteiro + Material + Terceirizado
-                const valorTotalObra = valorEmpreiteiro + (obra.material || 0) + totalTerceirizado
+                // Valor total da obra = Empreiteiro + Material + Terceirizado + Terreno
+                const valorTotalObra = valorEmpreiteiro + (obra.material || 0) + totalTerceirizado + (obra.valor_terreno || 0)
                 
                 const isHighlighted = highlightId === obra.id
                 
@@ -341,6 +223,9 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                         </div>
                       </TableCell>
                       <TableCell className="text-center py-3 font-bold">
+                        <span className="text-sm text-black">{formatCurrency(obra.valor_terreno || 0)}</span>
+                      </TableCell>
+                      <TableCell className="text-center py-3 font-bold">
                         <span className="text-sm text-green-700">{formatCurrency(valorTotalObra)}</span>
                       </TableCell>
                       <TableCell className="py-3">
@@ -368,7 +253,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                     
                     {isExpanded && (
                       <TableRow key={`${obra.id}-details`} className="bg-yellow-50 border-l-4 border-[#F5C800]">
-                        <TableCell colSpan={8} className="py-6 px-8">
+                        <TableCell colSpan={9} className="py-6 px-8">
                           <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
                             <h4 className="text-sm font-bold text-[#1E1E1E] mb-5 uppercase">
                               Detalhamento dos Custos Terceirizados
@@ -402,7 +287,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                     
                     {isEmpreiteiroExpanded && (
                       <TableRow key={`${obra.id}-empreiteiro`} className="bg-yellow-50 border-l-4 border-[#F5C800]">
-                        <TableCell colSpan={8} className="py-6 px-8">
+                        <TableCell colSpan={9} className="py-6 px-8">
                           <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
                             <h4 className="text-sm font-bold text-[#1E1E1E] mb-6 uppercase">
                               Demonstrativo Financeiro do Empreiteiro

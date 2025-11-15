@@ -36,8 +36,12 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
     .order("created_at", { ascending: false });
 
   // Calcular estatísticas
-  // Valor Contratual = soma dos valores totais das obras
-  const valorContratual = obras?.reduce((sum, obra) => sum + (obra.valor_total || 0), 0) || 0;
+  // Valor Contratual = Terreno + Entrada + Valor Financiado + Subsídio
+  const valorTerreno = obras?.reduce((sum, obra) => sum + (obra.valor_terreno || 0), 0) || 0;
+  const entrada = obras?.reduce((sum, obra) => sum + (obra.entrada || 0), 0) || 0;
+  const valorFinanciado = obras?.reduce((sum, obra) => sum + (obra.valor_financiado || 0), 0) || 0;
+  const subsidio = obras?.reduce((sum, obra) => sum + (obra.subsidio || 0), 0) || 0;
+  const valorContratual = valorTerreno + entrada + valorFinanciado + subsidio;
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -105,27 +109,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
               </div>
             </div>
 
-            {/* LINHA 2: CPF e Telefone */}
-            {(cliente.cpf_cnpj || cliente.telefone) && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 pb-4">
-                {cliente.cpf_cnpj && (
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs text-muted-foreground font-semibold uppercase block">CPF/CNPJ</span>
-                    <p className="text-sm font-mono text-foreground">{cliente.cpf_cnpj}</p>
-                  </div>
-                )}
-
-                {/* Telefone */}
-                {cliente.telefone && (
-                  <div className="flex flex-col gap-2">
-                    <span className="text-xs text-muted-foreground font-semibold uppercase block">TELEFONE</span>
-                    <p className="text-sm text-foreground">{cliente.telefone}</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* LINHA 3: CEP, Endereço, Cidade e Estado */}
+            {/* LINHA 2: CEP, Endereço, Cidade e Estado */}
             {(cliente.cep || cliente.endereco || cliente.cidade || cliente.estado) && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-4">
                 {/* CEP */}
@@ -162,11 +146,23 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
               </div>
             )}
 
-            {/* LINHA 4: Observações */}
-            {cliente.observacoes && (
-              <div className="flex flex-col gap-2">
-                <span className="text-xs text-muted-foreground font-semibold uppercase block">OBSERVAÇÕES</span>
-                <p className="text-sm text-muted-foreground">{cliente.observacoes}</p>
+            {/* LINHA 3: CPF e Telefone */}
+            {(cliente.cpf_cnpj || cliente.telefone) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-1">
+                {cliente.cpf_cnpj && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">CPF/CNPJ</span>
+                    <p className="text-sm font-mono text-foreground">{cliente.cpf_cnpj}</p>
+                  </div>
+                )}
+
+                {/* Telefone */}
+                {cliente.telefone && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs text-muted-foreground font-semibold uppercase block">TELEFONE</span>
+                    <p className="text-sm text-foreground">{cliente.telefone}</p>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
@@ -207,7 +203,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
-                      }).format((obras || []).reduce((acc, obra) => acc + (obra.valor_terreno || 0), 0))}
+                      }).format(valorTerreno)}
                     </p>
                   </div>
                 </CardContent>
@@ -222,7 +218,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
-                      }).format((obras || []).reduce((acc, obra) => acc + (obra.entrada || 0), 0))}
+                      }).format(entrada)}
                     </p>
                   </div>
                 </CardContent>
@@ -237,7 +233,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
-                      }).format((obras || []).reduce((acc, obra) => acc + (obra.valor_financiado || 0), 0))}
+                      }).format(valorFinanciado)}
                     </p>
                   </div>
                 </CardContent>
@@ -252,7 +248,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                       {new Intl.NumberFormat('pt-BR', { 
                         style: 'currency', 
                         currency: 'BRL' 
-                      }).format((obras || []).reduce((acc, obra) => acc + (obra.subsidio || 0), 0))}
+                      }).format(subsidio)}
                     </p>
                   </div>
                 </CardContent>

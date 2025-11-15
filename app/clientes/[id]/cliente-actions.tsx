@@ -190,7 +190,7 @@ export function ClienteStatusBadge({ cliente }: ClienteActionsProps) {
       label: "Em Andamento"
     },
     "PENDENTE": { 
-      color: "bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E]", 
+      color: "bg-blue-700 hover:bg-blue-700 text-white", 
       label: "Pendente"
     }
   };

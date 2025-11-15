@@ -6,13 +6,14 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Cliente } from "@/lib/types";
-import { Loader2, Building2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { buscarCepViaCep, calcularValorContratual, formatMoneyInput, parseMoneyInput } from "@/lib/utils";
+import { buscarCepViaCep, calcularValorContratual } from "@/lib/utils";
 import { getNextCode } from "@/lib/supabase-utils";
+import { StatusSelectContent } from "@/lib/status-utils";
 
 interface ClienteModalProps {
   cliente?: Cliente;
@@ -419,26 +420,7 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
                 <SelectTrigger className="border-2 focus:ring-[#F5C800] w-full">
                   <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PENDENTE">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                      <span>PENDENTE</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="EM ANDAMENTO">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <span>EM ANDAMENTO</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="FINALIZADO">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span>FINALIZADO</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
+                <StatusSelectContent />
               </Select>
             </div>
             <div className="space-y-2">

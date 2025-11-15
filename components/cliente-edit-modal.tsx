@@ -6,12 +6,13 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Loader2, User, Building2, DollarSign } from "lucide-react";
+import { Loader2, User } from "lucide-react";
 import type { Cliente, Obra } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { buscarCepViaCep, calcularValorContratual, formatMoneyInput, parseMoneyInput } from "@/lib/utils";
+import { buscarCepViaCep, calcularValorContratual } from "@/lib/utils";
+import { StatusSelectContent } from "@/lib/status-utils";
 
 interface ClienteEditModalProps {
   cliente?: Cliente;
@@ -25,8 +26,8 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [obras, setObras] = useState<Obra[]>([]);
   const [loadingCep, setLoadingCep] = useState(false);
+  const [, setObras] = useState<Obra[]>([]);
 
   // Dados do cliente
   const [formData, setFormData] = useState({
@@ -179,26 +180,6 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
       }
       setLoadingCep(false);
     }
-  };
-
-  const handleObraInputChange = (obraId: string, field: string, value: string) => {
-    setObrasData(prev => ({
-      ...prev,
-      [obraId]: {
-        ...prev[obraId],
-        [field]: parseMoneyInput(value)
-      }
-    }));
-  };
-
-  const handleObraTextChange = (obraId: string, field: string, value: string) => {
-    setObrasData(prev => ({
-      ...prev,
-      [obraId]: {
-        ...prev[obraId],
-        [field]: value
-      }
-    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -410,11 +391,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                     <SelectTrigger className="border-2 focus:border-[#F5C800]">
                       <SelectValue placeholder="Selecione o status" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PENDENTE">🟡 Pendente</SelectItem>
-                      <SelectItem value="EM ANDAMENTO">🔵 Em Andamento</SelectItem>
-                      <SelectItem value="FINALIZADO">🟢 Finalizado</SelectItem>
-                    </SelectContent>
+                    <StatusSelectContent />
                   </Select>
                 </div>
 

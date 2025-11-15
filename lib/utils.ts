@@ -61,3 +61,19 @@ export function parseMoneyInput(value: string): number {
   const numericValue = value.replace(/\D/g, '')
   return Number(numericValue) / 100
 }
+
+// Formatação de percentual
+export function formatPercentage(value: number): string {
+  return `${value.toFixed(1)}%`
+}
+
+// Formatação de data curta (DD/MM/YY)
+export function formatDateShort(date: string): string {
+  if (!date) return "-"
+  const data = new Date(date)
+  return data.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+  })
+}

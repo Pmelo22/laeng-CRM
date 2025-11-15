@@ -309,7 +309,6 @@ interface DashboardLayoutClientProps {
 
 export default function DashboardLayoutClient({
   children,
-  user,
 }: DashboardLayoutClientProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);

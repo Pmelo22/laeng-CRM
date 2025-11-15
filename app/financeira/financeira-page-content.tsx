@@ -4,11 +4,12 @@ import { useState, useMemo } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Search, Filter, Building2, Clock, Eye, EyeOff, CheckCircle2 } from "lucide-react"
 import type { DashboardFinanceiro, ObraFinanceiro } from "@/lib/types"
 import { FinanceiraTable } from "@/components/financeira-table"
+import { StatusSelectContent } from "@/lib/status-utils"
 
 interface FinanceiraPageContentProps {
   dashboard: DashboardFinanceiro
@@ -109,27 +110,7 @@ export default function FinanceiraPageContent({ obras }: FinanceiraPageContentPr
                   <Filter className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-[#1E1E1E]" />
                   <SelectValue placeholder="Filtrar" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">STATUS</SelectItem>
-                  <SelectItem value="FINALIZADO">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-green-600" />
-                      Finalizado
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="EM ANDAMENTO">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-orange-600" />
-                      Em Andamento
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="PENDENTE">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-blue-600" />
-                      Pendente
-                    </div>
-                  </SelectItem>
-                </SelectContent>
+                <StatusSelectContent />
               </Select>
 
               <Button
