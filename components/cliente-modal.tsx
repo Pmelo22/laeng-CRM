@@ -6,13 +6,14 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Cliente } from "@/lib/types";
-import { Loader2, Building2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { buscarCepViaCep, calcularValorContratual, formatMoneyInput, parseMoneyInput } from "@/lib/utils";
+import { buscarCepViaCep, calcularValorContratual } from "@/lib/utils";
 import { getNextCode } from "@/lib/supabase-utils";
+import { StatusSelectContent } from "@/lib/status-utils";
 
 interface ClienteModalProps {
   cliente?: Cliente;
@@ -46,14 +47,27 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     estado_obra: "",
     local_obra: "",
     tipo_contrato: "PARTICULAR" as "PARTICULAR" | "PREFEITURA" | "CAIXA" | "FINANCIAMENTO" | "OUTRO",
+    // Valores financeiros
     valor_terreno: 0,
     entrada: 0,
     valor_financiado: 0,
     subsidio: 0,
     valor_obra: 0,
-    empreiteiro_nome: "",
+    // Custos principais
     empreiteiro: 0,
+    material: 0,
+    terceirizado: 0,
+    mao_de_obra: 0,
+    // Dados do empreiteiro
+    empreiteiro_nome: "",
     empreiteiro_valor_pago: 0,
+    // Terceirizados especializados
+    pintor: 0,
+    eletricista: 0,
+    gesseiro: 0,
+    azulejista: 0,
+    manutencao: 0,
+    // Outros dados
     responsavel: "",
     entidade: "",
     fase: "",
@@ -119,14 +133,27 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           estado_obra: "",
           local_obra: "",
           tipo_contrato: "PARTICULAR",
+          // Valores financeiros
           valor_terreno: 0,
           entrada: 0,
           valor_financiado: 0,
           subsidio: 0,
           valor_obra: 0,
-          empreiteiro_nome: "",
+          // Custos principais
           empreiteiro: 0,
+          material: 0,
+          terceirizado: 0,
+          mao_de_obra: 0,
+          // Dados do empreiteiro
+          empreiteiro_nome: "",
           empreiteiro_valor_pago: 0,
+          // Terceirizados especializados
+          pintor: 0,
+          eletricista: 0,
+          gesseiro: 0,
+          azulejista: 0,
+          manutencao: 0,
+          // Outros dados
           responsavel: "",
           entidade: "",
           fase: "",
@@ -198,68 +225,79 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           throw error;
         }
 
-        // Criar a obra associada ao cliente
-        const novoCodigoObra = await getNextCode(supabase, "obras");
+        // SEMPRE criar uma obra associada ao cliente (mesmo que com dados incompletos)
+        // IMPORTANTE: Usar o MESMO código do cliente para manter consistência
+        const novoCodigoObra = novoCodigoCliente;
 
-        // Calcular valor contratual
+        // Calcular valor contratual (mesmo que vazio)
         const valorContratual = calcularValorContratual(
-          obraData.entrada,
-          obraData.valor_financiado,
-          obraData.subsidio
+          obraData.entrada || 0,
+          obraData.valor_financiado || 0,
+          obraData.subsidio || 0
         );
 
         const obraToSave = {
           codigo: novoCodigoObra,
           cliente_id: clienteCriado.id,
-          cliente_nome: formData.nome,
-          endereco: obraData.endereco_obra || formData.endereco,
-          endereco_obra: obraData.endereco_obra || formData.endereco,
-          cidade_obra: obraData.cidade_obra || formData.cidade,
-          estado_obra: obraData.estado_obra || formData.estado,
+          endereco: obraData.endereco_obra || formData.endereco || "Não informado",
+          endereco_obra: obraData.endereco_obra || formData.endereco || "Não informado",
+          cidade_obra: obraData.cidade_obra || formData.cidade || "Não informado",
+          estado_obra: obraData.estado_obra || formData.estado || "NA",
           local_obra: obraData.local_obra || null,
-          tipo_contrato: obraData.tipo_contrato,
-          status: formData.status,
+          tipo_contrato: obraData.tipo_contrato || "PARTICULAR",
+          status: formData.status, // Usar o MESMO status do cliente
+          // Valores financeiros
           valor_terreno: obraData.valor_terreno || 0,
           entrada: obraData.entrada || 0,
           valor_financiado: obraData.valor_financiado || 0,
           subsidio: obraData.subsidio || 0,
           valor_total: valorContratual,
           valor_obra: obraData.valor_obra || 0,
-          empreiteiro_nome: obraData.empreiteiro_nome || null,
+          // Custos principais
           empreiteiro: obraData.empreiteiro || 0,
+          material: obraData.material || 0,
+          terceirizado: obraData.terceirizado || 0,
+          mao_de_obra: obraData.mao_de_obra || 0,
+          // Dados do empreiteiro
+          empreiteiro_nome: obraData.empreiteiro_nome || null,
           empreiteiro_valor_pago: obraData.empreiteiro_valor_pago || 0,
           empreiteiro_saldo: (obraData.empreiteiro || 0) - (obraData.empreiteiro_valor_pago || 0),
           empreiteiro_percentual: obraData.empreiteiro > 0 ? ((obraData.empreiteiro_valor_pago || 0) / obraData.empreiteiro) * 100 : 0,
-          responsavel: obraData.responsavel || null,
+          // Terceirizados especializados
+          pintor: obraData.pintor || 0,
+          eletricista: obraData.eletricista || 0,
+          gesseiro: obraData.gesseiro || 0,
+          azulejista: obraData.azulejista || 0,
+          manutencao: obraData.manutencao || 0,
+          // Outros dados
+          responsavel: obraData.responsavel || "Não informado",
           entidade: obraData.entidade || null,
           fase: obraData.fase || null,
           ano_obra: obraData.ano_obra || new Date().getFullYear(),
           data_conclusao: obraData.data_conclusao || null,
-          // Inicializar outros campos com 0
-          material: 0,
-          terceirizado: 0,
-          mao_de_obra: 0,
-          pintor: 0,
-          eletricista: 0,
-          gesseiro: 0,
-          azulejista: 0,
-          manutencao: 0,
+          // Inicializar medições com 0
+          medicao_01: 0,
+          medicao_02: 0,
+          medicao_03: 0,
+          medicao_04: 0,
+          medicao_05: 0,
         };
 
-        // Adicionar observações da obra se existirem (campo não existe na tabela obras, então remover)
-        // As observações da obra serão tratadas separadamente se necessário no futuro
+        const { data: obraCriada, error: obraError } = await supabase.from("obras").insert([obraToSave]).select().single();
 
-        const { error: obraError } = await supabase.from("obras").insert([obraToSave]);
-
+        // Se houver erro ao criar a obra, lançar erro detalhado
         if (obraError) {
           console.error("Erro ao criar obra:", obraError);
-          throw obraError;
+          console.error("Dados que tentou salvar:", obraToSave);
+          throw new Error(`Erro ao criar obra: ${obraError.message}`);
         }
+
+        console.log("Obra criada com sucesso:", obraCriada);
 
         // Sucesso - mostrar toast
         toast({
-          title: "✅ Cliente e Obra cadastrados!",
-          description: `${formData.nome} e sua obra foram cadastrados com sucesso.`,
+          title: "✅ Cliente cadastrado!",
+          description: `${formData.nome} foi cadastrado com sucesso.`,
           duration: 3000,
         });
       }
@@ -382,31 +420,12 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
                 <SelectTrigger className="border-2 focus:ring-[#F5C800] w-full">
                   <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PENDENTE">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                      <span>PENDENTE</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="EM ANDAMENTO">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <span>EM ANDAMENTO</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="FINALIZADO">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span>FINALIZADO</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
+                <StatusSelectContent />
               </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="data_contrato" className="text-sm font-semibold">
-                Data do Contrato *
+                DATA *
               </Label>
               <Input
                 id="data_contrato"
@@ -440,11 +459,10 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           {/* Endereço */}
           <div className="space-y-2">
             <Label htmlFor="endereco" className="text-sm font-semibold">
-              Endereço *
+              Endereço
             </Label>
             <Input
               id="endereco"
-              required
               value={formData.endereco}
               onChange={(e) => setFormData({ ...formData, endereco: e.target.value })}
               placeholder="Rua, número, bairro"
@@ -487,218 +505,6 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           {/* Separador de Seção - Dados da Obra - APENAS PARA NOVO CLIENTE */}
           {!cliente && (
             <>
-          <div className="pt-6 border-t-2 border-gray-200">
-            <div className="flex items-center gap-2 mb-4">
-              <Building2 className="h-5 w-5 text-[#F5C800]" />
-              <h3 className="text-base font-bold text-[#1E1E1E]">Dados da Obra</h3>
-            </div>
-          </div>
-
-          {/* Valores Financeiros da Obra */}
-          <div>
-            <h4 className="text-sm font-semibold mb-3 text-gray-700">Valores Financeiros</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Terreno */}
-              <div className="space-y-1">
-                <Label htmlFor="valor_terreno" className="text-sm font-medium">
-                  Terreno (R$)
-                </Label>
-                <Input
-                  id="valor_terreno"
-                  type="text"
-                  value={formatMoneyInput(obraData.valor_terreno)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, valor_terreno: parseMoneyInput(e.target.value) });
-                  }}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-
-              {/* Entrada */}
-              <div className="space-y-1">
-                <Label htmlFor="entrada" className="text-sm font-medium">
-                  Entrada (R$)
-                </Label>
-                <Input
-                  id="entrada"
-                  type="text"
-                  value={formatMoneyInput(obraData.entrada)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, entrada: parseMoneyInput(e.target.value) });
-                  }}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-
-              {/* Subsídio */}
-              <div className="space-y-1">
-                <Label htmlFor="subsidio" className="text-sm font-medium">
-                  Subsídio (R$)
-                </Label>
-                <Input
-                  id="subsidio"
-                  type="text"
-                  value={formatMoneyInput(obraData.subsidio)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, subsidio: parseMoneyInput(e.target.value) });
-                  }}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-            </div>
-
-            {/* Valor Financiado e Valor da Obra */}
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label htmlFor="valor_financiado" className="text-sm font-medium">
-                  Valor Financiado (R$)
-                </Label>
-                <Input
-                  id="valor_financiado"
-                  type="text"
-                  value={formatMoneyInput(obraData.valor_financiado)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, valor_financiado: parseMoneyInput(e.target.value) });
-                  }}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <Label htmlFor="valor_obra" className="text-sm font-medium">
-                  Valor da Obra (Custo) (R$)
-                </Label>
-                <Input
-                  id="valor_obra"
-                  type="text"
-                  value={formatMoneyInput(obraData.valor_obra)}
-                  onChange={(e) => {
-                    setObraData({ ...obraData, valor_obra: parseMoneyInput(e.target.value) });
-                  }}
-                  disabled={isLoading}
-                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                  placeholder="0,00"
-                />
-              </div>
-            </div>
-
-            {/* Valor Contratual - Destaque */}
-            <div className="mt-4 bg-[#F5C800] p-6 rounded-lg">
-              <p className="text-sm font-semibold text-[#1E1E1E] mb-2">
-                Valor Contratual
-              </p>
-              <p className="text-3xl font-bold text-[#1E1E1E]">
-                R$ {formatMoneyInput(calcularValorContratual(obraData.entrada, obraData.valor_financiado, obraData.subsidio))}
-              </p>
-              <p className="text-xs text-[#1E1E1E]/70 mt-2">
-                = Entrada + Financiado + Subsídio
-              </p>
-            </div>
-
-            {/* Dados do Empreiteiro */}
-            <div className="mt-6 border-t pt-4">
-              <h4 className="text-sm font-semibold mb-3 text-gray-700">Dados do Empreiteiro</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Nome do Empreiteiro */}
-                <div className="space-y-1">
-                  <Label htmlFor="empreiteiro_nome" className="text-sm font-medium">
-                    Nome do Empreiteiro
-                  </Label>
-                  <Input
-                    id="empreiteiro_nome"
-                    type="text"
-                    value={obraData.empreiteiro_nome}
-                    onChange={(e) => setObraData({ ...obraData, empreiteiro_nome: e.target.value })}
-                    disabled={isLoading}
-                    className="border-2 focus:border-[#F5C800] h-12 px-4"
-                    placeholder="Nome do empreiteiro"
-                  />
-                </div>
-
-                {/* Valor Contratado (Empreiteiro) */}
-                <div className="space-y-1">
-                  <Label htmlFor="empreiteiro" className="text-sm font-medium">
-                    Valor Contratado (R$)
-                  </Label>
-                  <Input
-                    id="empreiteiro"
-                    type="text"
-                    value={formatMoneyInput(obraData.empreiteiro)}
-                    onChange={(e) => {
-                      setObraData({ ...obraData, empreiteiro: parseMoneyInput(e.target.value) });
-                    }}
-                    disabled={isLoading}
-                    className="border-2 focus:border-[#F5C800] font-mono h-12 px-4"
-                    placeholder="0,00"
-                  />
-                </div>
-
-                {/* Valor Pago ao Empreiteiro */}
-                <div className="space-y-1">
-                  <Label htmlFor="empreiteiro_valor_pago" className="text-sm font-medium">
-                    Valor Já Pago (R$)
-                  </Label>
-                  <Input
-                    id="empreiteiro_valor_pago"
-                    type="text"
-                    value={formatMoneyInput(obraData.empreiteiro_valor_pago)}
-                    onChange={(e) => {
-                      setObraData({ ...obraData, empreiteiro_valor_pago: parseMoneyInput(e.target.value) });
-                    }}
-                    disabled={isLoading}
-                    className="border-2 focus:border-[#F5C800] font-mono h-12 px-4"
-                    placeholder="0,00"
-                  />
-                </div>
-              </div>
-
-              {/* Saldo do Empreiteiro */}
-              {obraData.empreiteiro > 0 && (
-                <div className="mt-3 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-medium text-blue-900">Saldo Pendente</p>
-                      <p className="text-2xl font-bold text-blue-900">
-                        R$ {formatMoneyInput(obraData.empreiteiro - obraData.empreiteiro_valor_pago)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-blue-900">Percentual Pago</p>
-                      <p className="text-2xl font-bold text-blue-900">
-                        {obraData.empreiteiro > 0 
-                          ? ((obraData.empreiteiro_valor_pago / obraData.empreiteiro) * 100).toFixed(1)
-                          : 0}%
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Observações da Obra */}
-          <div className="space-y-2">
-            <Label htmlFor="observacoes_obra" className="text-sm font-semibold">
-              Observações da Obra
-            </Label>
-            <textarea
-              id="observacoes_obra"
-              value={obraData.observacoes_obra}
-              onChange={(e) => setObraData({ ...obraData, observacoes_obra: e.target.value })}
-              placeholder="Informações adicionais sobre a obra"
-              disabled={isLoading}
-              rows={3}
-              className="w-full border-2 focus:border-[#F5C800] rounded-md px-3 py-2 text-sm resize-none"
-            />
-          </div>
           </>
           )}
 

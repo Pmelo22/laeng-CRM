@@ -75,6 +75,12 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
 
     setIsLoading(true)
     try {
+      // Calcular valores derivados do empreiteiro
+      const empreiteiro_saldo = obraData.empreiteiro - obraData.empreiteiro_valor_pago
+      const empreiteiro_percentual = obraData.empreiteiro > 0 
+        ? (obraData.empreiteiro_valor_pago / obraData.empreiteiro) * 100 
+        : 0
+
       // Atualizar valores financeiros da obra
       const { error: obraError } = await supabase
         .from("obras")
@@ -90,6 +96,8 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
           manutencao: obraData.manutencao,
           empreiteiro_nome: obraData.empreiteiro_nome,
           empreiteiro_valor_pago: obraData.empreiteiro_valor_pago,
+          empreiteiro_saldo: empreiteiro_saldo,
+          empreiteiro_percentual: empreiteiro_percentual,
           updated_at: new Date().toISOString()
         })
         .eq("id", obra.id)
@@ -98,12 +106,20 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
 
       toast({
         title: "✅ Obra atualizada!",
-        description: `Os dados da obra foram atualizados com sucesso.`,
+        description: `Os dados foram sincronizados em todas as seções.`,
         duration: 3000,
       })
 
-      router.refresh()
       onClose()
+      await new Promise(resolve => setTimeout(resolve, 300))
+      router.refresh()
+      
+      // Forçar recarregamento completo para garantir sincronização
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.location.reload()
+        }
+      }, 500)
     } catch (error) {
       console.error("Erro ao atualizar obra:", error)
       toast({

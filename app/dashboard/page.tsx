@@ -133,7 +133,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent className="p-6">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Link href="/dashboard/clientes" className="group">
+              <Link href="/clientes" className="group">
                 <div className="p-5 border-2 border-slate-100 rounded-xl hover:border-primary hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50 group-hover:from-primary/5 group-hover:to-primary/10">
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-500 transition-colors">
@@ -146,7 +146,7 @@ export default async function DashboardPage() {
                 </div>
               </Link>
 
-              <Link href="/dashboard/obras" className="group">
+              <Link href="/obras" className="group">
                 <div className="p-5 border-2 border-slate-100 rounded-xl hover:border-primary hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50 group-hover:from-primary/5 group-hover:to-primary/10">
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-3 bg-orange-100 rounded-lg group-hover:bg-orange-500 transition-colors">
@@ -159,7 +159,7 @@ export default async function DashboardPage() {
                 </div>
               </Link>
 
-              <Link href="/dashboard/financeira" className="group">
+              <Link href="/financeira" className="group">
                 <div className="p-5 border-2 border-slate-100 rounded-xl hover:border-primary hover:shadow-lg transition-all bg-gradient-to-br from-white to-slate-50 group-hover:from-primary/5 group-hover:to-primary/10">
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-500 transition-colors">

@@ -5,12 +5,13 @@ import type { Cliente } from "@/lib/types"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { User, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Pencil } from "lucide-react"
+import { User, ChevronLeft, ChevronRight, Pencil } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
 import { ClienteEditModal } from "@/components/cliente-edit-modal"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { getClienteStatusBadge } from "@/lib/status-utils"
+import { useSortTable, usePagination, SortableTableHead } from "@/lib/table-utils"
 
 interface ClientesTableProps {
   clientes: Cliente[]
@@ -18,14 +19,9 @@ interface ClientesTableProps {
 }
 
 type SortField = 'codigo' | 'nome' | 'status' | 'endereco' | 'data_contrato'
-type SortDirection = 'asc' | 'desc' | 'none'
 
 export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps) {
   const router = useRouter()
-  const [sortField, setSortField] = useState<SortField | null>(null)
-  const [sortDirection, setSortDirection] = useState<SortDirection>('none')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(20)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
 
@@ -52,124 +48,9 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
     })
   }, [clientes, searchTerm])
 
-  // Função para alternar ordenação (3 estados: asc → desc → none)
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      // Mesmo campo: avançar estado
-      if (sortDirection === 'asc') {
-        setSortDirection('desc')
-      } else if (sortDirection === 'desc') {
-        setSortDirection('none')
-        setSortField(null) // Voltar ao padrão
-      }
-    } else {
-      // Novo campo: começar com asc
-      setSortField(field)
-      setSortDirection('asc')
-    }
-  }
-
-  // Renderizar ícone de ordenação
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) {
-      return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />
-    }
-    if (sortDirection === 'asc') {
-      return <ArrowUp className="h-4 w-4 ml-1 text-[#F5C800]" />
-    }
-    if (sortDirection === 'desc') {
-      return <ArrowDown className="h-4 w-4 ml-1 text-[#F5C800]" />
-    }
-    return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />
-  }
-
-  // Clientes ordenados
-  const sortedClientes = useMemo(() => {
-    if (!sortField || sortDirection === 'none') {
-      // Padrão: ordem crescente por código
-      return [...filteredClientes].sort((a, b) => (a.codigo || 0) - (b.codigo || 0))
-    }
-
-    return [...filteredClientes].sort((a, b) => {
-      let aValue: string | number | null
-      let bValue: string | number | null
-
-      switch (sortField) {
-        case 'codigo':
-          aValue = a.codigo || 0
-          bValue = b.codigo || 0
-          break
-        case 'nome':
-          aValue = a.nome?.toLowerCase() || ''
-          bValue = b.nome?.toLowerCase() || ''
-          break
-        case 'status':
-          aValue = a.status?.toLowerCase() || ''
-          bValue = b.status?.toLowerCase() || ''
-          break
-        case 'endereco':
-          aValue = a.endereco?.toLowerCase() || ''
-          bValue = b.endereco?.toLowerCase() || ''
-          break
-        case 'data_contrato':
-          aValue = a.data_contrato || ''
-          bValue = b.data_contrato || ''
-          break
-        default:
-          return 0
-      }
-
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
-      return 0
-    })
-  }, [filteredClientes, sortField, sortDirection])
-
-  // Calcular paginação
-  const totalPages = Math.ceil(sortedClientes.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedClientes = sortedClientes.slice(startIndex, endIndex)
-
-  // Resetar para página 1 quando mudar itens por página
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(Number(value))
-    setCurrentPage(1)
-  }
-
-  // Gerar array de números de página para exibir
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = []
-    const maxPagesToShow = 5
-    
-    if (totalPages <= maxPagesToShow) {
-      // Mostrar todas as páginas se forem poucas
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
-      }
-    } else {
-      // Lógica para mostrar páginas com "..."
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) pages.push(i)
-        pages.push('...')
-        pages.push(totalPages)
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1)
-        pages.push('...')
-        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i)
-      } else {
-        pages.push(1)
-        pages.push('...')
-        pages.push(currentPage - 1)
-        pages.push(currentPage)
-        pages.push(currentPage + 1)
-        pages.push('...')
-        pages.push(totalPages)
-      }
-    }
-    
-    return pages
-  }
+  // Hooks centralizados
+  const { handleSort, getSortIcon, sortedData: sortedClientes } = useSortTable<Cliente>(filteredClientes)
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedClientes, handleItemsPerPageChange, getPageNumbers } = usePagination(sortedClientes, 20)
 
   if (clientes.length === 0) {
     return <div className="text-center py-8 text-muted-foreground">Nenhum cliente cadastrado ainda.</div>
@@ -281,7 +162,7 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => router.push(`/dashboard/clientes/${cliente.id}`)}
+                    onClick={() => router.push(`/clientes/${cliente.id}`)}
                     className="border-2 border-gray-300 hover:border-[#F5C800] hover:bg-[#F5C800]/10 h-9 w-9 p-0 transition-colors"
                     title="Ver Perfil"
                   >

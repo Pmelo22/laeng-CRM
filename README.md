@@ -216,19 +216,17 @@ Sistema de autenticação completo com Supabase Auth:
 /auth/signout               → Logout
 
 /dashboard                  → Dashboard principal
-/dashboard/clientes         → Listagem de clientes
-/dashboard/clientes/novo    → Novo cliente
-/dashboard/clientes/[id]/editar → Editar cliente
 
-/dashboard/obras            → Listagem de obras
-/dashboard/obras/novo       → Nova obra
-/dashboard/obras/[id]/editar → Editar obra
+/clientes                   → Listagem de clientes
+/clientes/[id]              → Perfil do cliente
+
+/obras                      → Listagem de obras
+
+/financeira                 → Dashboard financeiro
 
 /dashboard/contratos        → Listagem de contratos
 /dashboard/contratos/novo   → Novo contrato
 /dashboard/contratos/[id]/editar → Editar contrato
-
-/dashboard/financeira       → Dashboard financeiro
 ```
 
 ## 🛠️ Tecnologias Utilizadas

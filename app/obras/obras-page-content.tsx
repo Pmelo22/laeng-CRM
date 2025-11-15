@@ -33,7 +33,7 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
           setTimeout(() => {
             element.classList.remove('highlight-pulse')
             // Remover o highlight da URL após a animação
-            window.history.replaceState({}, '', '/dashboard/obras')
+            window.history.replaceState({}, '', '/obras')
           }, 3000)
         }
       }, 500)

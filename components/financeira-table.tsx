@@ -1,34 +1,24 @@
 "use client"
 
-import React, { useState, useMemo } from "react"
+import React, { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { 
-  ChevronDown,
-  ChevronUp,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  ChevronLeft,
-  ChevronRight,
-  X,
-} from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import type { ObraFinanceiro } from "@/lib/types"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
-import { formatMoneyInput, parseMoneyInput } from "@/lib/utils"
+import { formatMoneyInput, parseMoneyInput, formatCurrency, formatPercentage } from "@/lib/utils"
+import { getStatusBadge } from "@/lib/status-utils"
+import { useSortTable, usePagination, useExpandableRows, ExpandToggleButton } from "@/lib/table-utils"
 
 interface FinanceiraTableProps {
   obras: ObraFinanceiro[]
 }
-
-type SortField = 'codigo' | 'cliente_nome' | 'status' | 'valor_total' | 'total_medicoes_pagas' | 'saldo_pendente' | 'custo_total' | 'resultado' | 'percentual_pago'
-type SortDirection = 'asc' | 'desc' | 'none'
 
 interface MedicaoData {
   numero: number
@@ -40,152 +30,14 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
-  const [sortField, setSortField] = useState<SortField | null>(null)
-  const [sortDirection, setSortDirection] = useState<SortDirection>('none')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(20)
   const [medicaoEditando, setMedicaoEditando] = useState<MedicaoData | null>(null)
   const [obraIdEditando, setObraIdEditando] = useState<string | null>(null)
   const [isLoadingMedicao, setIsLoadingMedicao] = useState(false)
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value)
-  }
-
-  const formatPercentage = (value: number) => {
-    return `${value.toFixed(1)}%`
-  }
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      if (sortDirection === 'asc') {
-        setSortDirection('desc')
-      } else if (sortDirection === 'desc') {
-        setSortDirection('none')
-        setSortField(null)
-      }
-    } else {
-      setSortField(field)
-      setSortDirection('asc')
-    }
-  }
-
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) {
-      return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />
-    }
-    if (sortDirection === 'asc') {
-      return <ArrowUp className="h-4 w-4 ml-1 text-[#F5C800]" />
-    }
-    if (sortDirection === 'desc') {
-      return <ArrowDown className="h-4 w-4 ml-1 text-[#F5C800]" />
-    }
-    return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />
-  }
-
-  const sortedObras = useMemo(() => {
-    if (!sortField || sortDirection === 'none') {
-      return [...obras].sort((a, b) => (a.codigo || 0) - (b.codigo || 0))
-    }
-
-    return [...obras].sort((a, b) => {
-      let aValue: string | number | null
-      let bValue: string | number | null
-
-      switch (sortField) {
-        case 'codigo':
-          aValue = a.codigo || 0
-          bValue = b.codigo || 0
-          break
-        case 'cliente_nome':
-          aValue = a.cliente_nome?.toLowerCase() || ''
-          bValue = b.cliente_nome?.toLowerCase() || ''
-          break
-        case 'status':
-          aValue = a.status?.toLowerCase() || ''
-          bValue = b.status?.toLowerCase() || ''
-          break
-        case 'valor_total':
-          aValue = a.valor_total || 0
-          bValue = b.valor_total || 0
-          break
-        case 'total_medicoes_pagas':
-          aValue = a.total_medicoes_pagas || 0
-          bValue = b.total_medicoes_pagas || 0
-          break
-        case 'saldo_pendente':
-          aValue = a.saldo_pendente || 0
-          bValue = b.saldo_pendente || 0
-          break
-        case 'custo_total':
-          aValue = a.custo_total || 0
-          bValue = b.custo_total || 0
-          break
-        case 'resultado':
-          aValue = a.resultado || 0
-          bValue = b.resultado || 0
-          break
-        case 'percentual_pago':
-          aValue = a.percentual_pago || 0
-          bValue = b.percentual_pago || 0
-          break
-        default:
-          return 0
-      }
-
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
-      return 0
-    })
-  }, [obras, sortField, sortDirection])
-
-  const toggleRow = (obraId: string) => {
-    setExpandedRows(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(obraId)) {
-        newSet.delete(obraId)
-      } else {
-        newSet.add(obraId)
-      }
-      return newSet
-    })
-  }
-
-  // Cálculo de paginação
-  const totalPages = Math.ceil(sortedObras.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedObras = sortedObras.slice(startIndex, endIndex)
-
-  // Gerar números de página para exibição
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = []
-    const maxVisible = 5
-    
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i)
-    } else {
-      pages.push(1)
-      if (currentPage > 3) pages.push('...')
-      
-      const start = Math.max(2, currentPage - 1)
-      const end = Math.min(totalPages - 1, currentPage + 1)
-      for (let i = start; i <= end; i++) pages.push(i)
-      
-      if (currentPage < totalPages - 2) pages.push('...')
-      pages.push(totalPages)
-    }
-    return pages
-  }
-
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(Number(value))
-    setCurrentPage(1)
-  }
+  // Hooks centralizados
+  const { toggleRow, isExpanded } = useExpandableRows()
+  const { handleSort, getSortIcon, sortedData: sortedObras } = useSortTable<ObraFinanceiro>(obras)
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(sortedObras, 20)
 
   const abrirEditorMedicao = (obraId: string, numeroMedicao: number, valorAtual: number, dataComputacao?: string) => {
     setObraIdEditando(obraId)
@@ -215,7 +67,7 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
       const campoDataComputacao = `medicao_0${numeroMedicao}_data_computacao`
 
       // Criar objeto de atualização dinamicamente
-      const updateData: Record<string, any> = {
+      const updateData: Record<string, string | number> = {
         [campoMedicao]: medicaoEditando.valor,
         [campoDataComputacao]: dataComputacao,
         updated_at: new Date().toISOString(),
@@ -373,18 +225,7 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
 
                       {/* Status */}
                       <TableCell className="py-3">
-                        <Badge
-                          variant="secondary"
-                          className={
-                            obra.status === 'EM ANDAMENTO'
-                              ? 'bg-red-100 text-red-700 border-red-200 font-bold'
-                              : obra.status === 'FINALIZADO'
-                              ? 'bg-green-100 text-green-700 border-green-200'
-                              : 'bg-blue-100 text-blue-700 border-blue-200'
-                          }
-                        >
-                          {obra.status}
-                        </Badge>
+                        {getStatusBadge(obra.status)}
                       </TableCell>
 
                       {/* Valor Total */}
@@ -398,18 +239,11 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                       <TableCell className="py-3 text-left min-w-[160px]">
                         <div className="flex items-center gap-2">
                           <div className="text-sm font-bold text-green-600">{formatCurrency(obra.total_medicoes_pagas || 0)}</div>
-                          <Button
-                            size="sm"
+                          <ExpandToggleButton 
+                            isExpanded={isExpanded(obra.id)} 
                             onClick={() => toggleRow(obra.id)}
-                            className="h-8 w-8 p-0 bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center flex-shrink-0"
-                            title={expandedRows.has(obra.id) ? "Recolher detalhes" : "Ver detalhes das medições"}
-                          >
-                            {expandedRows.has(obra.id) ? (
-                              <ChevronUp className="h-5 w-5 text-[#1E1E1E] font-bold" />
-                            ) : (
-                              <ChevronDown className="h-5 w-5 text-[#1E1E1E] font-bold" />
-                            )}
-                          </Button>
+                            title={isExpanded(obra.id) ? "Recolher detalhes" : "Ver detalhes das medições"}
+                          />
                         </div>
                       </TableCell>
 
@@ -466,7 +300,7 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                     </TableRow>
 
                     {/* Linha Expandida - Detalhamento de Medições */}
-                    {expandedRows.has(obra.id) && (
+                    {isExpanded(obra.id) && (
                       <TableRow key={`${obra.id}-details`} className="bg-yellow-50 border-l-4 border-[#F5C800]">
                         <TableCell colSpan={9} className="py-6 px-8">
                           <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">

@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import DashboardLayoutClient from "./layout-client";
+import DashboardLayoutClient from "../dashboard/layout-client";
 
-export default async function DashboardLayout({
+export default async function FinanceiraLayout({
   children,
 }: {
   children: React.ReactNode;
