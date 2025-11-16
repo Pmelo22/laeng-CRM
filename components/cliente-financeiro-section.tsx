@@ -52,7 +52,7 @@ export function ClienteFinanceiroSection({
     <>
       <Card className="border-2 border-green-200">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-sm sm:text-base uppercase">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-xl uppercase">
             <DollarSign className="h-4 w-4 text-green-600" />
             DADOS FINANCEIROS
           </CardTitle>
@@ -63,7 +63,7 @@ export function ClienteFinanceiroSection({
             {/* Card Principal: Valor Contratual (não editável) */}
             <Card className="border border-[#F5C800] bg-[#F5C800]">
               <CardContent className="pt-3 pb-3 px-4">
-                <div className="space-y-1">
+                <div className="space-y-1 text-center">
                   <p className="text-xs font-medium text-[#1E1E1E] uppercase">VALOR CONTRATUAL</p>
                   <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
                     {new Intl.NumberFormat('pt-BR', { 
