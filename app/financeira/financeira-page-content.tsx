@@ -19,7 +19,7 @@ interface FinanceiraPageContentProps {
 export default function FinanceiraPageContent({ obras }: FinanceiraPageContentProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [showFinalizados, setShowFinalizados] = useState(false)
+  const [showHidden, setShowHidden] = useState(false)
 
   // Calcular métricas de TODAS as obras
   const metrics = useMemo(() => {
@@ -31,13 +31,13 @@ export default function FinanceiraPageContent({ obras }: FinanceiraPageContentPr
     return { total, finalizadas, emAndamento, pendentes }
   }, [obras])
 
-  // Filtrar obras considerando o toggle de finalizadas
+  // Filtrar obras considerando o toggle - por padrão mostra apenas EM ANDAMENTO
   const obrasVisiveis = useMemo(() => {
-    if (!showFinalizados) {
-      return obras.filter(o => o.status !== 'FINALIZADO')
+    if (showHidden) {
+      return obras
     }
-    return obras
-  }, [obras, showFinalizados])
+    return obras.filter(o => o.status === 'EM ANDAMENTO')
+  }, [obras, showHidden])
 
   // Filtrar e ordenar obras para exibição
   const filteredObras = useMemo(() => {
@@ -114,24 +114,24 @@ export default function FinanceiraPageContent({ obras }: FinanceiraPageContentPr
               </Select>
 
               <Button
-                onClick={() => setShowFinalizados(!showFinalizados)}
+                onClick={() => setShowHidden(!showHidden)}
                 variant="outline"
                 className={`flex-1 sm:!w-[220px] !h-10 sm:!h-12 px-3 sm:px-6 rounded-lg font-semibold text-sm sm:text-base transition-all ${
-                  showFinalizados
+                  showHidden
                     ? 'bg-[#F5C800] text-[#1E1E1E] border-[#F5C800] hover:bg-[#F5C800]/90'
                     : 'bg-white text-[#1E1E1E] border-[#F5C800]/30 hover:border-[#F5C800]'
                 }`}
               >
-                {showFinalizados ? (
+                {showHidden ? (
                   <>
                     <Eye className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
-                    <span className="hidden xs:inline">Finalizadas Visíveis</span>
-                    <span className="xs:hidden">Visível</span>
+                    <span className="hidden xs:inline">Todos Visíveis</span>
+                    <span className="xs:hidden">Todos</span>
                   </>
                 ) : (
                   <>
                     <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
-                    <span className="hidden xs:inline">Mostrar Finalizadas</span>
+                    <span className="hidden xs:inline">Mostrar Todos</span>
                     <span className="xs:hidden">Mostrar</span>
                   </>
                 )}

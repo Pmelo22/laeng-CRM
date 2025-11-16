@@ -265,9 +265,9 @@ export function ExpandToggleButton({ isExpanded, onClick, title }: ExpandToggleB
       title={title}
     >
       {isExpanded ? (
-        <ChevronUp className="h-5 w-5 text-[#1E1E1E] font-bold" />
+        <ChevronUp className="h-4 w-4 text-[#1E1E1E] font-bold" />
       ) : (
-        <ChevronDown className="h-5 w-5 text-[#1E1E1E] font-bold" />
+        <ChevronDown className="h-4 w-4 text-[#1E1E1E] font-bold" />
       )}
     </Button>
   )

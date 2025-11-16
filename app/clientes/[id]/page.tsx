@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { 
   ArrowLeft, 
-  User, 
-  DollarSign
+  User
 } from "lucide-react";
 import { ClienteActions, ClienteStatusBadge, DeleteClienteButton } from "./cliente-actions";
+import { ClienteFinanceiroSection } from "@/components/cliente-financeiro-section";
 
 export const dynamic = 'force-dynamic';
 
@@ -34,14 +34,6 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
     .select("*")
     .eq("cliente_id", id)
     .order("created_at", { ascending: false });
-
-  // Calcular estatísticas
-  // Valor Contratual = Terreno + Entrada + Valor Financiado + Subsídio
-  const valorTerreno = obras?.reduce((sum, obra) => sum + (obra.valor_terreno || 0), 0) || 0;
-  const entrada = obras?.reduce((sum, obra) => sum + (obra.entrada || 0), 0) || 0;
-  const valorFinanciado = obras?.reduce((sum, obra) => sum + (obra.valor_financiado || 0), 0) || 0;
-  const subsidio = obras?.reduce((sum, obra) => sum + (obra.subsidio || 0), 0) || 0;
-  const valorContratual = valorTerreno + entrada + valorFinanciado + subsidio;
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -169,93 +161,9 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
         </Card>
 
         {/* Card 2: Dados Financeiros - Compacto */}
-        <Card className="border-2 border-green-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm sm:text-base uppercase">
-              <DollarSign className="h-4 w-4 text-green-600" />
-              DADOS FINANCEIROS
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="py-2">
-            {/* Grid com 5 cards de valores financeiros - Mais compacto */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-              {/* Card 1: Valor Contratual */}
-              <Card className="border border-[#F5C800] bg-[#F5C800]">
-                <CardContent className="pt-3 pb-3 px-4">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">VALOR CONTRATUAL</p>
-                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
-                      {new Intl.NumberFormat('pt-BR', { 
-                        style: 'currency', 
-                        currency: 'BRL' 
-                      }).format(valorContratual)}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card 2: Terreno */}
-              <Card className="border border-yellow-200 bg-yellow-200">
-                <CardContent className="pt-3 pb-3 px-4">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">TERRENO</p>
-                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
-                      {new Intl.NumberFormat('pt-BR', { 
-                        style: 'currency', 
-                        currency: 'BRL' 
-                      }).format(valorTerreno)}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card 3: Entrada */}
-              <Card className="border border-yellow-200 bg-yellow-200">
-                <CardContent className="pt-3 pb-3 px-4">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">ENTRADA</p>
-                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
-                      {new Intl.NumberFormat('pt-BR', { 
-                        style: 'currency', 
-                        currency: 'BRL' 
-                      }).format(entrada)}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card 4: Valor Financiado */}
-              <Card className="border border-yellow-200 bg-yellow-200">
-                <CardContent className="pt-3 pb-3 px-4">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">VALOR FINANCIADO</p>
-                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
-                      {new Intl.NumberFormat('pt-BR', { 
-                        style: 'currency', 
-                        currency: 'BRL' 
-                      }).format(valorFinanciado)}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card 5: Subsídio */}
-              <Card className="border border-yellow-200 bg-yellow-200">
-                <CardContent className="pt-3 pb-3 px-4">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-[#1E1E1E] uppercase">SUBSÍDIO</p>
-                    <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
-                      {new Intl.NumberFormat('pt-BR', { 
-                        style: 'currency', 
-                        currency: 'BRL' 
-                      }).format(subsidio)}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </CardContent>
-        </Card>
+        <ClienteFinanceiroSection 
+          obras={obras || []}
+        />
       </div>
     </div>
   );

@@ -236,8 +236,8 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                       </TableCell>
 
                       {/* Recebido */}
-                      <TableCell className="py-3 text-left min-w-[160px]">
-                        <div className="flex items-center gap-2">
+                      <TableCell className="py-3 text-left min-w-[120px]">
+                        <div className="flex items-center justify-between gap-1">
                           <div className="text-sm font-bold text-green-600">{formatCurrency(obra.total_medicoes_pagas || 0)}</div>
                           <ExpandToggleButton 
                             isExpanded={isExpanded(obra.id)} 
