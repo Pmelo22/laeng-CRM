@@ -12,6 +12,7 @@ import { ObraEditModal } from "@/components/obra-edit-modal"
 import { formatCurrency } from "@/lib/utils"
 import { getObraStatusBadge } from "@/lib/status-utils"
 import { useSortTable, usePagination, useExpandableRows } from "@/lib/table-utils"
+import { ObraTerceirizadoSection } from "@/components/obra-terceirizado-section"
 
 interface ObrasTableFullProps {
   obras: ObraComCliente[]
@@ -117,7 +118,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                   onClick={() => handleSort('material')}
                 >
                   <div className="flex items-center justify-center">
-                    MATERIAL (R$)
+                    MATERIAL
                     {getSortIcon('material')}
                   </div>
                 </TableHead>
@@ -126,7 +127,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                   onClick={() => handleSort('terceirizado')}
                 >
                   <div className="flex items-center justify-center">
-                    TERCEIRIZADO (R$)
+                    TERCEIRIZADO
                     {getSortIcon('terceirizado')}
                   </div>
                 </TableHead>
@@ -140,7 +141,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                   onClick={() => handleSort('valor_total')}
                 >
                   <div className="flex items-center justify-center">
-                    VALOR TOTAL DA OBRA (R$)
+                    VALOR TOTAL DA OBRA
                     {getSortIcon('valor_total')}
                   </div>
                 </TableHead>
@@ -258,28 +259,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                             <h4 className="text-sm font-bold text-[#1E1E1E] mb-5 uppercase">
                               Detalhamento dos Custos Terceirizados
                             </h4>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">Pintor</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">{formatCurrency(obra.pintor || 0)}</p>
-                              </div>
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">Eletricista</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">{formatCurrency(obra.eletricista || 0)}</p>
-                              </div>
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">Gesseiro</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">{formatCurrency(obra.gesseiro || 0)}</p>
-                              </div>
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">Azulejista</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">{formatCurrency(obra.azulejista || 0)}</p>
-                              </div>
-                              <div className="bg-[#F5C800] rounded-lg p-4 border border-gray-200">
-                                <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">Manutenção</p>
-                                <p className="text-base font-bold text-[#1E1E1E]">{formatCurrency(obra.manutencao || 0)}</p>
-                              </div>
-                            </div>
+                            <ObraTerceirizadoSection obra={obra} />
                           </div>
                         </TableCell>
                       </TableRow>
