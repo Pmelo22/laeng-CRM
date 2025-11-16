@@ -101,8 +101,8 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                 <div className="flex flex-col gap-2">
                   <span className="text-xs text-muted-foreground font-semibold uppercase block">DATA</span>
                   <Badge className="font-sans bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold text-sm px-3 py-1.5 w-fit">
-                    {cliente.data_cadastro 
-                      ? new Date(cliente.data_cadastro).toLocaleDateString('pt-BR')
+                    {cliente.data_contrato 
+                      ? new Date(cliente.data_contrato).toLocaleDateString('pt-BR')
                       : "Não informado"}
                   </Badge>
                 </div>

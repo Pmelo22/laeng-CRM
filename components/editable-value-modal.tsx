@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { formatMoneyInput, parseMoneyInput } from "@/lib/utils"
@@ -92,19 +92,22 @@ export function EditableValueModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
+      <DialogContent className="max-w-sm w-full p-0 rounded-lg overflow-hidden">
+        {/* Header */}
+        <div className="bg-[#1E1E1E] text-white px-6 py-4">
+          <DialogTitle className="text-xl font-bold uppercase">
             Editar {title}
           </DialogTitle>
-          <DialogDescription>
-            Altere o valor de {title.toLowerCase()} e clique em salvar para confirmar.
-          </DialogDescription>
-        </DialogHeader>
+          <p className="text-sm text-gray-300 mt-2">
+            Altere o valor e clique em salvar para confirmar.
+          </p>
+        </div>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-[#1E1E1E]">
+        {/* Conteúdo */}
+        <div className="px-6 py-6 space-y-6 bg-white">
+          {/* Input */}
+          <div className="space-y-3">
+            <label className="text-sm font-bold text-[#1E1E1E] uppercase block">
               Novo Valor (R$)
             </label>
             <Input
@@ -115,23 +118,28 @@ export function EditableValueModal({
                 setValue(newValue)
               }}
               placeholder="0,00"
-              className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+              disabled={isLoading}
+              className="border-2 border-gray-300 focus:border-[#F5C800] focus:ring-0 font-mono text-lg h-14 px-4 rounded-lg bg-white"
             />
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-xs text-blue-700">
-              <span className="font-semibold">Valor Anterior:</span> {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentValue)}
+          {/* Valor Anterior */}
+          <div className="bg-blue-50 border-l-4 border-blue-500 rounded px-4 py-4">
+            <p className="text-xs font-bold text-blue-900 uppercase mb-2">Valor Anterior</p>
+            <p className="text-2xl font-bold text-blue-900">
+              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentValue)}
             </p>
           </div>
         </div>
 
-        <DialogFooter className="flex gap-3">
+        {/* Footer */}
+        <div className="bg-gray-50 border-t px-6 py-4 flex gap-3 justify-end">
           <Button
             type="button"
             variant="outline"
             onClick={handleClose}
             disabled={isLoading}
+            className="border-2 border-gray-300 text-[#1E1E1E] hover:bg-gray-100 font-bold uppercase px-6"
           >
             Cancelar
           </Button>
@@ -139,11 +147,11 @@ export function EditableValueModal({
             type="button"
             onClick={handleSave}
             disabled={isLoading}
-            className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold"
+            className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#E5B800] font-bold uppercase px-6"
           >
             {isLoading ? "Salvando..." : "Salvar"}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 import { ClienteEditModal } from "@/components/cliente-edit-modal"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { getClienteStatusBadge } from "@/lib/status-utils"
-import { useSortTable, usePagination } from "@/lib/table-utils"
+import { usePagination } from "@/lib/table-utils"
 
 interface ClientesTableProps {
   clientes: Cliente[]
@@ -47,8 +47,7 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
   }, [clientes, searchTerm])
 
   // Hooks centralizados
-  const { handleSort, getSortIcon, sortedData: sortedClientes } = useSortTable<Cliente>(filteredClientes)
-  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedClientes, handleItemsPerPageChange, getPageNumbers } = usePagination(sortedClientes, 20)
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedClientes, handleItemsPerPageChange, getPageNumbers } = usePagination(filteredClientes, 20)
 
   if (clientes.length === 0) {
     return <div className="text-center py-8 text-muted-foreground">Nenhum cliente cadastrado ainda.</div>
@@ -61,44 +60,17 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
         <Table>
         <TableHeader className="sticky top-0 z-10 bg-[#1E1E1E] shadow-md">
           <TableRow className="bg-[#1E1E1E] hover:bg-[#1E1E1E]">
-            <TableHead 
-              className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-              onClick={() => handleSort('codigo')}
-            >
-              <div className="flex items-center">
-                CÓD.
-                {getSortIcon('codigo')}
-              </div>
+            <TableHead className="text-[#F5C800] font-bold py-3">
+              CÓD.
             </TableHead>
-            <TableHead 
-              className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-              onClick={() => handleSort('nome')}
-            >
-              <div className="flex items-center">
-                CLIENTE
-                {getSortIcon('nome')}
-              </div>
+            <TableHead className="text-[#F5C800] font-bold py-3">
+              CLIENTE
             </TableHead>
-            <TableHead 
-              className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-              onClick={() => handleSort('status')}
-            >
-              <div className="flex items-center">
-                STATUS
-                {getSortIcon('status')}
-              </div>
-            </TableHead>
-            <TableHead 
-              className="text-center text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-              onClick={() => handleSort('data_contrato')}
-            >
-              <div className="flex items-center justify-center">
-                DATA
-                {getSortIcon('data_contrato')}
-              </div>
+            <TableHead className="text-[#F5C800] font-bold py-3">
+              STATUS
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
-              TERRENO (R$)
+              DATA
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
               ENTRADA (R$)
@@ -131,9 +103,6 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               </TableCell>
               <TableCell className="text-center py-3">
                 <span className="text-sm">{formatDate(cliente.data_contrato)}</span>
-              </TableCell>
-              <TableCell className="text-center py-3 font-bold">
-                <span className="text-sm text-black font-bold">{formatCurrency(cliente.valor_terreno || 0)}</span>
               </TableCell>
               <TableCell className="text-center py-3 font-bold">
                 <span className="text-sm text-black font-bold">{formatCurrency(cliente.entrada || 0)}</span>
@@ -179,7 +148,7 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-2 py-4">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground font-semibold">
-            Mostrando {startIndex + 1} - {Math.min(endIndex, sortedClientes.length)} de {sortedClientes.length} clientes
+            Mostrando {startIndex + 1} - {Math.min(endIndex, filteredClientes.length)} de {filteredClientes.length} clientes
           </span>
         </div>
 

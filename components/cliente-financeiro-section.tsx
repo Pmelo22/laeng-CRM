@@ -21,11 +21,10 @@ export function ClienteFinanceiroSection({
   } | null>(null)
 
   // Calcular totais agregados das obras
-  const valorTerreno = obras?.reduce((sum, obra) => sum + (obra.valor_terreno || 0), 0) || 0
   const entrada = obras?.reduce((sum, obra) => sum + (obra.entrada || 0), 0) || 0
   const valorFinanciado = obras?.reduce((sum, obra) => sum + (obra.valor_financiado || 0), 0) || 0
   const subsidio = obras?.reduce((sum, obra) => sum + (obra.subsidio || 0), 0) || 0
-  const valorContratual = valorTerreno + entrada + valorFinanciado + subsidio
+  const valorContratual = entrada + valorFinanciado + subsidio
 
   const handleCardClick = (fieldName: string, title: string, currentValue: number) => {
     // Se há apenas uma obra, edita diretamente
@@ -42,7 +41,6 @@ export function ClienteFinanceiroSection({
   }
 
   const financeiroFields = [
-    { fieldName: "valor_terreno", title: "Terreno", value: valorTerreno, label: "TERRENO" },
     { fieldName: "entrada", title: "Entrada", value: entrada, label: "ENTRADA" },
     { fieldName: "valor_financiado", title: "Valor Financiado", value: valorFinanciado, label: "VALOR FINANCIADO" },
     { fieldName: "subsidio", title: "Subsídio", value: subsidio, label: "SUBSÍDIO" },
@@ -58,14 +56,14 @@ export function ClienteFinanceiroSection({
           </CardTitle>
         </CardHeader>
         <CardContent className="py-2">
-          {/* Grid com 5 cards de valores financeiros - Mais compacto */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          {/* Grid com 4 cards de valores financeiros - Full width e maior */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
             {/* Card Principal: Valor Contratual (não editável) */}
             <Card className="border border-[#F5C800] bg-[#F5C800]">
-              <CardContent className="pt-3 pb-3 px-4">
-                <div className="space-y-1 text-center">
-                  <p className="text-xs font-medium text-[#1E1E1E] uppercase">VALOR CONTRATUAL</p>
-                  <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
+              <CardContent className="pt-6 pb-6 px-6">
+                <div className="space-y-2 text-center">
+                  <p className="text-sm font-medium text-[#1E1E1E] uppercase">VALOR CONTRATUAL</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-[#1E1E1E]">
                     {new Intl.NumberFormat('pt-BR', { 
                       style: 'currency', 
                       currency: 'BRL' 
@@ -83,10 +81,10 @@ export function ClienteFinanceiroSection({
                 className="cursor-pointer transition-all hover:shadow-lg hover:scale-105 active:scale-95"
               >
                 <Card className="border border-yellow-200 bg-yellow-200 h-full">
-                  <CardContent className="pt-3 pb-3 px-4">
-                    <div className="space-y-1">
-                      <p className="text-xs font-medium text-[#1E1E1E] uppercase">{field.label}</p>
-                      <p className="text-lg sm:text-xl font-bold text-[#1E1E1E]">
+                  <CardContent className="pt-6 pb-6 px-6">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-[#1E1E1E] uppercase">{field.label}</p>
+                      <p className="text-2xl sm:text-3xl font-bold text-[#1E1E1E]">
                         {new Intl.NumberFormat('pt-BR', { 
                           style: 'currency', 
                           currency: 'BRL' 

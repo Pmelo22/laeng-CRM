@@ -21,6 +21,7 @@ interface ObraFinancialData {
   empreiteiro: number
   terceirizado: number
   material: number
+  valor_terreno: number
   mao_de_obra: number
   pintor: number
   eletricista: number
@@ -41,6 +42,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
     empreiteiro: 0,
     terceirizado: 0,
     material: 0,
+    valor_terreno: 0,
     mao_de_obra: 0,
     pintor: 0,
     eletricista: 0,
@@ -58,6 +60,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
         empreiteiro: Number(obra.empreiteiro) || 0,
         terceirizado: Number(obra.terceirizado) || 0,
         material: Number(obra.material) || 0,
+        valor_terreno: Number(obra.valor_terreno) || 0,
         mao_de_obra: Number(obra.mao_de_obra) || 0,
         pintor: Number(obra.pintor) || 0,
         eletricista: Number(obra.eletricista) || 0,
@@ -88,6 +91,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
           empreiteiro: obraData.empreiteiro,
           terceirizado: obraData.terceirizado,
           material: obraData.material,
+          valor_terreno: obraData.valor_terreno,
           mao_de_obra: obraData.mao_de_obra,
           pintor: obraData.pintor,
           eletricista: obraData.eletricista,
@@ -198,6 +202,22 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                   type="text"
                   value={formatMoneyInput(obraData.material)}
                   onChange={(e) => handleInputChange('material', e.target.value)}
+                  disabled={isLoading}
+                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                  placeholder="0,00"
+                />
+              </div>
+
+              {/* Terreno */}
+              <div className="space-y-1">
+                <Label htmlFor="valor_terreno" className="text-sm font-medium">
+                  Terreno (R$)
+                </Label>
+                <Input
+                  id="valor_terreno"
+                  type="text"
+                  value={formatMoneyInput(obraData.valor_terreno)}
+                  onChange={(e) => handleInputChange('valor_terreno', e.target.value)}
                   disabled={isLoading}
                   className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
                   placeholder="0,00"

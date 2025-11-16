@@ -120,67 +120,39 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
           <TableHeader className="sticky top-0 z-10 bg-[#1E1E1E] shadow-md">
             <TableRow className="bg-[#1E1E1E] hover:bg-[#1E1E1E]">
               <TableHead 
-                className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                onClick={() => handleSort('codigo')}
+                className="text-[#F5C800] font-bold py-3"
               >
-                <div className="flex items-center">
-                  CÓD.
-                  {getSortIcon('codigo')}
-                </div>
+                CÓD.
               </TableHead>
               <TableHead 
-                className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                onClick={() => handleSort('cliente_nome')}
+                className="text-[#F5C800] font-bold py-3"
               >
-                <div className="flex items-center">
-                  CLIENTE
-                  {getSortIcon('cliente_nome')}
-                </div>
+                CLIENTE
               </TableHead>
               <TableHead 
-                className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                onClick={() => handleSort('status')}
+                className="text-[#F5C800] font-bold py-3"
               >
-                <div className="flex items-center">
-                  STATUS
-                  {getSortIcon('status')}
-                </div>
+                STATUS
               </TableHead>
               <TableHead 
-                className="text-left text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                onClick={() => handleSort('valor_total')}
+                className="text-left text-[#F5C800] font-bold py-3"
               >
-                <div className="flex items-center">
-                  VALOR TOTAL
-                  {getSortIcon('valor_total')}
-                </div>
+                VALOR TOTAL
               </TableHead>
               <TableHead 
-                className="text-left text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                onClick={() => handleSort('total_medicoes_pagas')}
+                className="text-left text-[#F5C800] font-bold py-3"
               >
-                <div className="flex items-center">
-                  RECEBIDO
-                  {getSortIcon('total_medicoes_pagas')}
-                </div>
+                RECEBIDO
               </TableHead>
               <TableHead 
-                className="text-left text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                onClick={() => handleSort('saldo_pendente')}
+                className="text-left text-[#F5C800] font-bold py-3"
               >
-                <div className="flex items-center">
-                  A RECEBER
-                  {getSortIcon('saldo_pendente')}
-                </div>
+                A RECEBER
               </TableHead>
               <TableHead 
-                className="text-left text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                onClick={() => handleSort('custo_total')}
+                className="text-left text-[#F5C800] font-bold py-3"
               >
-                <div className="flex items-center">
-                  CUSTOS
-                  {getSortIcon('custo_total')}
-                </div>
+                CUSTOS
               </TableHead>
               <TableHead 
                 className="text-left text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
@@ -192,13 +164,9 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                 </div>
               </TableHead>
               <TableHead 
-                className="text-center text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                onClick={() => handleSort('percentual_pago')}
+                className="text-center text-[#F5C800] font-bold py-3"
               >
-                <div className="flex items-center justify-center">
-                  PROGRESSO
-                  {getSortIcon('percentual_pago')}
-                </div>
+                PROGRESSO
               </TableHead>
             </TableRow>
           </TableHeader>
