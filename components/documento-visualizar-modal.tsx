@@ -65,6 +65,7 @@ export function DocumentoVisualizarModal({
             <div className="flex-1 overflow-hidden">
               <DocxViewer
                 url={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/documentos_clientes/${documento.caminho_storage}`}
+                fileName={documento.nome_original}
               />
             </div>
           ) : (

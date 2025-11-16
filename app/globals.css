@@ -92,6 +92,16 @@ body, body * {
   scrollbar-color: #d1d5db transparent;
 }
 
+/* Esconder scrollbar mantendo funcionalidade */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Animação de highlight para obras */
 @keyframes highlight-pulse {
   0%, 100% {
