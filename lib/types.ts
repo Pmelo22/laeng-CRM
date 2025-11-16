@@ -171,6 +171,22 @@ export interface DashboardFinanceiro {
   obras_empate: number;
 }
 
+export interface Aviso {
+  id: string;
+  titulo: string;
+  descricao?: string;
+  urgencia: 'BAIXA' | 'MÉDIA' | 'ALTA' | 'CRÍTICA';
+  status: 'PENDENTE' | 'CONCLUÍDO';
+  criado_por: string;
+  criado_por_nome?: string;
+  atribuido_para?: string;
+  atribuido_para_nome?: string;
+  data_vencimento?: string;
+  data_conclusao?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface FluxoResumo {
   mes: string;
   total_entradas: number;

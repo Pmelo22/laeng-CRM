@@ -1,41 +1,107 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Obra } from "@/lib/types";
 import { BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-import { BarChart3, TrendingUp } from 'lucide-react';
 
 interface DashboardChartsProps {
   obras: Obra[];
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value: number; payload: { name: string } }>;
+}
+
+const CustomTooltip = (props: CustomTooltipProps) => {
+  const { active, payload } = props;
+  if (active && payload && payload.length) {
+    const formatCurrency = (value: number) => {
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 0,
+      }).format(value);
+    };
+    return (
+      <div
+        style={{
+          backgroundColor: '#1E1E1E',
+          border: '2px solid #F5C800',
+          borderRadius: '6px',
+          padding: '8px 12px',
+          fontSize: '13px',
+        }}
+      >
+        <p style={{ color: '#F5C800', fontWeight: 'bold', margin: 0 }}>
+          {payload[0].payload.name}
+        </p>
+        <p style={{ color: '#F5C800', fontWeight: 'bold', margin: '4px 0 0 0' }}>
+          {formatCurrency(payload[0].value)}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomTooltipPie = (props: CustomTooltipProps) => {
+  const { active, payload } = props;
+  if (active && payload && payload.length) {
+    return (
+      <div
+        style={{
+          backgroundColor: '#1E1E1E',
+          border: '2px solid #F5C800',
+          borderRadius: '6px',
+          padding: '8px 12px',
+          fontSize: '13px',
+        }}
+      >
+        <p style={{ color: '#F5C800', fontWeight: 'bold', margin: 0 }}>
+          {payload[0].payload.name}
+        </p>
+        <p style={{ color: '#F5C800', fontWeight: 'bold', margin: '4px 0 0 0' }}>
+          {payload[0].value}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function DashboardCharts({ obras }: DashboardChartsProps) {
-  // Cores da identidade visual (amarelo e preto)
   const COLORS = {
+    emAndamento: '#EA580C',
+    finalizado: '#22C55E',
+    pendente: '#3B82F6',
     yellow: '#F5C800',
-    black: '#1E1E1E',
-    gray: '#8B8B8B',
-    lightYellow: '#FFD700',
-    darkYellow: '#D4A800',
   };
 
-  const PIE_COLORS = [COLORS.yellow, COLORS.black, COLORS.gray];
-
-  // Faturamento por Fase
-  const faturamentoPorFase = obras.reduce((acc, obra) => {
-    const fase = obra.fase || 'Não definido';
-    const existing = acc.find(item => item.fase === fase);
+  // Faturamento por Status
+  const faturamentoPorStatus = obras.reduce((acc, obra) => {
+    const status = obra.status || 'PENDENTE';
+    const existing = acc.find(item => item.name === status);
+    const valor = Number(obra.valor_total) || 0;
     if (existing) {
-      existing.valor += Number(obra.valor_total) || 0;
+      existing.value += valor;
     } else {
-      acc.push({ fase, valor: Number(obra.valor_total) || 0 });
+      acc.push({ 
+        name: status === 'EM ANDAMENTO' ? 'EM ANDAMENTO' : status === 'FINALIZADO' ? 'FINALIZADO' : 'PENDENTE',
+        value: valor 
+      });
     }
     return acc;
-  }, [] as { fase: string; valor: number }[]);
+  }, [] as { name: string; value: number }[]);
 
-  // Obras por Fase (Pie Chart)
-  const obrasPorFase = obras.reduce((acc, obra) => {
-    const status = obra.status || 'Não definido';
+  const faturamentoPorStatusOrdenado = [
+    faturamentoPorStatus.find(f => f.name === 'EM ANDAMENTO') || { name: 'EM ANDAMENTO', value: 0 },
+    faturamentoPorStatus.find(f => f.name === 'FINALIZADO') || { name: 'FINALIZADO', value: 0 },
+    faturamentoPorStatus.find(f => f.name === 'PENDENTE') || { name: 'PENDENTE', value: 0 },
+  ];
+
+  // Obras por Status
+  const obrasPorStatus = obras.reduce((acc, obra) => {
+    const status = obra.status || 'PENDENTE';
     const existing = acc.find(item => item.name === status);
     if (existing) {
       existing.value += 1;
@@ -45,262 +111,239 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
     return acc;
   }, [] as { name: string; value: number }[]);
 
-  // Adicionar total geral para o pie chart
-  const totalObras = obras.length;
-  const obrasPorFaseComTotal = [
-    ...obrasPorFase,
-    { name: 'Total geral', value: totalObras }
+  const obrasPorStatusOrdenado = [
+    obrasPorStatus.find(o => o.name === 'EM ANDAMENTO') || { name: 'EM ANDAMENTO', value: 0 },
+    obrasPorStatus.find(o => o.name === 'FINALIZADO') || { name: 'FINALIZADO', value: 0 },
+    obrasPorStatus.find(o => o.name === 'PENDENTE') || { name: 'PENDENTE', value: 0 },
   ];
 
-  // Faturamento por Ano (Line Chart)
-  const faturamentoPorAno = obras.reduce((acc, obra) => {
-    const ano = obra.ano_obra || new Date(obra.data_conclusao || obra.created_at).getFullYear();
-    const existing = acc.find(item => item.ano === ano);
-    if (existing) {
-      existing.valor += Number(obra.valor_total) || 0;
-    } else {
-      acc.push({ ano, valor: Number(obra.valor_total) || 0 });
-    }
-    return acc;
-  }, [] as { ano: number; valor: number }[]).sort((a, b) => a.ano - b.ano);
+  // Faturamento por Ano (não utilizado - mantém compatibilidade)
 
-  // Obras por Ano (Line Chart)
-  const obrasPorAno = obras.reduce((acc, obra) => {
-    const ano = obra.ano_obra || new Date(obra.data_conclusao || obra.created_at).getFullYear();
-    const existing = acc.find(item => item.ano === ano);
-    if (existing) {
-      existing.quantidade += 1;
-    } else {
-      acc.push({ ano, quantidade: 1 });
-    }
-    return acc;
-  }, [] as { ano: number; quantidade: number }[]).sort((a, b) => a.ano - b.ano);
+  // Obras por Ano
+  const obrasPorAno = (() => {
+    // Agrupar obras por ano_obra
+    const obrasPorAnoMap: { [key: number]: number } = {};
+    
+    obras.forEach((obra) => {
+      // Usar ano_obra se existir, senão usar o ano do created_at
+      const ano = obra.ano_obra || new Date(obra.created_at || new Date()).getFullYear();
+      
+      if (!obrasPorAnoMap[ano]) {
+        obrasPorAnoMap[ano] = 0;
+      }
+      obrasPorAnoMap[ano] += 1;
+    });
 
-  // Locais de Obra
-  const locaisObra = obras.reduce((acc, obra) => {
-    const local = obra.local_obra || obra.endereco || 'Não definido';
-    const existing = acc.find(item => item.local === local);
-    if (existing) {
-      existing.quantidade += 1;
-    } else {
-      acc.push({ local, quantidade: 1 });
-    }
-    return acc;
-  }, [] as { local: string; quantidade: number }[]).sort((a, b) => b.quantidade - a.quantidade).slice(0, 5);
-
-  // Locais de Obra por Valor
-  const locaisObraValor = obras.reduce((acc, obra) => {
-    const local = obra.local_obra || obra.endereco || 'Não definido';
-    const existing = acc.find(item => item.local === local);
-    if (existing) {
-      existing.valor += Number(obra.valor_total) || 0;
-    } else {
-      acc.push({ local, valor: Number(obra.valor_total) || 0 });
-    }
-    return acc;
-  }, [] as { local: string; valor: number }[]).sort((a, b) => b.valor - a.valor).slice(0, 5);
+    // Filtrar apenas anos com mais de 5 obras e ordenar
+    return Object.keys(obrasPorAnoMap)
+      .map(Number)
+      .filter(ano => obrasPorAnoMap[ano] > 5)
+      .sort((a, b) => a - b)
+      .map(ano => ({
+        ano,
+        quantidade: obrasPorAnoMap[ano]
+      }));
+  })();
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
     }).format(value);
   };
 
+  const getBarColor = (name: string) => {
+    if (name === 'EM ANDAMENTO') return COLORS.emAndamento;
+    if (name === 'FINALIZADO') return COLORS.finalizado;
+    return COLORS.pendente;
+  };
+
+  const getPieColors = () => [COLORS.emAndamento, COLORS.finalizado, COLORS.pendente];
+
+  const gerarDadosComProjecao = () => {
+    // Agrupar obras por ano_obra - contar quantidade e somar valores
+    const obrasPorAnoMap: { [key: number]: { quantidade: number; valor: number } } = {};
+    
+    obras.forEach((obra) => {
+      // Usar ano_obra se existir, senão usar o ano do created_at
+      const ano = obra.ano_obra || new Date(obra.created_at || new Date()).getFullYear();
+      const valor = Number(obra.valor_total) || 0;
+      
+      if (!obrasPorAnoMap[ano]) {
+        obrasPorAnoMap[ano] = { quantidade: 0, valor: 0 };
+      }
+      obrasPorAnoMap[ano].quantidade += 1;
+      obrasPorAnoMap[ano].valor += valor;
+    });
+
+    // Filtrar apenas anos com mais de 5 obras
+    const anosValidos = Object.keys(obrasPorAnoMap)
+      .map(Number)
+      .filter(ano => obrasPorAnoMap[ano].quantidade > 5)
+      .sort((a, b) => a - b);
+
+    // Se não houver anos válidos, retornar array vazio
+    if (anosValidos.length === 0) {
+      return [];
+    }
+
+    // Calcular projeção como média dos 3 últimos anos válidos
+    const ultimosTresAnos = anosValidos.slice(-3).map(ano => obrasPorAnoMap[ano].valor);
+    const mediaProjecao = ultimosTresAnos.length > 0 
+      ? ultimosTresAnos.reduce((a, b) => a + b, 0) / ultimosTresAnos.length
+      : 0;
+
+    // Montar dados do gráfico: histórico + 1 projeção
+    const dados = anosValidos.map(ano => ({
+      ano,
+      valor: obrasPorAnoMap[ano].valor,
+      isProjecao: false
+    }));
+
+    // Adicionar projeção para o próximo ano após o último ano válido
+    const proximoAnoProjecao = Math.max(...anosValidos) + 1;
+    dados.push({
+      ano: proximoAnoProjecao,
+      valor: Math.round(mediaProjecao),
+      isProjecao: true
+    });
+
+    return dados;
+  };
+
   return (
-    <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
-      {/* Faturamento por Fase */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <BarChart3 className="h-5 w-5 text-primary" />
-            </div>
-            FATURAMENTO x FASE
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={faturamentoPorFase}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="fase" />
-              <YAxis />
-              <Tooltip 
-                formatter={(value: number) => formatCurrency(value)}
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
-              />
-              <Bar dataKey="valor" fill={COLORS.yellow} name="Valor Total" />
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+      {/* Card 1: FATURAMENTO x FASE */}
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-[#1E1E1E] px-6 py-4">
+          <h3 className="text-base font-bold text-[#F5C800] uppercase tracking-wide">Faturamento x Fase</h3>
+        </div>
+        <div className="p-6 bg-white" style={{ height: '360px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={faturamentoPorStatusOrdenado} margin={{ top: 10, right: 20, left: 60, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#666' }} />
+              <YAxis tick={{ fontSize: 12, fill: '#666' }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(224, 187, 20, 0.1)' }} />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                {faturamentoPorStatusOrdenado.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getBarColor(entry.name)} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Obras por Fase */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </div>
-            OBRAS x FASE
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <ResponsiveContainer width="100%" height={300}>
+      {/* Card 2: OBRAS x FASE */}
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-[#1E1E1E] px-6 py-4">
+          <h3 className="text-base font-bold text-[#F5C800] uppercase tracking-wide">Obras x Fase</h3>
+        </div>
+        <div className="p-6 bg-white flex items-center justify-center" style={{ height: '360px' }}>
+          <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={obrasPorFaseComTotal}
+                data={obrasPorStatusOrdenado}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={(entry) => `${entry.name}: ${entry.value}`}
-                outerRadius={100}
-                fill={COLORS.yellow}
+                label={({ value }) => (
+                  <tspan style={{ fill: '#1E1E1E', fontSize: '14px', fontWeight: 'bold' }}>
+                    {value}
+                  </tspan>
+                )}
+                outerRadius={90}
                 dataKey="value"
               >
-                {obrasPorFaseComTotal.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                {obrasPorStatusOrdenado.map((entry, index) => (
+                  <Cell key={`pie-${index}`} fill={getPieColors()[index]} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }} />
-              <Legend />
+              <Tooltip content={<CustomTooltipPie />} />
+              <Legend wrapperStyle={{ paddingTop: '12px' }} />
             </PieChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Faturamento por Ano */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <BarChart3 className="h-5 w-5 text-primary" />
-            </div>
-            FATURAMENTO x ANO
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={faturamentoPorAno}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="ano" />
-              <YAxis />
+      {/* Card 3: FATURAMENTO x ANO (COM PROJEÇÃO) */}
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-[#1E1E1E] px-6 py-4">
+          <h3 className="text-base font-bold text-[#F5C800] uppercase tracking-wide">Faturamento x Ano (Projeção)</h3>
+        </div>
+        <div className="p-6 bg-white" style={{ height: '360px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={gerarDadosComProjecao()} margin={{ top: 10, right: 20, left: 60, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis dataKey="ano" tick={{ fontSize: 12, fill: '#666' }} />
+              <YAxis tick={{ fontSize: 12, fill: '#666' }} />
               <Tooltip 
                 formatter={(value: number) => formatCurrency(value)}
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
+                contentStyle={{ 
+                  backgroundColor: '#1E1E1E', 
+                  border: '2px solid #F5C800', 
+                  borderRadius: '6px',
+                  color: '#F5C800',
+                  padding: '8px 12px',
+                  fontSize: '13px'
+                }}
+                labelStyle={{ color: '#F5C800', fontWeight: 'bold' }}
+                cursor={{ stroke: '#F5C800', strokeWidth: 1 }}
               />
-              <Legend />
               <Line 
                 type="monotone" 
                 dataKey="valor" 
-                stroke={COLORS.darkYellow} 
-                strokeWidth={2}
-                name="Faturamento"
-                dot={{ fill: COLORS.yellow, r: 5 }}
+                stroke={COLORS.yellow}
+                strokeWidth={3}
+                dot={{
+                  fill: COLORS.yellow,
+                  r: 5,
+                  strokeWidth: 1,
+                  stroke: '#1E1E1E',
+                }}
+                activeDot={{ r: 7 }}
               />
             </LineChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Obras por Ano */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </div>
-            OBRA x ANO
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={obrasPorAno}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="ano" />
-              <YAxis />
-              <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }} />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="quantidade" 
-                stroke="#3B82F6" 
-                strokeWidth={2}
-                name="Quantidade de Obras"
-                dot={{ fill: '#3B82F6', r: 5 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Locais de Obra */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <BarChart3 className="h-5 w-5 text-primary" />
-            </div>
-            LOCAIS DE OBRA
-          </CardTitle>
-          <CardDescription>Top 5 locais com mais obras</CardDescription>
-        </CardHeader>
-        <CardContent className="p-6">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={locaisObra}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="local" angle={-45} textAnchor="end" height={100} />
-              <YAxis />
-              <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }} />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="quantidade" 
-                stroke={COLORS.darkYellow} 
-                strokeWidth={2}
-                name="Quantidade"
-                dot={{ fill: COLORS.yellow, r: 5 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Locais de Obra por Valor */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-white">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <BarChart3 className="h-5 w-5 text-primary" />
-            </div>
-            LOCAIS DE OBRA x VALOR
-          </CardTitle>
-          <CardDescription>Top 5 locais por faturamento</CardDescription>
-        </CardHeader>
-        <CardContent className="p-6">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={locaisObraValor}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="local" angle={-45} textAnchor="end" height={100} />
-              <YAxis />
+      {/* Card 4: OBRA x ANO */}
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-[#1E1E1E] px-6 py-4">
+          <h3 className="text-base font-bold text-[#F5C800] uppercase tracking-wide">Obra x Ano</h3>
+        </div>
+        <div className="p-6 bg-white" style={{ height: '360px' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={obrasPorAno} margin={{ top: 10, right: 20, left: 60, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis dataKey="ano" tick={{ fontSize: 12, fill: '#666' }} />
+              <YAxis tick={{ fontSize: 12, fill: '#666' }} />
               <Tooltip 
-                formatter={(value: number) => formatCurrency(value)}
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
+                contentStyle={{ 
+                  backgroundColor: '#1E1E1E', 
+                  border: '2px solid #F5C800', 
+                  borderRadius: '6px',
+                  color: '#F5C800',
+                  padding: '8px 12px',
+                  fontSize: '13px'
+                }}
+                cursor={{ stroke: '#F5C800', strokeWidth: 1 }}
               />
-              <Legend />
               <Line 
                 type="monotone" 
-                dataKey="valor" 
-                stroke={COLORS.darkYellow} 
-                strokeWidth={2}
-                name="Valor Total"
-                dot={{ fill: COLORS.yellow, r: 5 }}
+                dataKey="quantidade" 
+                stroke={COLORS.yellow}
+                strokeWidth={3}
+                dot={{ fill: COLORS.yellow, r: 5, strokeWidth: 1, stroke: '#1E1E1E' }}
+                activeDot={{ r: 7 }}
               />
             </LineChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
