@@ -11,8 +11,9 @@ import { useRouter } from "next/navigation"
 import { ObraEditModal } from "@/components/obra-edit-modal"
 import { formatCurrency } from "@/lib/utils"
 import { getObraStatusBadge } from "@/lib/status-utils"
-import { useSortTable, usePagination, useExpandableRows } from "@/lib/table-utils"
+import { usePagination, useExpandableRows } from "@/lib/table-utils"
 import { ObraTerceirizadoSection } from "@/components/obra-terceirizado-section"
+import { EditableValueModal } from "@/components/editable-value-modal"
 
 interface ObrasTableFullProps {
   obras: ObraComCliente[]
@@ -23,6 +24,12 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
   const router = useRouter()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedObra, setSelectedObra] = useState<ObraComCliente | null>(null)
+  const [editingValue, setEditingValue] = useState<{
+    fieldName: string
+    title: string
+    currentValue: number
+    obraId: string
+  } | null>(null)
 
   const handleEditObra = (obra: ObraComCliente) => {
     setSelectedObra(obra)
@@ -34,35 +41,17 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
     setSelectedObra(null)
   }
 
-  // Comparador customizado para sorting
-  const compareFn = (a: ObraComCliente, b: ObraComCliente, field: keyof ObraComCliente, direction: 'asc' | 'desc'): number => {
-    let aValue: string | number | null
-    let bValue: string | number | null
-
-    if (field === 'terceirizado') {
-      // Calcular total terceirizado para ordenação
-      aValue = (a.terceirizado || 0) + (a.pintor || 0) + (a.eletricista || 0) + (a.gesseiro || 0) + (a.azulejista || 0) + (a.manutencao || 0)
-      bValue = (b.terceirizado || 0) + (b.pintor || 0) + (b.eletricista || 0) + (b.gesseiro || 0) + (b.azulejista || 0) + (b.manutencao || 0)
-    } else {
-      const key = field as Exclude<keyof ObraComCliente, 'terceirizado'>
-      aValue = a[key] as string | number | null
-      bValue = b[key] as string | number | null
-    }
-
-    aValue = aValue ?? ''
-    bValue = bValue ?? ''
-
-    if (typeof aValue === 'string') aValue = aValue.toLowerCase()
-    if (typeof bValue === 'string') bValue = bValue.toLowerCase()
-
-    if (aValue < bValue) return direction === 'asc' ? -1 : 1
-    if (aValue > bValue) return direction === 'asc' ? 1 : -1
-    return 0
+  const handleEditValue = (obra: ObraComCliente, fieldName: string, title: string, currentValue: number) => {
+    setEditingValue({
+      fieldName,
+      title,
+      currentValue,
+      obraId: obra.id
+    })
   }
 
   // Hooks centralizados
-  const { handleSort, getSortIcon, sortedData: sortedObras } = useSortTable<ObraComCliente>(obras, undefined, undefined, compareFn)
-  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(sortedObras, 20)
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(obras, 20)
   const { expandedRows, toggleRow: toggleRowExpansion } = useExpandableRows()
   const { expandedRows: expandedEmpreiteiro, toggleRow: toggleEmpreiteiroExpansion } = useExpandableRows()
 
@@ -77,73 +66,29 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-[#1E1E1E] shadow-md">
               <TableRow className="bg-[#1E1E1E] hover:bg-[#1E1E1E]">
-                <TableHead 
-                  className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                  onClick={() => handleSort('codigo')}
-                >
-                  <div className="flex items-center">
-                    CÓD.
-                    {getSortIcon('codigo')}
-                  </div>
+                <TableHead className="text-[#F5C800] font-bold py-3">
+                  CÓD.
                 </TableHead>
-                <TableHead 
-                  className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                  onClick={() => handleSort('cliente_nome')}
-                >
-                  <div className="flex items-center">
-                    CLIENTE
-                    {getSortIcon('cliente_nome')}
-                  </div>
+                <TableHead className="text-[#F5C800] font-bold py-3">
+                  CLIENTE
                 </TableHead>
-                <TableHead 
-                  className="text-[#F5C800] font-bold cursor-pointer hover:bg-[#F5C800]/10 transition-colors py-3" 
-                  onClick={() => handleSort('status')}
-                >
-                  <div className="flex items-center">
-                    STATUS
-                    {getSortIcon('status')}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="text-center text-[#F5C800] font-bold py-3 cursor-pointer hover:bg-[#F5C800]/10 transition-colors" 
-                  onClick={() => handleSort('empreiteiro')}
-                >
-                  <div className="flex items-center justify-center">
-                    EMPREITEIRO
-                    {getSortIcon('empreiteiro')}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="text-center text-[#F5C800] font-bold py-3 cursor-pointer hover:bg-[#F5C800]/10 transition-colors" 
-                  onClick={() => handleSort('material')}
-                >
-                  <div className="flex items-center justify-center">
-                    MATERIAL
-                    {getSortIcon('material')}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="text-center text-[#F5C800] font-bold py-3 cursor-pointer hover:bg-[#F5C800]/10 transition-colors" 
-                  onClick={() => handleSort('terceirizado')}
-                >
-                  <div className="flex items-center justify-center">
-                    TERCEIRIZADO
-                    {getSortIcon('terceirizado')}
-                  </div>
+                <TableHead className="text-[#F5C800] font-bold py-3">
+                  STATUS
                 </TableHead>
                 <TableHead className="text-center text-[#F5C800] font-bold py-3">
-                  <div className="flex items-center justify-center">
-                    TERRENO
-                  </div>
+                  EMPREITEIRO
                 </TableHead>
-                <TableHead 
-                  className="text-center text-[#F5C800] font-bold py-3 cursor-pointer hover:bg-[#F5C800]/10 transition-colors" 
-                  onClick={() => handleSort('valor_total')}
-                >
-                  <div className="flex items-center justify-center">
-                    VALOR TOTAL DA OBRA
-                    {getSortIcon('valor_total')}
-                  </div>
+                <TableHead className="text-center text-[#F5C800] font-bold py-3">
+                  TERCEIRIZADO
+                </TableHead>
+                <TableHead className="text-center text-[#F5C800] font-bold py-3">
+                  MATERIAL
+                </TableHead>
+                <TableHead className="text-center text-[#F5C800] font-bold py-3">
+                  TERRENO
+                </TableHead>
+                <TableHead className="text-center text-[#F5C800] font-bold py-3">
+                  VALOR TOTAL DA OBRA
                 </TableHead>
                 <TableHead className="text-center text-[#F5C800] font-bold py-3">AÇÕES</TableHead>
               </TableRow>
@@ -185,9 +130,9 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                       </TableCell>
                       <TableCell className="text-center py-3">
                         <div className="flex items-center justify-center gap-2">
-                          <div className="min-w-[120px] text-center">
-                            <div className="text-sm font-semibold">{obra.empreiteiro_nome || 'SEM EMPREITEIRO'}</div>
-                            <div className="text-xs font-bold text-black">{formatCurrency(valorEmpreiteiro)}</div>
+                          <div className="min-w-[110px] text-center flex flex-col items-center">
+                            <div className="text-xs font-semibold text-gray-600 truncate max-w-[100px]">{obra.empreiteiro_nome || 'SEM EMPREITEIRO'}</div>
+                            <div className="text-sm font-bold text-black mt-1">{formatCurrency(valorEmpreiteiro)}</div>
                           </div>
                           <Button
                             size="sm"
@@ -203,12 +148,9 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                           </Button>
                         </div>
                       </TableCell>
-                      <TableCell className="text-center py-3 font-bold">
-                        <span className="text-sm text-black">{formatCurrency(obra.material || 0)}</span>
-                      </TableCell>
                       <TableCell className="text-center py-3">
                         <div className="flex items-center justify-center gap-2">
-                          <span className="text-sm font-bold text-black min-w-[120px]">{formatCurrency(totalTerceirizado)}</span>
+                          <span className="text-sm font-bold text-black min-w-[110px] text-center">{formatCurrency(totalTerceirizado)}</span>
                           <Button
                             size="sm"
                             onClick={() => toggleRowExpansion(obra.id)}
@@ -223,11 +165,24 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                           </Button>
                         </div>
                       </TableCell>
-                      <TableCell className="text-center py-3 font-bold">
-                        <span className="text-sm text-black">{formatCurrency(obra.valor_terreno || 0)}</span>
+                      <TableCell className="text-center py-3 font-bold min-w-[110px]">
+                        <button
+                          onClick={() => handleEditValue(obra, 'material', 'Material', obra.material || 0)}
+                          className="text-sm text-black hover:text-[#F5C800] transition-colors cursor-pointer font-bold inline-block"
+                        >
+                          {formatCurrency(obra.material || 0)}
+                        </button>
                       </TableCell>
-                      <TableCell className="text-center py-3 font-bold">
-                        <span className="text-sm text-green-700">{formatCurrency(valorTotalObra)}</span>
+                      <TableCell className="text-center py-3 font-bold min-w-[110px]">
+                        <button
+                          onClick={() => handleEditValue(obra, 'valor_terreno', 'Terreno', obra.valor_terreno || 0)}
+                          className="text-sm text-black hover:text-[#F5C800] transition-colors cursor-pointer font-bold inline-block"
+                        >
+                          {formatCurrency(obra.valor_terreno || 0)}
+                        </button>
+                      </TableCell>
+                      <TableCell className="text-center py-3 font-bold min-w-[120px]">
+                        <span className="text-sm text-green-700 inline-block">{formatCurrency(valorTotalObra)}</span>
                       </TableCell>
                       <TableCell className="py-3">
                         <div className="flex items-center justify-center gap-2">
@@ -366,7 +321,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-2 py-4">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground font-semibold">
-            Mostrando {startIndex + 1} - {Math.min(endIndex, sortedObras.length)} de {sortedObras.length} obras
+            Mostrando {startIndex + 1} - {Math.min(endIndex, obras.length)} de {obras.length} obras
           </span>
         </div>
 
@@ -438,6 +393,19 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
         onClose={handleCloseModal}
         obra={selectedObra || undefined}
       />
+
+      {/* Modal para editar Material e Terreno */}
+      {editingValue && (
+        <EditableValueModal
+          isOpen={!!editingValue}
+          onClose={() => setEditingValue(null)}
+          title={editingValue.title}
+          currentValue={editingValue.currentValue}
+          fieldName={editingValue.fieldName}
+          tableId={editingValue.obraId}
+          tableName="obras"
+        />
+      )}
     </div>
   )
 }
