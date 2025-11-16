@@ -11,14 +11,12 @@ import { useRouter } from "next/navigation"
 import { ClienteEditModal } from "@/components/cliente-edit-modal"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { getClienteStatusBadge } from "@/lib/status-utils"
-import { useSortTable, usePagination, SortableTableHead } from "@/lib/table-utils"
+import { useSortTable, usePagination } from "@/lib/table-utils"
 
 interface ClientesTableProps {
   clientes: Cliente[]
   searchTerm?: string
 }
-
-type SortField = 'codigo' | 'nome' | 'status' | 'endereco' | 'data_contrato'
 
 export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps) {
   const router = useRouter()

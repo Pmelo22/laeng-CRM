@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { ClienteActions, ClienteStatusBadge, DeleteClienteButton } from "./cliente-actions";
 import { ClienteFinanceiroSection } from "@/components/cliente-financeiro-section";
+import { ClienteDocumentosSection } from "@/components/cliente-documentos-section";
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +35,13 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
     .select("*")
     .eq("cliente_id", id)
     .order("created_at", { ascending: false });
+
+  // Buscar documentos do cliente
+  const { data: documentos } = await supabase
+    .from("documentos_cliente")
+    .select("*")
+    .eq("cliente_id", id)
+    .order("data_upload", { ascending: false });
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -163,6 +171,12 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
         {/* Card 2: Dados Financeiros - Compacto */}
         <ClienteFinanceiroSection 
           obras={obras || []}
+        />
+
+        {/* Card 3: Documentos */}
+        <ClienteDocumentosSection 
+          clienteId={cliente.id}
+          documentos={documentos || []}
         />
       </div>
     </div>
