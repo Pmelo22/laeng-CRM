@@ -1,12 +1,12 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import type { ObraFinanceiro } from "@/lib/types"
 import { createClient } from "@/lib/supabase/client"
@@ -33,11 +33,19 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
   const [medicaoEditando, setMedicaoEditando] = useState<MedicaoData | null>(null)
   const [obraIdEditando, setObraIdEditando] = useState<string | null>(null)
   const [isLoadingMedicao, setIsLoadingMedicao] = useState(false)
+  const [inputValue, setInputValue] = useState<string>('')
 
   // Hooks centralizados
   const { toggleRow, isExpanded } = useExpandableRows()
   const { handleSort, getSortIcon, sortedData: sortedObras } = useSortTable<ObraFinanceiro>(obras)
   const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(sortedObras, 20)
+
+  // Sincronizar input com medicaoEditando
+  useEffect(() => {
+    if (medicaoEditando) {
+      setInputValue(formatMoneyInput(medicaoEditando.valor))
+    }
+  }, [medicaoEditando])
 
   const abrirEditorMedicao = (obraId: string, numeroMedicao: number, valorAtual: number, dataComputacao?: string) => {
     setObraIdEditando(obraId)
@@ -51,6 +59,7 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
   const fecharEditorMedicao = () => {
     setMedicaoEditando(null)
     setObraIdEditando(null)
+    setInputValue('')
   }
 
   const salvarMedicao = async () => {
@@ -460,22 +469,29 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
 
       {/* Modal de Edição de Medição */}
       <Dialog open={medicaoEditando !== null} onOpenChange={(open) => !open && fecharEditorMedicao()}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
+        <DialogContent className="max-w-sm w-full p-0 rounded-lg overflow-hidden">
+          {/* Header */}
+          <div className="bg-[#1E1E1E] text-white px-6 py-4">
+            <DialogTitle className="text-xl font-bold uppercase">
               Editar Medição {medicaoEditando?.numero}
             </DialogTitle>
-          </DialogHeader>
+            <p className="text-sm text-gray-300 mt-2">
+              Altere o valor e clique em salvar para confirmar.
+            </p>
+          </div>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#1E1E1E]">
-                Valor da Medição (R$)
+          {/* Conteúdo */}
+          <div className="px-6 py-6 space-y-6 bg-white">
+            {/* Input */}
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-[#1E1E1E] uppercase block">
+                Novo Valor (R$)
               </label>
               <Input
                 type="text"
-                value={formatMoneyInput(medicaoEditando?.valor || 0)}
+                value={inputValue}
                 onChange={(e) => {
+                  setInputValue(e.target.value)
                   const valor = parseMoneyInput(e.target.value)
                   if (medicaoEditando) {
                     setMedicaoEditando({
@@ -485,26 +501,29 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                   }
                 }}
                 placeholder="0,00"
-                className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                disabled={isLoadingMedicao}
+                className="border-2 border-gray-300 focus:border-[#F5C800] focus:ring-0 font-mono text-lg h-14 px-4 rounded-lg bg-white"
+                autoFocus
               />
             </div>
 
-            {medicaoEditando?.dataComputacao && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-xs text-blue-700 font-semibold mb-1">Última computação:</p>
-                <p className="text-sm font-bold text-blue-900">
-                  {formatarDataComputacao(medicaoEditando.dataComputacao)}
-                </p>
-              </div>
-            )}
+            {/* Valor Anterior */}
+            <div className="bg-blue-50 border-l-4 border-blue-500 rounded px-4 py-4">
+              <p className="text-xs font-bold text-blue-900 uppercase mb-2">Valor Anterior</p>
+              <p className="text-2xl font-bold text-blue-900">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(medicaoEditando?.valor || 0)}
+              </p>
+            </div>
           </div>
 
-          <DialogFooter className="flex gap-3">
+          {/* Footer */}
+          <div className="bg-gray-50 border-t px-6 py-4 flex gap-3 justify-end">
             <Button
               type="button"
               variant="outline"
               onClick={fecharEditorMedicao}
               disabled={isLoadingMedicao}
+              className="border-2 border-gray-300 text-[#1E1E1E] hover:bg-gray-100 font-bold uppercase px-6"
             >
               Cancelar
             </Button>
@@ -512,11 +531,11 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
               type="button"
               onClick={salvarMedicao}
               disabled={isLoadingMedicao}
-              className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold"
+              className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#E5B800] font-bold uppercase px-6"
             >
-              {isLoadingMedicao ? "Salvando..." : "Salvar Medição"}
+              {isLoadingMedicao ? "Salvando..." : "Salvar"}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
