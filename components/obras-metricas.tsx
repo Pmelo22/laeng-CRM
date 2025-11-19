@@ -63,7 +63,7 @@ export function ObrasMetricas({
                 <XAxis dataKey="fase" style={{ fontSize: '12px' }} />
                 <YAxis style={{ fontSize: '12px' }} />
                 <Tooltip 
-                  formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value)}
+                  formatter={(value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value)}
                   contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', fontSize: '12px' }}
                 />
                 <Bar dataKey="valor" fill="#F5C800" name="Valor" />
@@ -111,10 +111,10 @@ export function ObrasMetricas({
           </CardHeader>
           <CardContent>
             <div className="text-2xl sm:text-3xl font-bold text-blue-600">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(receitaTotal)}
+              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(receitaTotal)}
             </div>
             <p className="text-xs sm:text-sm text-slate-600 mt-2">
-              Custo: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(custoTotal)}
+              Custo: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(custoTotal)}
             </p>
           </CardContent>
         </Card>
@@ -126,7 +126,7 @@ export function ObrasMetricas({
           </CardHeader>
           <CardContent>
             <div className={`text-2xl sm:text-3xl font-bold ${lucroTotal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {((lucroTotal / (obras?.length || 1))).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })} por obra
+              {((lucroTotal / (obras?.length || 1))).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })} por obra
             </div>
             <p className="text-xs sm:text-sm text-slate-600 mt-2">
               Margem geral: <span className={`font-bold ${parseFloat(margemLucro as string) > 0 ? 'text-green-600' : 'text-red-600'}`}>{margemLucro}%</span>

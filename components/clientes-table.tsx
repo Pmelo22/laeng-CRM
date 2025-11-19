@@ -73,16 +73,16 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               DATA
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
-              ENTRADA (R$)
+              ENTRADA 
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
-              VALOR FINANCIADO (R$)
+              VALOR FINANCIADO 
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
-              SUBSÍDIO (R$)
+              SUBSÍDIO 
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
-              VALOR TOTAL (R$)
+              VALOR TOTAL 
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">AÇÕES</TableHead>
           </TableRow>

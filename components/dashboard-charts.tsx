@@ -19,7 +19,8 @@ const CustomTooltip = (props: CustomTooltipProps) => {
       return new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
-        minimumFractionDigits: 0,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       }).format(value);
     };
     return (
@@ -71,7 +72,7 @@ const CustomTooltipPie = (props: CustomTooltipProps) => {
 
 export function DashboardCharts({ obras }: DashboardChartsProps) {
   const COLORS = {
-    emAndamento: '#EA580C',
+    emAndamento: '#E53935',
     finalizado: '#22C55E',
     pendente: '#3B82F6',
     yellow: '#F5C800',
@@ -149,7 +150,8 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(value);
   };
 
@@ -219,18 +221,26 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
         <div className="bg-[#1E1E1E] px-6 py-4">
           <h3 className="text-base font-bold text-[#F5C800] uppercase tracking-wide">Faturamento x Fase</h3>
         </div>
-        <div className="p-6 bg-white" style={{ height: '360px' }}>
+        <div className="p-6 bg-white flex flex-col items-center justify-center" style={{ height: '360px' }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={faturamentoPorStatusOrdenado} margin={{ top: 10, right: 20, left: 60, bottom: 10 }}>
+            <BarChart data={faturamentoPorStatusOrdenado} margin={{ top: 10, right: 30, left: 10, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#666' }} />
+              <XAxis dataKey="name" tick={{ fontSize: 0 }} />
               <YAxis tick={{ fontSize: 12, fill: '#666' }} />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(224, 187, 20, 0.1)' }} />
-              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+              <Bar dataKey="value" name="Valor" radius={[6, 6, 0, 0]} label={{ position: 'top', formatter: (value: number) => formatCurrency(value), fontSize: 12, fontWeight: 'bold', fill: '#1E1E1E' }}>
                 {faturamentoPorStatusOrdenado.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={getBarColor(entry.name)} />
                 ))}
               </Bar>
+              <Legend 
+                wrapperStyle={{ paddingTop: '20px', display: 'flex', justifyContent: 'center' }}
+                payload={faturamentoPorStatusOrdenado.map((entry) => ({
+                  value: entry.name,
+                  type: 'circle',
+                  color: getBarColor(entry.name)
+                }))}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -249,11 +259,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ value }) => (
-                  <tspan style={{ fill: '#1E1E1E', fontSize: '14px', fontWeight: 'bold' }}>
-                    {value}
-                  </tspan>
-                )}
+                label={(entry) => `${entry.value}`}
                 outerRadius={90}
                 dataKey="value"
               >
@@ -262,7 +268,14 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltipPie />} />
-              <Legend wrapperStyle={{ paddingTop: '12px' }} />
+              <Legend 
+                wrapperStyle={{ paddingTop: '16px', display: 'flex', justifyContent: 'center' }}
+                payload={obrasPorStatusOrdenado.map((entry, index) => ({
+                  value: entry.name,
+                  type: 'circle',
+                  color: getPieColors()[index]
+                }))}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -278,7 +291,6 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
             <LineChart data={gerarDadosComProjecao()} margin={{ top: 10, right: 20, left: 60, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="ano" tick={{ fontSize: 12, fill: '#666' }} />
-              <YAxis tick={{ fontSize: 12, fill: '#666' }} />
               <Tooltip 
                 formatter={(value: number) => formatCurrency(value)}
                 contentStyle={{ 
@@ -304,6 +316,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                   stroke: '#1E1E1E',
                 }}
                 activeDot={{ r: 7 }}
+                label={{ position: 'top', formatter: (value: number) => formatCurrency(value), fontSize: 11, fontWeight: 'bold', fill: '#1E1E1E' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -320,7 +333,6 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
             <LineChart data={obrasPorAno} margin={{ top: 10, right: 20, left: 60, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="ano" tick={{ fontSize: 12, fill: '#666' }} />
-              <YAxis tick={{ fontSize: 12, fill: '#666' }} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: '#1E1E1E', 
@@ -339,6 +351,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                 strokeWidth={3}
                 dot={{ fill: COLORS.yellow, r: 5, strokeWidth: 1, stroke: '#1E1E1E' }}
                 activeDot={{ r: 7 }}
+                label={{ position: 'top', fontSize: 11, fontWeight: 'bold', fill: '#1E1E1E' }}
               />
             </LineChart>
           </ResponsiveContainer>

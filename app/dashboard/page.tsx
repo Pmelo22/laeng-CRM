@@ -61,7 +61,6 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl sm:text-3xl font-bold text-black">{clientesComObrasList.length}</div>
-                <p className="text-xs sm:text-sm font-bold text-black mt-1">Cadastrados</p>
               </CardContent>
             </Card>
 
@@ -71,7 +70,6 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl sm:text-3xl font-bold text-white">{clientesFinalizados}</div>
-                <p className="text-xs sm:text-sm font-bold text-white mt-1">Projetos completos</p>
               </CardContent>
             </Card>
 
@@ -81,7 +79,6 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl sm:text-3xl font-bold text-white">{clientesEmAndamento}</div>
-                <p className="text-xs sm:text-sm font-bold text-white mt-1">Ativos</p>
               </CardContent>
             </Card>
 
@@ -91,7 +88,6 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl sm:text-3xl font-bold text-white">{clientesPendentes}</div>
-                <p className="text-xs sm:text-sm font-bold text-white mt-1">À iniciar</p>
               </CardContent>
             </Card>
           </div>
@@ -104,9 +100,8 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-lg sm:text-xl font-bold text-slate-700">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(receitaTotal)}
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(receitaTotal)}
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 mt-1">Total</p>
               </CardContent>
             </Card>
 
@@ -116,9 +111,8 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-lg sm:text-xl font-bold text-green-600">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(totalRecebido)}
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalRecebido)}
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 mt-1">Faturado</p>
               </CardContent>
             </Card>
 
@@ -128,9 +122,8 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className={`text-lg sm:text-xl font-bold ${lucroTotal >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(lucroTotal)}
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(lucroTotal)}
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 mt-1">Resultado</p>
               </CardContent>
             </Card>
 
@@ -140,9 +133,8 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-lg sm:text-xl font-bold text-indigo-600">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(ticketMedio)}
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(ticketMedio)}
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 mt-1">{clientesComObrasList.length} clientes</p>
               </CardContent>
             </Card>
           </div>
