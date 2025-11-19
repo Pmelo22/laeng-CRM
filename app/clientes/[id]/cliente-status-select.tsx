@@ -35,7 +35,7 @@ export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
       if (error) throw error;
 
       // SINCRONIZAR STATUS: Atualizar todas as obras associadas
-      const { data: obrasAtualizadas, error: obraError } = await supabase
+      const { error: obraError } = await supabase
         .from("obras")
         .update({ 
           status: newStatus,
@@ -45,9 +45,7 @@ export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
         .select();
 
       if (obraError) {
-        console.error("❌ Erro ao sincronizar status das obras:", obraError);
-      } else {
-        console.log("✅ Status sincronizado! Obras atualizadas:", obrasAtualizadas?.length || 0);
+        // Erro ao sincronizar - continuar mesmo assim
       }
 
       router.refresh();
@@ -58,8 +56,7 @@ export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
           window.location.reload();
         }
       }, 500);
-    } catch (error) {
-      console.error("Erro ao atualizar status:", error);
+    } catch {
       // Reverter para o status anterior em caso de erro
       setCurrentStatus(cliente.status || "PENDENTE");
     } finally {

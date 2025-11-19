@@ -117,15 +117,7 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
       onClose()
       await new Promise(resolve => setTimeout(resolve, 300))
       router.refresh()
-      
-      // Forçar recarregamento completo para garantir sincronização
-      setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          window.location.reload()
-        }
-      }, 500)
     } catch (error) {
-      console.error("Erro ao atualizar obra:", error)
       toast({
         title: "❌ Erro ao atualizar",
         description: "Ocorreu um erro ao salvar os dados. Tente novamente.",

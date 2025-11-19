@@ -19,7 +19,6 @@ export async function getNextCode(
 
   // PGRST116 = nenhum registro encontrado (primeira inserção)
   if (error && error.code !== 'PGRST116') {
-    console.error(`Erro ao buscar último código de ${tableName}:`, error)
     throw error
   }
 

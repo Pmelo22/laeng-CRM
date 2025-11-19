@@ -36,18 +36,9 @@ export async function buscarCepViaCep(cep: string): Promise<{
     const data = await response.json()
     return data
   } catch (error) {
-    console.error("Erro ao buscar CEP:", error)
+    // Erro silencioso - CEP inválido ou API indisponível
     return null
   }
-}
-
-// Calcular valor contratual (entrada + financiado + subsídio)
-export function calcularValorContratual(
-  entrada: number,
-  financiado: number,
-  subsidio: number
-): number {
-  return (entrada || 0) + (financiado || 0) + (subsidio || 0)
 }
 
 // Formatar valor para input monetário (com máscara)

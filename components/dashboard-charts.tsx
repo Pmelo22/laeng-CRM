@@ -223,7 +223,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
         </div>
         <div className="p-6 bg-white flex flex-col items-center justify-center" style={{ height: '360px' }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={faturamentoPorStatusOrdenado} margin={{ top: 10, right: 30, left: 10, bottom: 60 }}>
+            <BarChart data={faturamentoPorStatusOrdenado} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="name" tick={{ fontSize: 0 }} />
               <YAxis tick={{ fontSize: 12, fill: '#666' }} />
@@ -234,7 +234,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                 ))}
               </Bar>
               <Legend 
-                wrapperStyle={{ paddingTop: '20px', display: 'flex', justifyContent: 'center' }}
+                wrapperStyle={{ display: 'flex', justifyContent: 'center' }}
                 payload={faturamentoPorStatusOrdenado.map((entry) => ({
                   value: entry.name,
                   type: 'circle',
@@ -251,7 +251,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
         <div className="bg-[#1E1E1E] px-6 py-4">
           <h3 className="text-base font-bold text-[#F5C800] uppercase tracking-wide">Obras x Fase</h3>
         </div>
-        <div className="p-6 bg-white flex items-center justify-center" style={{ height: '360px' }}>
+        <div className="p-6 bg-white flex flex-col items-center justify-center" style={{ height: '360px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -259,7 +259,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={(entry) => `${entry.value}`}
+                label={(entry: { value: number }) => entry.value}
                 outerRadius={90}
                 dataKey="value"
               >
@@ -269,7 +269,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
               </Pie>
               <Tooltip content={<CustomTooltipPie />} />
               <Legend 
-                wrapperStyle={{ paddingTop: '16px', display: 'flex', justifyContent: 'center' }}
+                wrapperStyle={{ paddingTop: '40px', display: 'flex', justifyContent: 'center' }}
                 payload={obrasPorStatusOrdenado.map((entry, index) => ({
                   value: entry.name,
                   type: 'circle',
@@ -316,7 +316,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                   stroke: '#1E1E1E',
                 }}
                 activeDot={{ r: 7 }}
-                label={{ position: 'top', formatter: (value: number) => formatCurrency(value), fontSize: 11, fontWeight: 'bold', fill: '#1E1E1E' }}
+                label={{ position: 'top', formatter: (value: number) => formatCurrency(value), fontSize: 13, fontWeight: 'bold', fill: '#1E1E1E' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -351,7 +351,7 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                 strokeWidth={3}
                 dot={{ fill: COLORS.yellow, r: 5, strokeWidth: 1, stroke: '#1E1E1E' }}
                 activeDot={{ r: 7 }}
-                label={{ position: 'top', fontSize: 11, fontWeight: 'bold', fill: '#1E1E1E' }}
+                label={{ position: 'top', fontSize: 13, fontWeight: 'bold', fill: '#1E1E1E' }}
               />
             </LineChart>
           </ResponsiveContainer>
