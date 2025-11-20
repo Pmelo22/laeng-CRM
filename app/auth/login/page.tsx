@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/components/auth-context";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
@@ -11,27 +11,32 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRouter } from 'next/navigation';
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [login, setLogin] = useState("");
-  const [senha, setSenha] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { login: authLogin } = useAuth();
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      await authLogin(login, senha);
-    } catch (erro: unknown) {
-      setError(
-        erro instanceof Error ? erro.message : "Erro ao fazer login"
-      );
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      router.push("/dashboard");
+      router.refresh();
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "Erro ao fazer login");
     } finally {
       setIsLoading(false);
     }
@@ -57,41 +62,32 @@ export default function LoginPage() {
               <CardTitle className="text-3xl font-bold tracking-tight" style={{ fontFamily: "'Engravers Gothic BT', sans-serif" }}>
                 LA Engenharia
               </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Sistema de Gestão
-              </p>
             </div>
           </CardHeader>
           <CardContent className="pb-8">
             <form onSubmit={handleLogin}>
               <div className="flex flex-col gap-5">
                 <div className="grid gap-2">
-                  <Label htmlFor="login" className="text-sm font-medium">
-                    Login
-                  </Label>
+                  <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                   <Input
-                    id="login"
-                    type="text"
-                    placeholder="seu_usuario"
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
                     required
-                    value={login}
-                    onChange={(e) => setLogin(e.target.value)}
-                    disabled={isLoading}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="h-11 border-slate-200 focus:border-[#F5C800] focus:ring-[#F5C800]"
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="senha" className="text-sm font-medium">
-                    Senha
-                  </Label>
+                  <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
                   <Input
-                    id="senha"
+                    id="password"
                     type="password"
                     placeholder="••••••••"
                     required
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    disabled={isLoading}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="h-11 border-slate-200 focus:border-[#F5C800] focus:ring-[#F5C800]"
                   />
                 </div>
