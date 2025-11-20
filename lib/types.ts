@@ -15,12 +15,15 @@ export interface Cliente {
   updated_by_name?: string;
   created_at: string;
   updated_at: string;
-  // Campos agregados das obras
-  valor_terreno?: number;
-  entrada?: number;
-  valor_financiado?: number;
-  subsidio?: number;
-  valor_total?: number;
+  // Campos agregados das obras (calculados automaticamente pela VIEW)
+  valor_total?: number; // Soma de valor_total de todas as obras
+  entrada_total?: number; // Soma de entrada de todas as obras
+  valor_financiado_total?: number; // Soma de valor_financiado de todas as obras
+  subsidio_total?: number; // Soma de subsidio de todas as obras
+  total_obras?: number; // Contagem de obras
+  obras_finalizadas?: number;
+  obras_em_andamento?: number;
+  obras_pendentes?: number;
 }
 
 export interface Obra {

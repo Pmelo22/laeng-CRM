@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Cliente } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { buscarCepViaCep, calcularValorContratual } from "@/lib/utils";
+import { buscarCepViaCep } from "@/lib/utils";
 import { getNextCode } from "@/lib/supabase-utils";
 import { StatusSelectContent } from "@/lib/status-utils";
 
@@ -229,12 +229,8 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
         // IMPORTANTE: Usar o MESMO código do cliente para manter consistência
         const novoCodigoObra = novoCodigoCliente;
 
-        // Calcular valor contratual (mesmo que vazio)
-        const valorContratual = calcularValorContratual(
-          obraData.entrada || 0,
-          obraData.valor_financiado || 0,
-          obraData.subsidio || 0
-        );
+        // valor_total é calculado automaticamente pelo trigger do banco
+        const valorContratual = (obraData.entrada || 0) + (obraData.valor_financiado || 0) + (obraData.subsidio || 0);
 
         const obraToSave = {
           codigo: novoCodigoObra,
@@ -283,16 +279,12 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           medicao_05: 0,
         };
 
-        const { data: obraCriada, error: obraError } = await supabase.from("obras").insert([obraToSave]).select().single();
+        const { error: obraError } = await supabase.from("obras").insert([obraToSave]).select().single();
 
         // Se houver erro ao criar a obra, lançar erro detalhado
         if (obraError) {
-          console.error("Erro ao criar obra:", obraError);
-          console.error("Dados que tentou salvar:", obraToSave);
           throw new Error(`Erro ao criar obra: ${obraError.message}`);
         }
-
-        console.log("Obra criada com sucesso:", obraCriada);
 
         // Sucesso - mostrar toast
         toast({
@@ -311,17 +303,9 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
       
       // Forçar refresh da página para recarregar os dados do servidor
       router.refresh();
-      
-      // Como fallback, recarregar a página completamente
-      setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          window.location.reload();
-        }
-      }, 500);
     } catch (error: unknown) {
       // Erro - manter modal aberto e mostrar mensagem
       const errorMessage = error instanceof Error ? error.message : "Erro ao salvar cliente";
-      console.error("Erro completo:", error);
       
       setError(errorMessage);
       setIsLoading(false);

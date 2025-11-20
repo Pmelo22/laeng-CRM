@@ -22,7 +22,18 @@ interface UploadState {
 
 interface DocumentUploadConfig {
   clienteId: string
-  tipoDocumento: 'documento_1' | 'documento_2' | 'documento_3' | 'documento_4' | 'documento_5'
+  tipoDocumento: 
+    | 'documentos_pessoais' 
+    | 'alvara_construcao' 
+    | 'habite_se' 
+    | 'certidao' 
+    | 'averbacao' 
+    | 'art' 
+    | 'pci' 
+    | 'projeto' 
+    | 'cno' 
+    | 'scpo' 
+    | 'cnd'
   file: File
 }
 
@@ -59,12 +70,7 @@ export function useDocumentUpload() {
       setUploadState(prev => ({ ...prev, progress: 20 }))
 
       // 3. Otimizar documento
-      console.log(`Otimizando ${file.name}...`)
       const optimizationResult = await optimizeDocument(file)
-      
-      console.log(`Tamanho original: ${formatFileSize(optimizationResult.originalSize)}`)
-      console.log(`Tamanho otimizado: ${formatFileSize(optimizationResult.optimizedSize)}`)
-      console.log(`Compressão: ${optimizationResult.compressionRatio.toFixed(2)}%`)
 
       setUploadState(prev => ({ ...prev, progress: 40 }))
 
@@ -73,7 +79,6 @@ export function useDocumentUpload() {
       const extension = file.name.split('.').pop()?.toLowerCase()
       const fileName = `${tipoDocumento}_${timestamp}.${extension}`
 
-      console.log(`Enviando para Edge Function: ${fileName}`)
       setUploadState(prev => ({ ...prev, progress: 50 }))
 
       // 5. Chamar Edge Function (que fará upload com service role key, ignorando RLS)
@@ -163,8 +168,6 @@ export function useDocumentUpload() {
         throw new Error('Documento não encontrado no banco de dados')
       }
 
-      console.log('Deletando arquivo:', data.caminho_storage)
-
       // Chamar Edge Function para deletar (usa service role key)
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
       const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -190,8 +193,6 @@ export function useDocumentUpload() {
         throw new Error(errorData.error || 'Erro ao deletar arquivo via Edge Function')
       }
 
-      console.log('Arquivo deletado com sucesso')
-
       toast({
         title: '✅ Documento removido!',
         description: 'O documento foi deletado com sucesso.',
@@ -203,8 +204,6 @@ export function useDocumentUpload() {
       return { success: true }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro ao deletar documento'
-      
-      console.error('Erro completo ao deletar:', error)
       
       toast({
         title: '❌ Erro ao remover documento',

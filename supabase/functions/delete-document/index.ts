@@ -28,8 +28,6 @@ serve(async (req: Request) => {
       throw new Error('Caminho do arquivo não fornecido')
     }
 
-    console.log(`Deletando arquivo: ${caminhoStorage}`)
-
     // 1. Deletar do Storage (usando service role key que ignora RLS)
     const { error: storageError } = await supabase.storage
       .from('documentos_clientes')
@@ -39,8 +37,6 @@ serve(async (req: Request) => {
       console.error('Erro ao deletar do Storage:', storageError)
       throw new Error(`Erro ao deletar arquivo: ${storageError.message}`)
     }
-
-    console.log('Arquivo deletado do Storage')
 
     // 2. Deletar referência do banco (opcional - pode ser feito pelo client também)
     if (clienteId && tipoDocumento) {

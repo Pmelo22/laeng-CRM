@@ -21,14 +21,31 @@ interface ClienteDocumentosSectionProps {
   }>
 }
 
-type TipoDocumento = 'documento_1' | 'documento_2' | 'documento_3' | 'documento_4' | 'documento_5'
+type TipoDocumento = 
+  | 'documentos_pessoais' 
+  | 'alvara_construcao' 
+  | 'habite_se' 
+  | 'certidao' 
+  | 'averbacao' 
+  | 'art' 
+  | 'pci' 
+  | 'projeto' 
+  | 'cno' 
+  | 'scpo' 
+  | 'cnd'
 
 const TIPOS_DOCUMENTOS: { tipo: TipoDocumento; label: string }[] = [
-  { tipo: 'documento_1', label: 'Documento 1' },
-  { tipo: 'documento_2', label: 'Documento 2' },
-  { tipo: 'documento_3', label: 'Documento 3' },
-  { tipo: 'documento_4', label: 'Documento 4' },
-  { tipo: 'documento_5', label: 'Documento 5' },
+  { tipo: 'documentos_pessoais', label: 'Documentos Pessoais' },
+  { tipo: 'alvara_construcao', label: 'Alvará de Construção' },
+  { tipo: 'habite_se', label: 'Habite-se' },
+  { tipo: 'certidao', label: 'Certidão' },
+  { tipo: 'averbacao', label: 'Averbação' },
+  { tipo: 'art', label: 'ART' },
+  { tipo: 'pci', label: 'PCI' },
+  { tipo: 'projeto', label: 'Projeto' },
+  { tipo: 'cno', label: 'CNO' },
+  { tipo: 'scpo', label: 'SCPO' },
+  { tipo: 'cnd', label: 'CND' },
 ]
 
 export function ClienteDocumentosSection({ clienteId, documentos = [] }: ClienteDocumentosSectionProps) {
@@ -36,11 +53,17 @@ export function ClienteDocumentosSection({ clienteId, documentos = [] }: Cliente
   const [uploadingType, setUploadingType] = useState<TipoDocumento | null>(null)
   const [viewingDoc, setViewingDoc] = useState<typeof documentos[0] | null>(null)
   const fileInputRefs = useRef<Record<TipoDocumento, HTMLInputElement | null>>({
-    documento_1: null,
-    documento_2: null,
-    documento_3: null,
-    documento_4: null,
-    documento_5: null,
+    documentos_pessoais: null,
+    alvara_construcao: null,
+    habite_se: null,
+    certidao: null,
+    averbacao: null,
+    art: null,
+    pci: null,
+    projeto: null,
+    cno: null,
+    scpo: null,
+    cnd: null,
   })
 
   // Mapa de documentos por tipo
@@ -140,7 +163,7 @@ export function ClienteDocumentosSection({ clienteId, documentos = [] }: Cliente
           </div>
 
           {/* Grid de slots de upload */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {TIPOS_DOCUMENTOS.map(({ tipo, label }) => {
               const doc = documentosPorTipo[tipo]
               const isUploading = uploadingType === tipo

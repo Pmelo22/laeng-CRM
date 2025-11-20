@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Loader2, User } from "lucide-react";
 import type { Cliente, Obra } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { buscarCepViaCep, calcularValorContratual } from "@/lib/utils";
+import { buscarCepViaCep } from "@/lib/utils";
 import { StatusSelectContent } from "@/lib/status-utils";
 
 interface ClienteEditModalProps {
@@ -158,7 +158,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
       });
       setObrasData(initialObrasData);
     } catch (error) {
-      console.error("Erro ao buscar obras:", error);
+      // Erro ao buscar obras - usar array vazio
     }
   };
 
@@ -214,12 +214,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         for (const obraId of Object.keys(obrasData)) {
           const obraValues = obrasData[obraId];
           
-          // Calcular valores derivados
-          const valorContratual = calcularValorContratual(
-            obraValues.entrada,
-            obraValues.valor_financiado,
-            obraValues.subsidio
-          );
+          // valor_total é calculado automaticamente pelo trigger do banco
           
           const empreiteiro_saldo = obraValues.empreiteiro - obraValues.empreiteiro_valor_pago;
           const empreiteiro_percentual = obraValues.empreiteiro > 0 
@@ -248,21 +243,15 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
               entrada: obraValues.entrada,
               subsidio: obraValues.subsidio,
               valor_financiado: obraValues.valor_financiado,
-              valor_total: valorContratual,
               valor_obra: obraValues.valor_obra,
               updated_at: new Date().toISOString()
             })
             .eq("id", obraId);
 
           if (obraError) {
-            console.error("❌ Erro ao atualizar obra:", obraError);
             throw obraError;
           }
-          
-          console.log(`✅ Obra ${obraId} atualizada com status: ${formData.status}`);
         }
-
-        console.log(`✅ Total de ${Object.keys(obrasData).length} obra(s) atualizada(s) com sucesso!`);
 
         toast({
           title: "✅ Cliente atualizado!",
@@ -276,15 +265,8 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
       
       await new Promise(resolve => setTimeout(resolve, 300));
       router.refresh();
-      
-      setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          window.location.reload();
-        }
-      }, 500);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Erro ao salvar cliente";
-      console.error("Erro completo:", error);
       
       setError(errorMessage);
       setIsLoading(false);

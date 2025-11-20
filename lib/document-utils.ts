@@ -47,7 +47,6 @@ export async function optimizePDF(file: File): Promise<OptimizationResult> {
       compressionRatio: (1 - optimizedSize / originalSize) * 100,
     }
   } catch (error) {
-    console.error('Erro ao otimizar PDF:', error)
     // Se a otimização falhar, retorna o arquivo original
     return {
       optimizedFile: file,
@@ -77,7 +76,6 @@ export async function optimizeDOC(file: File): Promise<OptimizationResult> {
       compressionRatio: (1 - optimizedSize / originalSize) * 100,
     }
   } catch (error) {
-    console.error('Erro ao otimizar DOC:', error)
     return {
       optimizedFile: file,
       originalSize,
@@ -108,7 +106,6 @@ async function compressFile(file: File): Promise<Blob> {
     
     return new Blob([arrayBuffer], { type: file.type })
   } catch (error) {
-    console.error('Erro ao comprimir arquivo:', error)
     return file
   }
 }

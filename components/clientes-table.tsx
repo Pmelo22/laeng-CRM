@@ -73,16 +73,16 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               DATA
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
-              ENTRADA (R$)
+              ENTRADA 
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
-              VALOR FINANCIADO (R$)
+              VALOR FINANCIADO 
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
-              SUBSÍDIO (R$)
+              SUBSÍDIO 
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">
-              VALOR TOTAL (R$)
+              VALOR TOTAL 
             </TableHead>
             <TableHead className="text-center text-[#F5C800] font-bold py-3">AÇÕES</TableHead>
           </TableRow>
@@ -105,13 +105,13 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
                 <span className="text-sm">{formatDate(cliente.data_contrato)}</span>
               </TableCell>
               <TableCell className="text-center py-3 font-bold">
-                <span className="text-sm text-black font-bold">{formatCurrency(cliente.entrada || 0)}</span>
+                <span className="text-sm text-black font-bold">{formatCurrency(cliente.entrada_total || 0)}</span>
               </TableCell>
               <TableCell className="text-center py-3 font-bold">
-                <span className="text-sm text-black font-bold">{formatCurrency(cliente.valor_financiado || 0)}</span>
+                <span className="text-sm text-black font-bold">{formatCurrency(cliente.valor_financiado_total || 0)}</span>
               </TableCell>
               <TableCell className="text-center py-3 font-bold">
-                <span className="text-sm text-black font-bold">{formatCurrency(cliente.subsidio || 0)}</span>
+                <span className="text-sm text-black font-bold">{formatCurrency(cliente.subsidio_total || 0)}</span>
               </TableCell>
               <TableCell className="text-center py-3 font-bold">
                 <span className="text-sm text-green-700 font-bold">{formatCurrency(cliente.valor_total || 0)}</span>
