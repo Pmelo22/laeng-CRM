@@ -477,7 +477,7 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
               <Input
                 id="estado"
                 value={formData.estado}
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value.toUpperCase() })}
+                onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
                 placeholder="UF"
                 maxLength={2}
                 disabled={isLoading}

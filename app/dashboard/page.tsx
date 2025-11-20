@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Building2, DollarSign, Activity } from 'lucide-react';
 import Link from "next/link";
@@ -8,7 +8,7 @@ import { DashboardCharts } from "@/components/dashboard-charts";
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   // Buscar dados em paralelo
   const [

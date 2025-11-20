@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ScrollText,
-  User
+  User,
+  Shield
 } from 'lucide-react';
 import Link from "next/link";
 import Image from "next/image";
@@ -82,7 +83,7 @@ function Logo({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+function Sidebar({ collapsed, onToggle, cargo }: { collapsed: boolean; onToggle: () => void; cargo?: string }) {
   const pathname = usePathname();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const supabase = createClient();
@@ -94,6 +95,18 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
     };
     getUser();
   }, [supabase]);
+
+  // Menu items com item Admin condicional
+  const displayMenuItems = cargo === "admin" 
+    ? [
+        ...menuItems,
+        {
+          title: "Administração",
+          icon: Shield,
+          href: "/admin",
+        }
+      ]
+    : menuItems;
 
   return (
     <aside 
@@ -117,7 +130,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
       </button>
 
       <nav className="flex-1 p-3 space-y-1">
-        {menuItems.map((item) => {
+        {displayMenuItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -201,7 +214,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
   );
 }
 
-function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function MobileSidebar({ isOpen, onClose, cargo }: { isOpen: boolean; onClose: () => void; cargo?: string }) {
   const pathname = usePathname();
 
   useEffect(() => {
@@ -214,6 +227,18 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
+
+  // Menu items com item Admin condicional
+  const displayMenuItems = cargo === "admin" 
+    ? [
+        ...menuItems,
+        {
+          title: "Administração",
+          icon: Shield,
+          href: "/admin",
+        }
+      ]
+    : menuItems;
 
   return (
     <>
@@ -243,7 +268,7 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
+          {displayMenuItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -301,6 +326,7 @@ interface DashboardLayoutClientProps {
   user: {
     id: string;
     email?: string;
+    cargo?: string;
     user_metadata?: {
       name?: string;
     };
@@ -309,14 +335,15 @@ interface DashboardLayoutClientProps {
 
 export default function DashboardLayoutClient({
   children,
+  user,
 }: DashboardLayoutClientProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
-      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
+      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} cargo={user.cargo} />
+      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} cargo={user.cargo} />
       
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile Header */}

@@ -453,7 +453,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
                     id="estado"
                     type="text"
                     value={formData.estado}
-                    onChange={(e) => setFormData({ ...formData, estado: e.target.value.toUpperCase() })}
+                    onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
                     placeholder="UF"
                     maxLength={2}
                     disabled={isLoading}
