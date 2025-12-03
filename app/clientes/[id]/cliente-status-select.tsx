@@ -27,8 +27,7 @@ export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
       const { error } = await supabase
         .from("clientes")
         .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString() 
+          status: newStatus
         })
         .eq("id", cliente.id);
 
@@ -38,8 +37,7 @@ export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
       const { error: obraError } = await supabase
         .from("obras")
         .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString() 
+          status: newStatus
         })
         .eq("cliente_id", cliente.id)
         .select();

@@ -9,9 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, User } from "lucide-react";
-import type { Cliente, Obra } from "@/lib/types";
+import type { Cliente } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { buscarCepViaCep } from "@/lib/utils";
+import { buscarCepViaCep, formatDateForInput } from "@/lib/utils";
 import { StatusSelectContent } from "@/lib/status-utils";
 
 interface ClienteEditModalProps {
@@ -27,7 +27,6 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadingCep, setLoadingCep] = useState(false);
-  const [, setObras] = useState<Obra[]>([]);
 
   // Dados do cliente
   const [formData, setFormData] = useState({
@@ -39,30 +38,8 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
     cidade: "",
     estado: "",
     cep: "",
-    data_contrato: new Date().toISOString().split('T')[0],
+    data_contrato: formatDateForInput(null),
   });
-
-  // Dados das obras do cliente (para edição)
-  const [obrasData, setObrasData] = useState<Record<string, {
-    // Custos principais
-    empreiteiro: number;
-    material: number;
-    // Demonstrativo empreiteiro
-    empreiteiro_nome: string;
-    empreiteiro_valor_pago: number;
-    // Terceirizados
-    pintor: number;
-    eletricista: number;
-    gesseiro: number;
-    azulejista: number;
-    manutencao: number;
-    // Valores financeiros
-    valor_terreno: number;
-    entrada: number;
-    subsidio: number;
-    valor_financiado: number;
-    valor_obra: number;
-  }>>({});
 
   // Carregar dados quando modal abrir
   useEffect(() => {
@@ -76,9 +53,8 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         cidade: cliente.cidade || "",
         estado: cliente.estado || "",
         cep: cliente.cep || "",
-        data_contrato: cliente.data_contrato || new Date().toISOString().split('T')[0],
+        data_contrato: formatDateForInput(cliente.data_contrato),
       });
-      buscarObras();
     } else if (isOpen && !cliente) {
       // Resetar form para novo cliente
       setFormData({
@@ -90,77 +66,11 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         cidade: "",
         estado: "",
         cep: "",
-        data_contrato: new Date().toISOString().split('T')[0],
+        data_contrato: formatDateForInput(null),
       });
-      setObras([]);
-      setObrasData({});
     }
     setError(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, cliente]);
-
-  const buscarObras = async () => {
-    if (!cliente) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from("obras")
-        .select("*")
-        .eq("cliente_id", cliente.id);
-
-      if (error) throw error;
-
-      const obrasFormatadas = (data || []) as Obra[];
-      setObras(obrasFormatadas);
-      
-      // Inicializar obrasData com os valores das obras
-      const initialObrasData: Record<string, {
-        empreiteiro: number;
-        material: number;
-        terceirizado: number;
-        mao_de_obra: number;
-        empreiteiro_nome: string;
-        empreiteiro_valor_pago: number;
-        pintor: number;
-        eletricista: number;
-        gesseiro: number;
-        azulejista: number;
-        manutencao: number;
-        valor_terreno: number;
-        entrada: number;
-        subsidio: number;
-        valor_financiado: number;
-        valor_obra: number;
-      }> = {};
-      obrasFormatadas.forEach((obra) => {
-        initialObrasData[obra.id] = {
-          // Custos principais
-          empreiteiro: Number(obra.empreiteiro) || 0,
-          material: Number(obra.material) || 0,
-          terceirizado: Number(obra.terceirizado) || 0,
-          mao_de_obra: Number(obra.mao_de_obra) || 0,
-          // Demonstrativo empreiteiro
-          empreiteiro_nome: obra.empreiteiro_nome || "",
-          empreiteiro_valor_pago: Number(obra.empreiteiro_valor_pago) || 0,
-          // Terceirizados especializados
-          pintor: Number(obra.pintor) || 0,
-          eletricista: Number(obra.eletricista) || 0,
-          gesseiro: Number(obra.gesseiro) || 0,
-          azulejista: Number(obra.azulejista) || 0,
-          manutencao: Number(obra.manutencao) || 0,
-          // Valores financeiros
-          valor_terreno: Number(obra.valor_terreno) || 0,
-          entrada: Number(obra.entrada) || 0,
-          subsidio: Number(obra.subsidio) || 0,
-          valor_financiado: Number(obra.valor_financiado) || 0,
-          valor_obra: Number(obra.valor_obra) || 0,
-        };
-      });
-      setObrasData(initialObrasData);
-    } catch (error) {
-      // Erro ao buscar obras - usar array vazio
-    }
-  };
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newCep = e.target.value;
@@ -205,57 +115,14 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         // Atualizar cliente existente
         const { error: clienteError } = await supabase
           .from("clientes")
-          .update({ ...baseData, updated_at: new Date().toISOString() })
+          .update(baseData)
           .eq("id", cliente.id);
 
         if (clienteError) throw clienteError;
 
-        // Atualizar todas as obras do cliente
-        for (const obraId of Object.keys(obrasData)) {
-          const obraValues = obrasData[obraId];
-          
-          // valor_total é calculado automaticamente pelo trigger do banco
-          
-          const empreiteiro_saldo = obraValues.empreiteiro - obraValues.empreiteiro_valor_pago;
-          const empreiteiro_percentual = obraValues.empreiteiro > 0 
-            ? (obraValues.empreiteiro_valor_pago / obraValues.empreiteiro) * 100 
-            : 0;
-
-          const { error: obraError } = await supabase
-            .from("obras")
-            .update({
-              // SINCRONIZAÇÃO: Incluir o status do cliente
-              status: formData.status,
-              // Custos
-              empreiteiro: obraValues.empreiteiro,
-              material: obraValues.material,
-              empreiteiro_nome: obraValues.empreiteiro_nome,
-              empreiteiro_valor_pago: obraValues.empreiteiro_valor_pago,
-              empreiteiro_saldo: empreiteiro_saldo,
-              empreiteiro_percentual: empreiteiro_percentual,
-              pintor: obraValues.pintor,
-              eletricista: obraValues.eletricista,
-              gesseiro: obraValues.gesseiro,
-              azulejista: obraValues.azulejista,
-              manutencao: obraValues.manutencao,
-              // Valores financeiros
-              valor_terreno: obraValues.valor_terreno,
-              entrada: obraValues.entrada,
-              subsidio: obraValues.subsidio,
-              valor_financiado: obraValues.valor_financiado,
-              valor_obra: obraValues.valor_obra,
-              updated_at: new Date().toISOString()
-            })
-            .eq("id", obraId);
-
-          if (obraError) {
-            throw obraError;
-          }
-        }
-
         toast({
           title: "✅ Cliente atualizado!",
-          description: `Os dados de ${formData.nome} foram atualizados e sincronizados.`,
+          description: `Os dados de ${formData.nome} foram atualizados com sucesso.`,
           duration: 3000,
         });
       }

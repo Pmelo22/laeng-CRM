@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Cliente } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { buscarCepViaCep } from "@/lib/utils";
+import { buscarCepViaCep, formatDateForInput } from "@/lib/utils";
 import { getNextCode } from "@/lib/supabase-utils";
 import { StatusSelectContent } from "@/lib/status-utils";
 
@@ -37,7 +37,7 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     cidade: "",
     estado: "",
     cep: "",
-    data_contrato: new Date().toISOString().split('T')[0],
+    data_contrato: formatDateForInput(null),
   });
 
   // Dados da obra
@@ -112,7 +112,7 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           cidade: cliente.cidade || "",
           estado: cliente.estado || "",
           cep: cliente.cep || "",
-          data_contrato: cliente.data_contrato || new Date().toISOString().split('T')[0],
+          data_contrato: formatDateForInput(cliente.data_contrato),
         });
       } else {
         // Modal de criação - resetar para valores padrão
@@ -125,7 +125,7 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           cidade: "",
           estado: "",
           cep: "",
-          data_contrato: new Date().toISOString().split('T')[0],
+          data_contrato: formatDateForInput(null),
         });
         setObraData({
           endereco_obra: "",
