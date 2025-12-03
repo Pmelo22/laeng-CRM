@@ -15,9 +15,17 @@ export function formatCurrency(value: number): string {
   }).format(value)
 }
 
-// Formatação de data
+// Formatação de data (sem problemas de timezone)
 export function formatDate(date: string | null | undefined): string {
   if (!date) return "-"
+  
+  // Se a data está no formato YYYY-MM-DD, fazer parse manual para evitar timezone
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [year, month, day] = date.split('-');
+    return `${day}/${month}/${year}`;
+  }
+  
+  // Para outros formatos, usar Date normal
   return new Date(date).toLocaleDateString('pt-BR')
 }
 
@@ -58,4 +66,32 @@ export function parseMoneyInput(value: string): number {
 // Formatação de percentual
 export function formatPercentage(value: number): string {
   return `${value.toFixed(1)}%`
+}
+
+// Converter data do formato YYYY-MM-DD para o formato do input (sem problemas de timezone)
+export function formatDateForInput(dateString: string | null | undefined): string {
+  if (!dateString) return new Date().toISOString().split('T')[0];
+  
+  // Se já está no formato YYYY-MM-DD, retornar direto
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    return dateString;
+  }
+  
+  // Caso contrário, tentar converter
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+}
+
+// Converter data do input para string sem conversão de timezone
+// Garante que a data 2025-12-16 seja salva como 2025-12-16, não 2025-12-15
+export function parseDateFromInput(dateString: string): string {
+  if (!dateString) return new Date().toISOString().split('T')[0];
+  
+  // Input date já vem no formato YYYY-MM-DD correto
+  // Apenas validar e retornar
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    return dateString;
+  }
+  
+  return new Date().toISOString().split('T')[0];
 }
