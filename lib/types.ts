@@ -26,25 +26,8 @@ export interface Cliente {
   obras_pendentes?: number;
 }
 
-export interface Obra {
-  id: string;
-  codigo: number; // Código da obra
-  cliente_id: string; // Foreign key para clientes
-  responsavel: string; // Responsável pela obra
-  entidade?: string; // CUS., S.J., A.F.G, PARTICULAR, PREFEITURA
-  tipo_contrato?: 'PARTICULAR' | 'PREFEITURA' | 'CAIXA' | 'FINANCIAMENTO' | 'OUTRO';
-  endereco: string; // Endereço da obra
-  endereco_obra?: string;
-  cidade_obra?: string;
-  estado_obra?: string;
-  status: 'FINALIZADO' | 'EM ANDAMENTO' | 'PENDENTE';
-  entrada: number; // Valor pago na entrada
-  valor_financiado: number; // Valor financiado pela instituição
-  subsidio: number; // Subsídio/incentivo fiscal
-  valor_total: number; // Entrada + Financiado + Subsídio
-  data_conclusao?: string; // Data de conclusão da obra
-  valor_terreno: number; // Valor do terreno
-  // Campos de custos detalhados
+// ============ TIPOS BASE DE CUSTOS (COMPARTILHADO ENTRE OBRA E OBRAFINANCEIRO) ============
+export interface ObraCustos {
   empreiteiro?: number;
   empreiteiro_nome?: string;
   empreiteiro_valor_pago?: number;
@@ -58,11 +41,10 @@ export interface Obra {
   gesseiro?: number;
   azulejista?: number;
   manutencao?: number;
-  valor_obra?: number; // Valor total da obra (custo)
-  ano_obra?: number;
-  local_obra?: string;
-  fase?: string;
-  // Campos de medições
+}
+
+// ============ TIPOS BASE DE MEDIÇÕES (COMPARTILHADO ENTRE OBRA E OBRAFINANCEIRO) ============
+export interface ObraMedicoes {
   medicao_01?: number;
   medicao_02?: number;
   medicao_03?: number;
@@ -73,6 +55,34 @@ export interface Obra {
   medicao_03_data_computacao?: string;
   medicao_04_data_computacao?: string;
   medicao_05_data_computacao?: string;
+}
+
+// ============ TIPOS BASE DE FINANCEIRO (COMPARTILHADO) ============
+export interface ObraFinanceiro {
+  valor_terreno: number;
+  entrada: number;
+  valor_financiado: number;
+  subsidio: number;
+  valor_total: number;
+  valor_obra?: number;
+}
+
+export interface Obra extends ObraFinanceiro, ObraCustos, ObraMedicoes {
+  id: string;
+  codigo: number; // Código da obra
+  cliente_id: string; // Foreign key para clientes
+  responsavel: string; // Responsável pela obra
+  entidade?: string; // CUS., S.J., A.F.G, PARTICULAR, PREFEITURA
+  tipo_contrato?: 'PARTICULAR' | 'PREFEITURA' | 'CAIXA' | 'FINANCIAMENTO' | 'OUTRO';
+  endereco: string; // Endereço da obra
+  endereco_obra?: string;
+  cidade_obra?: string;
+  estado_obra?: string;
+  status: 'FINALIZADO' | 'EM ANDAMENTO' | 'PENDENTE';
+  data_conclusao?: string; // Data de conclusão da obra
+  ano_obra?: number;
+  local_obra?: string;
+  fase?: string;
   created_by?: string;
   created_by_name?: string;
   updated_by_name?: string;
@@ -85,6 +95,16 @@ export interface ObraComCliente extends Obra {
   cliente_endereco: string;
   cliente_cidade: string;
   cliente_telefone?: string;
+}
+
+export interface ObraFinanceiroAggregated extends Pick<Obra, 'id' | 'codigo' | 'status' | 'valor_obra'>, ObraFinanceiro, ObraCustos, ObraMedicoes {
+  cliente_nome: string;
+  custo_total: number;
+  resultado: number;
+  margem_lucro: number;
+  total_medicoes_pagas: number;
+  saldo_pendente: number;
+  percentual_pago: number;
 }
 
 // ============ TIPOS FINANCEIROS ============
@@ -116,48 +136,6 @@ export interface FluxoCaixa {
   created_by?: string;
   created_at: string;
   updated_at: string;
-}
-
-export interface ObraFinanceiro {
-  id: string;
-  codigo: number;
-  cliente_nome: string;
-  status: string;
-  valor_terreno: number;
-  entrada: number;
-  valor_financiado: number;
-  subsidio: number;
-  valor_total: number;
-  valor_obra: number;
-  custo_total: number;
-  resultado: number;
-  margem_lucro: number;
-  total_medicoes_pagas: number;
-  saldo_pendente: number;
-  percentual_pago: number;
-  empreiteiro?: number;
-  empreiteiro_nome?: string;
-  empreiteiro_valor_pago?: number;
-  empreiteiro_saldo?: number;
-  empreiteiro_percentual?: number;
-  terceirizado?: number;
-  material?: number;
-  mao_de_obra?: number;
-  pintor?: number;
-  eletricista?: number;
-  gesseiro?: number;
-  azulejista?: number;
-  manutencao?: number;
-  medicao_01?: number;
-  medicao_02?: number;
-  medicao_03?: number;
-  medicao_04?: number;
-  medicao_05?: number;
-  medicao_01_data_computacao?: string;
-  medicao_02_data_computacao?: string;
-  medicao_03_data_computacao?: string;
-  medicao_04_data_computacao?: string;
-  medicao_05_data_computacao?: string;
 }
 
 export interface DashboardFinanceiro {

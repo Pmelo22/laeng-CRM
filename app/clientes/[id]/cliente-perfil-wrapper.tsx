@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
-import { ClienteModal } from "@/components/cliente-modal";
+import { ClienteFormModal } from "@/components/cliente-form-modal";
 import { Cliente } from "@/lib/types";
 
 interface ClientePerfilWrapperProps {
@@ -23,7 +23,7 @@ export function ClientePerfilWrapper({ cliente }: ClientePerfilWrapperProps) {
         Editar Cliente
       </Button>
 
-      <ClienteModal
+      <ClienteFormModal
         cliente={cliente}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

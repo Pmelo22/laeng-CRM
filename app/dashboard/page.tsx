@@ -4,6 +4,7 @@ import { Users, Building2, DollarSign, Activity } from 'lucide-react';
 import Link from "next/link";
 import { DashboardAlerts } from "@/components/dashboard-alerts";
 import { DashboardCharts } from "@/components/dashboard-charts";
+import { calculateDashboardMetrics } from "@/lib/dashboard-metrics";
 
 export const dynamic = 'force-dynamic';
 
@@ -21,21 +22,21 @@ export default async function DashboardPage() {
     supabase.from("avisos").select("*").eq("status", "PENDENTE").order("urgencia", { ascending: false }).order("created_at", { ascending: false })
   ]);
 
-  // ========== ANÁLISE CLIENTES ==========
-  const clientesFinalizados = clientesData?.filter(c => c.status === 'FINALIZADO').length || 0;
-  const clientesEmAndamento = clientesData?.filter(c => c.status === 'EM ANDAMENTO').length || 0;
-  const clientesPendentes = clientesData?.filter(c => c.status === 'PENDENTE' || !c.status).length || 0;
+  // ========== ANÁLISE CLIENTES E OBRAS ==========
+  const metrics = calculateDashboardMetrics(clientesData, obras);
 
-  // ========== ANÁLISE OBRAS ==========
-  const receitaTotal = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
-  const custoTotal = obras?.reduce((sum, obra) => sum + (Number(obra.custo_total) || 0), 0) || 0;
-  const lucroTotal = receitaTotal - custoTotal;
-  
-  const totalRecebido = obras?.reduce((sum, obra) => sum + (Number(obra.empreiteiro_valor_pago) || 0), 0) || 0;
-
-  // Clientes com obras ativas
-  const clientesComObrasList = [...new Set(obras?.map(o => o.cliente_id) || [])];
-  const ticketMedio = clientesComObrasList.length > 0 ? receitaTotal / clientesComObrasList.length : 0;
+  const {
+    clientesTotal,
+    clientesFinalizados,
+    clientesEmAndamento,
+    clientesPendentes,
+    clientesComObrasList,
+    receitaTotal,
+    custoTotal,
+    lucroTotal,
+    totalRecebido,
+    ticketMedio,
+  } = metrics;
 
   return (
     <div className="p-3 sm:p-4 md:p-6 lg:p-8 space-y-6 sm:space-y-8">

@@ -29,28 +29,19 @@ export function PDFViewer({ url, fileName = "documento.pdf" }: PDFViewerProps) {
   const [isRendering, setIsRendering] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
 
-  // Configurar PDF.js worker
+  // Setup e carregar PDF
   useEffect(() => {
-    const setupWorker = async () => {
+    const setupAndLoad = async () => {
       try {
+        // Configurar worker
         const pdfjsLib = await import("pdfjs-dist")
         pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs"
-      } catch (err) {
-        console.error("Erro ao configurar worker:", err)
-      }
-    }
-    setupWorker()
-  }, [])
 
-  // Carregar PDF
-  useEffect(() => {
-    const loadPdf = async () => {
-      try {
+        // Carregar PDF
         setIsLoading(true)
         setError(null)
         setCurrentPage(1)
 
-        const pdfjsLib = await import("pdfjs-dist")
         const pdf = await pdfjsLib.getDocument(url).promise
         pdfDocRef.current = pdf
         setTotalPages(pdf.numPages)
@@ -63,10 +54,10 @@ export function PDFViewer({ url, fileName = "documento.pdf" }: PDFViewerProps) {
       }
     }
 
-    loadPdf()
+    setupAndLoad()
   }, [url])
 
-  // Renderizar página
+  // Renderizar página + scroll ao zoom
   useEffect(() => {
     const renderPage = async () => {
       if (!pdfDocRef.current || !canvasRef.current || isLoading) {
@@ -103,14 +94,12 @@ export function PDFViewer({ url, fileName = "documento.pdf" }: PDFViewerProps) {
     }
 
     renderPage()
-  }, [currentPage, scale, isLoading])
 
-  // Scroll para o topo quando zoom muda
-  useEffect(() => {
+    // Scroll ao topo quando zoom muda
     if (containerRef.current) {
       containerRef.current.scrollTop = 0
     }
-  }, [scale])
+  }, [currentPage, scale, isLoading])
 
   const handlePreviousPage = useCallback(() => {
     setCurrentPage((prev) => Math.max(prev - 1, 1))
