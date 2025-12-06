@@ -196,3 +196,36 @@ export interface FluxoResumo {
   total_saidas: number;
   saldo_periodo: number;
 }
+
+// Tipos para administração de usuários
+export interface Usuario {
+  id: string;
+  email: string;
+  nome_completo: string;
+  cargo: 'admin' | 'funcionario';
+  ativo: boolean;
+  created_at: string;
+  updated_at: string;
+  ultimo_acesso?: string;
+}
+
+export interface PermissoesUsuario {
+  dashboard: {
+    view: boolean;
+  };
+  clientes: {
+    view: boolean;
+    create: boolean;
+    delete: boolean;
+  };
+  obras: {
+    view: boolean;
+    create: boolean;
+    delete: boolean;
+  };
+  financeira: {
+    view: boolean;
+    create: boolean;
+    delete: boolean;
+  };
+}

@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ScrollText,
-  User
+  User,
+  Shield
 } from 'lucide-react';
 import Link from "next/link";
 import Image from "next/image";
@@ -48,6 +49,11 @@ const menuItems = [
     title: "Logs",
     icon: ScrollText,
     href: "/dashboard/logs",
+  },
+  {
+    title: "Admin",
+    icon: Shield,
+    href: "/admin",
   },
 ];
 
