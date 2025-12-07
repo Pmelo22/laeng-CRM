@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { Toaster } from "@/components/ui/toaster";
+import { useMenuAccess } from './hooks/useMenuAccess';
 
 const menuItems = [
   {
@@ -89,33 +90,23 @@ function Logo({ collapsed }: { collapsed: boolean }) {
 }
 
 function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+
   const pathname = usePathname();
-  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const { user, items, loading } = useMenuAccess(menuItems);
 
-  const [items, setItems] = useState(menuItems);
-
-  const supabase = createClient();
-
-  useEffect(() => {
-
-    const getUser = async () => {
-
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-
-
-      const { data: profile} = await supabase.from("profiles").select("*").eq("id", user?.id).single();
-
-      if (profile?.cargo !== "admin") { 
-      setItems(prev => prev.filter(item => item.title !== "Admin"));
-    }
-    
-    };
-    getUser();
-
-  }, [supabase])
-
-
+  if (loading) {
+    return (
+      <aside className="hidden lg:block w-72 bg-[#1E1E1E] animate-pulse opacity-50">
+        <div className="h-16 border-b border-gray-800" />
+        <div className="p-4 space-y-3">
+          <div className="h-10 bg-gray-700 rounded" />
+          <div className="h-10 bg-gray-700 rounded" />
+          <div className="h-10 bg-gray-700 rounded" />
+        </div>
+      </aside>
+    );
+  }
+  
   return (
     <aside 
       className={cn(
@@ -185,6 +176,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
         </div>
       )}
 
+      
       <div className="border-t border-gray-800 p-3">
         <form action="/auth/signout" method="post">
           <Button 
@@ -225,30 +217,8 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
 function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
 
   const pathname = usePathname();
-  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const { user, items, loading } = useMenuAccess(menuItems);
 
-  const [items, setItems] = useState(menuItems);
-
-  const supabase = createClient();
-
-  useEffect(() => {
-
-    const getUser = async () => {
-
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-
-
-      const { data: profile} = await supabase.from("profiles").select("*").eq("id", user?.id).single();
-
-      if (profile?.cargo !== "admin") { 
-      setItems(prev => prev.filter(item => item.title !== "Admin"));
-    }
-    
-    };
-    getUser();
-
-  }, [supabase])
 
   useEffect(() => {
     if (isOpen) {
@@ -260,6 +230,8 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
+
+  if (loading) return null;
 
   return (
     <>
@@ -309,6 +281,24 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             );
           })}
         </nav>
+
+        {/* Usuário Autenticado (Mobile) */}
+        {user && (
+          <div className="border-t border-gray-800 p-3 bg-[#2A2A2A]">
+            <div className="flex items-center gap-3 p-2 rounded-lg">
+              <div className="w-10 h-10 rounded-full bg-[#F5C800] flex items-center justify-center flex-shrink-0">
+                <User className="h-5 w-5 text-[#1E1E1E]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">
+                  {user.user_metadata?.name || user.email?.split("@")[0] || "Usuário"}
+                </p>
+                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         <div className="border-t border-gray-800 p-3">
           <form action="/auth/signout" method="post">
