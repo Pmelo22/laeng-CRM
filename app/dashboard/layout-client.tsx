@@ -91,15 +91,30 @@ function Logo({ collapsed }: { collapsed: boolean }) {
 function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const pathname = usePathname();
   const [user, setUser] = useState<SupabaseUser | null>(null);
+
+  const [items, setItems] = useState(menuItems);
+
   const supabase = createClient();
 
   useEffect(() => {
+
     const getUser = async () => {
+
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+
+
+      const { data: profile} = await supabase.from("profiles").select("*").eq("id", user?.id).single();
+
+      if (profile?.cargo !== "admin") { 
+      setItems(prev => prev.filter(item => item.title !== "Admin"));
+    }
+    
     };
     getUser();
-  }, [supabase]);
+
+  }, [supabase])
+
 
   return (
     <aside 
@@ -123,7 +138,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
       </button>
 
       <nav className="flex-1 p-3 space-y-1">
-        {menuItems.map((item) => {
+        {items.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -208,7 +223,32 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
 }
 
 function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+
   const pathname = usePathname();
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+
+  const [items, setItems] = useState(menuItems);
+
+  const supabase = createClient();
+
+  useEffect(() => {
+
+    const getUser = async () => {
+
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+
+
+      const { data: profile} = await supabase.from("profiles").select("*").eq("id", user?.id).single();
+
+      if (profile?.cargo !== "admin") { 
+      setItems(prev => prev.filter(item => item.title !== "Admin"));
+    }
+    
+    };
+    getUser();
+
+  }, [supabase])
 
   useEffect(() => {
     if (isOpen) {
@@ -249,7 +289,7 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
+          {items.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
