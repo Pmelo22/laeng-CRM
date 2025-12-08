@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react"
 import type { ObraComCliente } from "@/lib/types"
 
 // Lazy load com suspense fallback
-const ObraTableFullContent = dynamic(() => import("./obras-table-full"), {
+const ObraTableFullContent = dynamic(() => import("./obras-table-full").then(mod => ({ default: mod.ObrasTableFull })), {
   loading: () => (
     <div className="flex items-center justify-center p-8">
       <Loader2 className="h-6 w-6 animate-spin text-yellow-500" />
@@ -15,7 +15,6 @@ const ObraTableFullContent = dynamic(() => import("./obras-table-full"), {
 
 interface ObraTableFullLazyProps {
   obras: ObraComCliente[]
-  onEdit?: (obra: ObraComCliente) => void
 }
 
 /**
@@ -23,6 +22,6 @@ interface ObraTableFullLazyProps {
  * Melhora performance carregando o componente sob demanda
  * Economiza ~20KB do bundle principal
  */
-export function ObraTableFullLazy({ obras, onEdit }: ObraTableFullLazyProps) {
-  return <ObraTableFullContent obras={obras} onEdit={onEdit} />
+export function ObraTableFullLazy({ obras }: ObraTableFullLazyProps) {
+  return <ObraTableFullContent obras={obras} />
 }

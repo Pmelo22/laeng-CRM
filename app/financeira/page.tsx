@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import type { DashboardFinanceiro, ObraFinanceiro } from "@/lib/types"
+import type { DashboardFinanceiro, ObraFinanceiroAggregated } from "@/lib/types"
 import FinanceiraPageContent from "./financeira-page-content"
 
 export const dynamic = 'force-dynamic';
@@ -43,7 +43,7 @@ export default async function FinanceiraPage() {
     .select("*")
     .order("codigo", { ascending: true })
 
-  const obras = (obrasData as unknown as ObraFinanceiro[]) || []
+  const obras = (obrasData as unknown as ObraFinanceiroAggregated[]) || []
 
   return <FinanceiraPageContent dashboard={dashboard} obras={obras} />
 }

@@ -7,7 +7,6 @@ interface UseDocumentViewerReturn {
   totalPages: number;
   scale: number;
   isLoading: boolean;
-  isRendering: boolean;
   isDownloading: boolean;
   error: string | null;
   handlePreviousPage: () => void;
@@ -96,7 +95,6 @@ export function useDocumentViewer(initialScale: number = 1.5): UseDocumentViewer
     totalPages,
     scale,
     isLoading,
-    isRendering,
     isDownloading,
     error,
     handlePreviousPage,
@@ -109,7 +107,7 @@ export function useDocumentViewer(initialScale: number = 1.5): UseDocumentViewer
     setIsLoading,
     setError,
     setCurrentPage,
-    canvasRef,
-    containerRef,
+    canvasRef: canvasRef as React.RefObject<HTMLCanvasElement>,
+    containerRef: containerRef as React.RefObject<HTMLDivElement>,
   };
 }

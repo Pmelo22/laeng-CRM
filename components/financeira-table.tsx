@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import type { ObraFinanceiro } from "@/lib/types"
+import type { ObraFinanceiroAggregated } from "@/lib/types"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -17,7 +17,7 @@ import { getStatusBadge } from "@/lib/status-utils"
 import { useSortTable, usePagination, useExpandableRows, ExpandToggleButton } from "@/lib/table-utils"
 
 interface FinanceiraTableProps {
-  obras: ObraFinanceiro[]
+  obras: ObraFinanceiroAggregated[]
 }
 
 interface MedicaoData {
@@ -37,7 +37,7 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
 
   // Hooks centralizados
   const { toggleRow, isExpanded } = useExpandableRows()
-  const { handleSort, getSortIcon, sortedData: sortedObras } = useSortTable<ObraFinanceiro>(obras)
+  const { handleSort, getSortIcon, sortedData: sortedObras } = useSortTable<ObraFinanceiroAggregated>(obras)
   const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(sortedObras, 20)
 
   // Sincronizar input com medicaoEditando
