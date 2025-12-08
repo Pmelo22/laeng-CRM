@@ -182,6 +182,20 @@ export function ClienteFormModal({
 
         if (error) throw error;
 
+        // ✅ SINCRONIZAR: Atualizar todas as obras associadas com o novo status
+        const { error: obraError } = await supabase
+          .from("obras")
+          .update({ 
+            status: formData.status,
+            updated_at: new Date().toISOString() 
+          })
+          .eq("cliente_id", cliente.id);
+
+        if (obraError) {
+          console.warn("Aviso ao sincronizar obras:", obraError);
+          // Não falhar, apenas avisar
+        }
+
         toast({
           title: "✅ Cliente atualizado!",
           description: `Os dados de ${formData.nome} foram atualizados com sucesso.`,

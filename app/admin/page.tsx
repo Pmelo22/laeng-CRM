@@ -15,10 +15,16 @@ export default async function AdminPage() {
   }
 
   // implementar backend, adicionar verificação de permissão admin
-  const { data: profile } = await supabase.from("profiles").select("cargo").eq("id", user.id).single()
-  
-  if (!profile || profile.cargo !== 'admin') {
-  redirect("/dashboard")}
+  try {
+    const { data: profile, error } = await supabase.from("profiles").select("cargo").eq("id", user.id).single()
+    
+    if (error || !profile || profile.cargo !== 'admin') {
+      redirect("/dashboard")
+    }
+  } catch (err) {
+    console.error("Erro ao verificar admin:", err)
+    redirect("/dashboard")
+  }
 
   // implementar backend, buscar usuários reais do banco quando pronto
   // const { data: usuarios } = await supabase

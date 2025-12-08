@@ -8,10 +8,12 @@ import type { Obra } from "@/lib/types"
 
 interface ClienteFinanceiroSectionProps {
   obras: Obra[]
+  clienteId: string
 }
 
 export function ClienteFinanceiroSection({
   obras,
+  clienteId,
 }: ClienteFinanceiroSectionProps) {
   const [editingModal, setEditingModal] = useState<{
     fieldName: string

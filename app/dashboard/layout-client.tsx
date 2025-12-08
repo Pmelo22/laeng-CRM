@@ -20,10 +20,8 @@ import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { Toaster } from "@/components/ui/toaster";
-import { useMenuAccess } from './hooks/useMenuAccess';
 
 const menuItems = [
   {
@@ -89,24 +87,14 @@ function Logo({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
-
+function Sidebar({ collapsed, onToggle, user, userRole }: { collapsed: boolean; onToggle: () => void; user: SupabaseUser; userRole: string }) {
   const pathname = usePathname();
-  const { user, items, loading } = useMenuAccess(menuItems);
-
-  if (loading) {
-    return (
-      <aside className="hidden lg:block w-72 bg-[#1E1E1E] animate-pulse opacity-50">
-        <div className="h-16 border-b border-gray-800" />
-        <div className="p-4 space-y-3">
-          <div className="h-10 bg-gray-700 rounded" />
-          <div className="h-10 bg-gray-700 rounded" />
-          <div className="h-10 bg-gray-700 rounded" />
-        </div>
-      </aside>
-    );
-  }
   
+  // Filtrar menu items baseado no role
+  const filteredItems = userRole === 'admin' 
+    ? menuItems 
+    : menuItems.filter(item => item.title !== 'Admin');
+
   return (
     <aside 
       className={cn(
@@ -129,7 +117,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
       </button>
 
       <nav className="flex-1 p-3 space-y-1">
-        {items.map((item) => {
+        {filteredItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -176,7 +164,6 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
         </div>
       )}
 
-      
       <div className="border-t border-gray-800 p-3">
         <form action="/auth/signout" method="post">
           <Button 
@@ -214,10 +201,14 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
   );
 }
 
-function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function MobileSidebar({ isOpen, onClose, user, userRole }: { isOpen: boolean; onClose: () => void; user: SupabaseUser; userRole: string }) {
 
   const pathname = usePathname();
-  const { user, items, loading } = useMenuAccess(menuItems);
+  
+  // Filtrar menu items baseado no role
+  const filteredItems = userRole === 'admin' 
+    ? menuItems 
+    : menuItems.filter(item => item.title !== 'Admin');
 
 
   useEffect(() => {
@@ -230,8 +221,6 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
-
-  if (loading) return null;
 
   return (
     <>
@@ -261,7 +250,7 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {items.map((item) => {
+          {filteredItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -334,25 +323,22 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 
 interface DashboardLayoutClientProps {
   children: React.ReactNode;
-  user: {
-    id: string;
-    email?: string;
-    user_metadata?: {
-      name?: string;
-    };
-  };
+  user: SupabaseUser;
+  userRole: string;
 }
 
 export default function DashboardLayoutClient({
   children,
+  user,
+  userRole,
 }: DashboardLayoutClientProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
-      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
+      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} user={user} userRole={userRole} />
+      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} user={user} userRole={userRole} />
       
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile Header */}

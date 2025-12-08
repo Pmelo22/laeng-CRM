@@ -171,6 +171,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
         {/* Card 2: Dados Financeiros - Compacto */}
         <ClienteFinanceiroSection 
           obras={obras || []}
+          clienteId={cliente.id}
         />
 
         {/* Card 3: Documentos */}

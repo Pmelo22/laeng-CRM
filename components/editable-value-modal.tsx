@@ -31,7 +31,6 @@ export function EditableValueModal({
   onSave,
 }: EditableValueModalProps) {
   const { toast } = useToast()
-  const supabase = createClient()
   const router = useRouter()
   const [value, setValue] = useState(currentValue)
   const [isLoading, setIsLoading] = useState(false)
@@ -43,20 +42,18 @@ export function EditableValueModal({
         throw new Error("ID da tabela ou nome do campo não definido")
       }
 
-      const updateData: Record<string, number | string> = {
-        [fieldName]: value,
-        updated_at: new Date().toISOString(),
-      }
+      const supabase = createClient()
 
+      // Atualizar o valor
       const { error } = await supabase
         .from(tableName)
-        .update(updateData)
+        .update({
+          [fieldName]: value,
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", tableId)
 
-      if (error) {
-        console.error("Erro detalhado do Supabase:", error)
-        throw new Error(error.message || "Erro ao atualizar no banco de dados")
-      }
+      if (error) throw error
 
       toast({
         title: "✅ Salvo com sucesso!",

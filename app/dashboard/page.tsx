@@ -7,19 +7,29 @@ import { DashboardCharts } from "@/components/dashboard-charts";
 import { calculateDashboardMetrics } from "@/lib/dashboard-metrics";
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable caching completely
 
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  // Buscar dados em paralelo
+  // Buscar dados em paralelo com no-cache
   const [
     { data: clientesData },
     { data: obras },
     { data: avisos }
   ] = await Promise.all([
-    supabase.from("clientes").select("*"),
-    supabase.from("obras").select("*"),
-    supabase.from("avisos").select("*").eq("status", "PENDENTE").order("urgencia", { ascending: false }).order("created_at", { ascending: false })
+    supabase
+      .from("clientes")
+      .select("*"),
+    supabase
+      .from("obras")
+      .select("*"),
+    supabase
+      .from("avisos")
+      .select("*")
+      .eq("status", "PENDENTE")
+      .order("urgencia", { ascending: false })
+      .order("created_at", { ascending: false })
   ]);
 
   // ========== ANÁLISE CLIENTES E OBRAS ==========
