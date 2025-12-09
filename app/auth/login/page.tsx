@@ -16,31 +16,50 @@ import { useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
+
+  const [username, setUsername] = useState("")
+
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  const supabase = createClient();
+  setIsLoading(true);
+  setError(null);
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      router.push("/dashboard");
-      router.refresh();
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Erro ao fazer login");
-    } finally {
-      setIsLoading(false);
+  try {
+
+    const { data: email, error: rpcError } = await supabase.rpc(
+      "get_email_by_username_for_login",
+      { p_username: username }
+    );
+
+    if (rpcError || !email) {
+      throw new Error("Usuário ou senha inválidos");
     }
-  };
+
+
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+
+    if (authError) {
+      throw new Error("Usuário ou senha inválidos");
+    }
+
+    router.push("/dashboard");
+    router.refresh();
+  } catch (err: unknown) {
+    setError(err instanceof Error ? err.message : "Erro ao fazer login");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-6 bg-gradient-to-br from-slate-100 via-slate-50 to-yellow-50">
@@ -67,15 +86,16 @@ export default function LoginPage() {
           <CardContent className="pb-8">
             <form onSubmit={handleLogin}>
               <div className="flex flex-col gap-5">
+                {/* Username */}
                 <div className="grid gap-2">
-                  <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                  <Label htmlFor="username" className="text-sm font-medium">Usuário</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
+                    id="username"
+                    type="text"
+                    placeholder="usuario"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="h-11 border-slate-200 focus:border-[#F5C800] focus:ring-[#F5C800]"
                   />
                 </div>
