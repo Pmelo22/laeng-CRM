@@ -1,6 +1,5 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
@@ -13,53 +12,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
+import { loginAction } from "./actions";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
 
   const [username, setUsername] = useState("")
-
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  const supabase = createClient();
-  setIsLoading(true);
-  setError(null);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
-  try {
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("password", password);
 
-    const { data: email, error: rpcError } = await supabase.rpc(
-      "get_email_by_username_for_login",
-      { p_username: username }
-    );
+    const result = await loginAction(formData);
 
-    if (rpcError || !email) {
-      throw new Error("Usuário ou senha inválidos");
-    }
-
-
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-
-    if (authError) {
-      throw new Error("Usuário ou senha inválidos");
+    if (result.error) {
+      setError(result.error);
+      setIsLoading(false);
+      return;
     }
 
     router.push("/dashboard");
-    router.refresh();
-  } catch (err: unknown) {
-    setError(err instanceof Error ? err.message : "Erro ao fazer login");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-6 bg-gradient-to-br from-slate-100 via-slate-50 to-yellow-50">
