@@ -7,13 +7,13 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Search, Filter, Building2, Clock, Eye, EyeOff, CheckCircle2 } from "lucide-react"
-import type { DashboardFinanceiro, ObraFinanceiro } from "@/lib/types"
+import type { DashboardFinanceiro, ObraFinanceiroAggregated } from "@/lib/types"
 import { FinanceiraTable } from "@/components/financeira-table"
 import { StatusSelectContent } from "@/lib/status-utils"
 
 interface FinanceiraPageContentProps {
   dashboard: DashboardFinanceiro
-  obras: ObraFinanceiro[]
+  obras: ObraFinanceiroAggregated[]
 }
 
 export default function FinanceiraPageContent({ obras }: FinanceiraPageContentProps) {

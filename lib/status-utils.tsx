@@ -52,21 +52,11 @@ export function getObraStatusConfig(status: string): StatusConfig {
 }
 
 export function getClienteStatusBadge(status: string) {
-  const config = getStatusConfig(status)
-  return (
-    <Badge variant="outline" className={`${config.color} border font-medium px-2 py-1 text-xs font-bold`}>
-      {config.label}
-    </Badge>
-  )
+  return getStatusBadge(status)
 }
 
 export function getObraStatusBadge(status: string) {
-  const config = getStatusConfig(status)
-  return (
-    <Badge variant="outline" className={`${config.color} border font-medium px-2 py-1 text-xs font-bold`}>
-      {config.label}
-    </Badge>
-  )
+  return getStatusBadge(status)
 }
 
 /**

@@ -4,38 +4,49 @@ import { Users, Building2, DollarSign, Activity } from 'lucide-react';
 import Link from "next/link";
 import { DashboardAlerts } from "@/components/dashboard-alerts";
 import { DashboardCharts } from "@/components/dashboard-charts";
+import { calculateDashboardMetrics } from "@/lib/dashboard-metrics";
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Disable caching completely
 
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  // Buscar dados em paralelo
+  // Buscar dados em paralelo com no-cache
   const [
     { data: clientesData },
     { data: obras },
     { data: avisos }
   ] = await Promise.all([
-    supabase.from("clientes").select("*"),
-    supabase.from("obras").select("*"),
-    supabase.from("avisos").select("*").eq("status", "PENDENTE").order("urgencia", { ascending: false }).order("created_at", { ascending: false })
+    supabase
+      .from("clientes")
+      .select("*"),
+    supabase
+      .from("obras")
+      .select("*"),
+    supabase
+      .from("avisos")
+      .select("*")
+      .eq("status", "PENDENTE")
+      .order("urgencia", { ascending: false })
+      .order("created_at", { ascending: false })
   ]);
 
-  // ========== ANÁLISE CLIENTES ==========
-  const clientesFinalizados = clientesData?.filter(c => c.status === 'FINALIZADO').length || 0;
-  const clientesEmAndamento = clientesData?.filter(c => c.status === 'EM ANDAMENTO').length || 0;
-  const clientesPendentes = clientesData?.filter(c => c.status === 'PENDENTE' || !c.status).length || 0;
+  // ========== ANÁLISE CLIENTES E OBRAS ==========
+  const metrics = calculateDashboardMetrics(clientesData, obras);
 
-  // ========== ANÁLISE OBRAS ==========
-  const receitaTotal = obras?.reduce((sum, obra) => sum + (Number(obra.valor_total) || 0), 0) || 0;
-  const custoTotal = obras?.reduce((sum, obra) => sum + (Number(obra.custo_total) || 0), 0) || 0;
-  const lucroTotal = receitaTotal - custoTotal;
-  
-  const totalRecebido = obras?.reduce((sum, obra) => sum + (Number(obra.empreiteiro_valor_pago) || 0), 0) || 0;
-
-  // Clientes com obras ativas
-  const clientesComObrasList = [...new Set(obras?.map(o => o.cliente_id) || [])];
-  const ticketMedio = clientesComObrasList.length > 0 ? receitaTotal / clientesComObrasList.length : 0;
+  const {
+    clientesTotal,
+    clientesFinalizados,
+    clientesEmAndamento,
+    clientesPendentes,
+    clientesComObrasList,
+    receitaTotal,
+    custoTotal,
+    lucroTotal,
+    totalRecebido,
+    ticketMedio,
+  } = metrics;
 
   return (
     <div className="p-3 sm:p-4 md:p-6 lg:p-8 space-y-6 sm:space-y-8">
@@ -55,84 +66,84 @@ export default async function DashboardPage() {
         <div className="lg:col-span-2 space-y-6">
           {/* PRIMEIRA LINHA - CLIENTES */}
           <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
-            <Card className="border-0 shadow-lg bg-yellow-400 hover:shadow-xl transition-shadow">
-              <CardHeader className="pb-2 sm:pb-3">
+            <Card className="border-0 shadow-lg bg-yellow-400 hover:shadow-xl transition-shadow flex flex-col h-full">
+              <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-bold text-black uppercase">Total de Clientes</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl sm:text-3xl font-bold text-black">{clientesComObrasList.length}</div>
+              <CardContent className="flex-grow flex items-center">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-black">{clientesComObrasList.length}</div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-green-600 hover:shadow-xl transition-shadow">
-              <CardHeader className="pb-2 sm:pb-3">
+            <Card className="border-0 shadow-lg bg-green-600 hover:shadow-xl transition-shadow flex flex-col h-full">
+              <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-bold text-white uppercase">Finalizados</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl sm:text-3xl font-bold text-white">{clientesFinalizados}</div>
+              <CardContent className="flex-grow flex items-center">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">{clientesFinalizados}</div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-red-600 hover:shadow-xl transition-shadow">
-              <CardHeader className="pb-2 sm:pb-3">
+            <Card className="border-0 shadow-lg bg-red-600 hover:shadow-xl transition-shadow flex flex-col h-full">
+              <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-bold text-white uppercase">Em Andamento</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl sm:text-3xl font-bold text-white">{clientesEmAndamento}</div>
+              <CardContent className="flex-grow flex items-center">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">{clientesEmAndamento}</div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-blue-600 from-slate-50 to-slate-100/50 hover:shadow-xl transition-shadow">
-              <CardHeader className="pb-2 sm:pb-3">
+            <Card className="border-0 shadow-lg bg-blue-600 hover:shadow-xl transition-shadow flex flex-col h-full">
+              <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-bold text-white uppercase">Pendente</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl sm:text-3xl font-bold text-white">{clientesPendentes}</div>
+              <CardContent className="flex-grow flex items-center">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">{clientesPendentes}</div>
               </CardContent>
             </Card>
           </div>
 
           {/* SEGUNDA LINHA - FINANCEIRO */}
           <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-slate-50 to-slate-100/50 hover:shadow-xl transition-shadow">
-              <CardHeader className="pb-2 sm:pb-3">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-slate-50 to-slate-100/50 hover:shadow-xl transition-shadow flex flex-col h-full">
+              <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-medium text-slate-600 uppercase">Receita</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl font-bold text-slate-700">
+              <CardContent className="flex-grow flex items-center">
+                <div className="text-sm sm:text-base md:text-lg font-bold text-slate-700">
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(receitaTotal)}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100/50 hover:shadow-xl transition-shadow">
-              <CardHeader className="pb-2 sm:pb-3">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100/50 hover:shadow-xl transition-shadow flex flex-col h-full">
+              <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-medium text-slate-600 uppercase">Recebido</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl font-bold text-green-600">
+              <CardContent className="flex-grow flex items-center">
+                <div className="text-sm sm:text-base md:text-lg font-bold text-green-600">
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalRecebido)}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className={`border-0 shadow-lg bg-gradient-to-br ${lucroTotal >= 0 ? 'from-emerald-50 to-emerald-100/50' : 'from-red-50 to-red-100/50'} hover:shadow-xl transition-shadow`}>
-              <CardHeader className="pb-2 sm:pb-3">
+            <Card className={`border-0 shadow-lg bg-gradient-to-br ${lucroTotal >= 0 ? 'from-emerald-50 to-emerald-100/50' : 'from-red-50 to-red-100/50'} hover:shadow-xl transition-shadow flex flex-col h-full`}>
+              <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-medium text-slate-600 uppercase">Lucro</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className={`text-lg sm:text-xl font-bold ${lucroTotal >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+              <CardContent className="flex-grow flex items-center">
+                <div className={`text-sm sm:text-base md:text-lg font-bold ${lucroTotal >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(lucroTotal)}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100/50 hover:shadow-xl transition-shadow">
-              <CardHeader className="pb-2 sm:pb-3">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100/50 hover:shadow-xl transition-shadow flex flex-col h-full">
+              <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-medium text-slate-600 uppercase">Ticket Médio</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl font-bold text-indigo-600">
+              <CardContent className="flex-grow flex items-center">
+                <div className="text-sm sm:text-base md:text-lg font-bold text-indigo-600">
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(ticketMedio)}
                 </div>
               </CardContent>
@@ -150,14 +161,14 @@ export default async function DashboardPage() {
       <DashboardCharts obras={obras || []} />
 
       {/* Quick Links */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-4">
-        <Link href="/clientes" className="group">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
+        <Link href="/clientes" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
-            <CardContent className="p-4 sm:p-6 flex items-center gap-3 sm:gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-500 transition-colors">
+            <CardContent className="p-4 sm:p-6 flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4 h-full">
+              <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-500 transition-colors flex-shrink-0">
                 <Users className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 group-hover:text-white transition-colors" />
               </div>
-              <div>
+              <div className="text-center sm:text-left">
                 <p className="font-semibold text-xs sm:text-sm uppercase">Clientes</p>
                 <p className="text-[10px] sm:text-xs text-muted-foreground">Gestão</p>
               </div>
@@ -165,13 +176,13 @@ export default async function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/obras" className="group">
+        <Link href="/obras" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
-            <CardContent className="p-4 sm:p-6 flex items-center gap-3 sm:gap-4">
-              <div className="p-3 bg-orange-100 rounded-lg group-hover:bg-orange-500 transition-colors">
+            <CardContent className="p-4 sm:p-6 flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4 h-full">
+              <div className="p-3 bg-orange-100 rounded-lg group-hover:bg-orange-500 transition-colors flex-shrink-0">
                 <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600 group-hover:text-white transition-colors" />
               </div>
-              <div>
+              <div className="text-center sm:text-left">
                 <p className="font-semibold text-xs sm:text-sm uppercase">Obras</p>
                 <p className="text-[10px] sm:text-xs text-muted-foreground">Projetos</p>
               </div>
@@ -179,13 +190,13 @@ export default async function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/financeira" className="group">
+        <Link href="/financeira" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
-            <CardContent className="p-4 sm:p-6 flex items-center gap-3 sm:gap-4">
-              <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-500 transition-colors">
+            <CardContent className="p-4 sm:p-6 flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4 h-full">
+              <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-500 transition-colors flex-shrink-0">
                 <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 group-hover:text-white transition-colors" />
               </div>
-              <div>
+              <div className="text-center sm:text-left">
                 <p className="font-semibold text-xs sm:text-sm uppercase">Financeira</p>
                 <p className="text-[10px] sm:text-xs text-muted-foreground">Fluxo</p>
               </div>
@@ -193,13 +204,13 @@ export default async function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/dashboard/logs" className="group">
+        <Link href="/dashboard/logs" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
-            <CardContent className="p-4 sm:p-6 flex items-center gap-3 sm:gap-4">
-              <div className="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-500 transition-colors">
+            <CardContent className="p-4 sm:p-6 flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4 h-full">
+              <div className="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-500 transition-colors flex-shrink-0">
                 <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 group-hover:text-white transition-colors" />
               </div>
-              <div>
+              <div className="text-center sm:text-left">
                 <p className="font-semibold text-xs sm:text-sm uppercase">Logs</p>
                 <p className="text-[10px] sm:text-xs text-muted-foreground">Atividades</p>
               </div>

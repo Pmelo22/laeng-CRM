@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ScrollText,
-  User
+  User,
+  Shield
 } from 'lucide-react';
 import Link from "next/link";
 import Image from "next/image";
@@ -19,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -48,6 +48,11 @@ const menuItems = [
     title: "Logs",
     icon: ScrollText,
     href: "/dashboard/logs",
+  },
+  {
+    title: "Admin",
+    icon: Shield,
+    href: "/admin",
   },
 ];
 
@@ -82,18 +87,13 @@ function Logo({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+function Sidebar({ collapsed, onToggle, user, userRole }: { collapsed: boolean; onToggle: () => void; user: SupabaseUser; userRole: string }) {
   const pathname = usePathname();
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const supabase = createClient();
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    getUser();
-  }, [supabase]);
+  
+  // Filtrar menu items baseado no role
+  const filteredItems = userRole === 'admin' 
+    ? menuItems 
+    : menuItems.filter(item => item.title !== 'Admin');
 
   return (
     <aside 
@@ -117,7 +117,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
       </button>
 
       <nav className="flex-1 p-3 space-y-1">
-        {menuItems.map((item) => {
+        {filteredItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -201,8 +201,15 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
   );
 }
 
-function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function MobileSidebar({ isOpen, onClose, user, userRole }: { isOpen: boolean; onClose: () => void; user: SupabaseUser; userRole: string }) {
+
   const pathname = usePathname();
+  
+  // Filtrar menu items baseado no role
+  const filteredItems = userRole === 'admin' 
+    ? menuItems 
+    : menuItems.filter(item => item.title !== 'Admin');
+
 
   useEffect(() => {
     if (isOpen) {
@@ -243,7 +250,7 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
+          {filteredItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -263,6 +270,24 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             );
           })}
         </nav>
+
+        {/* Usuário Autenticado (Mobile) */}
+        {user && (
+          <div className="border-t border-gray-800 p-3 bg-[#2A2A2A]">
+            <div className="flex items-center gap-3 p-2 rounded-lg">
+              <div className="w-10 h-10 rounded-full bg-[#F5C800] flex items-center justify-center flex-shrink-0">
+                <User className="h-5 w-5 text-[#1E1E1E]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">
+                  {user.user_metadata?.name || user.email?.split("@")[0] || "Usuário"}
+                </p>
+                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         <div className="border-t border-gray-800 p-3">
           <form action="/auth/signout" method="post">
@@ -298,25 +323,22 @@ function MobileSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 
 interface DashboardLayoutClientProps {
   children: React.ReactNode;
-  user: {
-    id: string;
-    email?: string;
-    user_metadata?: {
-      name?: string;
-    };
-  };
+  user: SupabaseUser;
+  userRole: string;
 }
 
 export default function DashboardLayoutClient({
   children,
+  user,
+  userRole,
 }: DashboardLayoutClientProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
-      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
+      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} user={user} userRole={userRole} />
+      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} user={user} userRole={userRole} />
       
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile Header */}

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import DashboardLayoutClient from "../dashboard/layout-client";
 
-export default async function ClientesLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -35,4 +35,3 @@ export default async function ClientesLayout({
 
   return <DashboardLayoutClient user={user} userRole={userRole}>{children}</DashboardLayoutClient>;
 }
-

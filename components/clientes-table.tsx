@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { User, ChevronLeft, ChevronRight, Pencil } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
-import { ClienteEditModal } from "@/components/cliente-edit-modal"
+import { ClienteFormModal } from "@/components/cliente-form-modal"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { getClienteStatusBadge } from "@/lib/status-utils"
 import { usePagination } from "@/lib/table-utils"
@@ -216,7 +216,7 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
       </div>
 
       {/* Modal de Edição */}
-      <ClienteEditModal 
+      <ClienteFormModal 
         isOpen={isEditModalOpen}
         onClose={handleCloseModal}
         cliente={selectedCliente || undefined}

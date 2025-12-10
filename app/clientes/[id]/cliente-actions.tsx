@@ -16,7 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Edit, Loader2, Trash2 } from "lucide-react";
 import { Cliente } from "@/lib/types";
-import { ClienteEditModal } from "@/components/cliente-edit-modal";
+import { ClienteFormModal } from "@/components/cliente-form-modal";
 
 interface ClienteActionsProps {
   cliente: Cliente;
@@ -38,7 +38,7 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
         Editar Cliente
       </Button>
 
-      <ClienteEditModal
+      <ClienteFormModal
         cliente={cliente}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Plus, Search, CheckCircle2, Clock, XCircle, Filter, Eye, EyeOff } from "lucide-react"
 import { ClientesTable } from "@/components/clientes-table"
-import { ClienteModal } from "@/components/cliente-modal"
+import { ClienteFormModal } from "@/components/cliente-form-modal"
 import type { Cliente } from "@/lib/types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
@@ -188,9 +188,10 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
       </div>
 
       {/* Modal para Novo Cliente */}
-      <ClienteModal 
+      <ClienteFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        isCreateMode={true}
       />
     </div>
   )

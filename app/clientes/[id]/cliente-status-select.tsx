@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { Cliente } from "@/lib/types";
+import { updateClienteStatus } from "./actions";
 
 interface ClienteStatusSelectProps {
   cliente: Cliente;
@@ -13,7 +13,6 @@ interface ClienteStatusSelectProps {
 
 export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
   const router = useRouter();
-  const supabase = createClient();
   const [isUpdating, setIsUpdating] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(cliente.status || "PENDENTE");
 
@@ -24,40 +23,22 @@ export function ClienteStatusSelect({ cliente }: ClienteStatusSelectProps) {
     setCurrentStatus(newStatus);
 
     try {
-      const { error } = await supabase
-        .from("clientes")
-        .update({ 
-          status: newStatus
-        })
-        .eq("id", cliente.id);
+      // Usar server action para atualizar e revalidar cache
+      await updateClienteStatus(cliente.id, newStatus);
 
-      if (error) throw error;
-
-      // SINCRONIZAR STATUS: Atualizar todas as obras associadas
-      const { error: obraError } = await supabase
-        .from("obras")
-        .update({ 
-          status: newStatus
-        })
-        .eq("cliente_id", cliente.id)
-        .select();
-
-      if (obraError) {
-        // Erro ao sincronizar - continuar mesmo assim
-      }
-
-      router.refresh();
-      
-      // Forçar recarregamento completo
+      // Aguardar um momento e fazer reload para sincronizar UI
+      // Recarrega também o dashboard se aberto em outra aba
       setTimeout(() => {
         if (typeof window !== 'undefined') {
           window.location.reload();
+          // Se o dashboard está aberto, também recarrega
+          window.opener?.location?.reload?.();
         }
       }, 500);
-    } catch {
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
       // Reverter para o status anterior em caso de erro
       setCurrentStatus(cliente.status || "PENDENTE");
-    } finally {
       setIsUpdating(false);
     }
   };

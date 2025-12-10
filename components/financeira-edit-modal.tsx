@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { createClient } from "@/lib/supabase/client"
-import type { ObraFinanceiro } from "@/lib/types"
+import type { ObraFinanceiroAggregated } from "@/lib/types"
 import { useRouter } from "next/navigation"
 import { formatMoneyInput, parseMoneyInput } from "@/lib/utils"
 import { Loader2, DollarSign } from "lucide-react"
@@ -15,7 +15,7 @@ import { Loader2, DollarSign } from "lucide-react"
 interface FinanceiraEditModalProps {
   isOpen: boolean
   onClose: () => void
-  obra?: ObraFinanceiro
+  obra?: ObraFinanceiroAggregated
 }
 
 interface FinanceiraData {
@@ -24,7 +24,6 @@ interface FinanceiraData {
   valor_financiado: number
   subsidio: number
   valor_obra: number
-  custo_total: number
   empreiteiro: number
   empreiteiro_nome: string
   empreiteiro_valor_pago: number
@@ -50,7 +49,6 @@ export function FinanceiraEditModal({ isOpen, onClose, obra }: FinanceiraEditMod
     valor_financiado: 0,
     subsidio: 0,
     valor_obra: 0,
-    custo_total: 0,
     empreiteiro: 0,
     empreiteiro_nome: "",
     empreiteiro_valor_pago: 0,
@@ -73,7 +71,6 @@ export function FinanceiraEditModal({ isOpen, onClose, obra }: FinanceiraEditMod
         valor_financiado: Number(obra.valor_financiado) || 0,
         subsidio: Number(obra.subsidio) || 0,
         valor_obra: Number(obra.valor_obra) || 0,
-        custo_total: Number(obra.custo_total) || 0,
         empreiteiro: Number(obra.empreiteiro) || 0,
         empreiteiro_nome: obra.empreiteiro_nome || "",
         empreiteiro_valor_pago: Number(obra.empreiteiro_valor_pago) || 0,
