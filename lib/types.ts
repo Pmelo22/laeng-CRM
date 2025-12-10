@@ -190,20 +190,38 @@ export interface Usuario {
 export interface PermissoesUsuario {
   dashboard: {
     view: boolean;
+    create?: boolean;
+    delete?: boolean;
+    edit?: boolean;
   };
   clientes: {
     view: boolean;
     create: boolean;
     delete: boolean;
+    edit: boolean;
   };
   obras: {
     view: boolean;
     create: boolean;
     delete: boolean;
+    edit: boolean;
   };
   financeira: {
     view: boolean;
     create: boolean;
     delete: boolean;
+    edit: boolean;
+  };
+  logs?: {
+    view: boolean;
+    create?: boolean;
+    delete?: boolean;
+    edit?: boolean;
+  };
+  admin?: {
+    view: boolean;
+    create?: boolean;
+    delete?: boolean;
+    edit?: boolean;
   };
 }

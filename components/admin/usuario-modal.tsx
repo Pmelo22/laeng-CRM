@@ -11,6 +11,7 @@ import { Loader2, User, Shield } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { PermissoesTab } from "./permissoes-tab"
 import type { Usuario, PermissoesUsuario } from "@/lib/types"
+import { criarUsuarioAction } from "../actions/userLogic"
 
 interface UsuarioModalProps {
   usuario?: Usuario | null
@@ -20,9 +21,19 @@ interface UsuarioModalProps {
 
 const PERMISSOES_DEFAULT: PermissoesUsuario = {
   dashboard: { view: true },
-  clientes: { view: false, create: false, delete: false },
-  obras: { view: false, create: false, delete: false },
-  financeira: { view: false, create: false, delete: false },
+  clientes: {
+    view: false, create: false, delete: false,
+    edit: false
+  },
+  obras: {
+    view: false, create: false, delete: false,
+    edit: false
+  },
+  financeira: {
+    view: false, create: false, delete: false,
+    edit: false
+  },
+  
 }
 
 interface FormData {
@@ -110,52 +121,59 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
     return null
   }, [formData, isPasswordRequired])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const erroValidacao = validarFormulario()
-    if (erroValidacao) {
-      toast({
-        title: "Erro de validação",
-        description: erroValidacao,
-        variant: "destructive",
-      })
-      return
-    }
+ const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  e.preventDefault()
+  
+  const erroValidacao = validarFormulario()
+  if (erroValidacao) {
+    toast({
+      title: "Erro de validação",
+      description: erroValidacao,
+      variant: "destructive",
+    })
+    return
+  }
 
-    setIsLoading(true)
-    try {
-      const usuarioData = {
+  setIsLoading(true)
+  try {
+
+    if (!isEditMode) {
+      const res = await criarUsuarioAction({
         login: formData.login,
+        senha: formData.senha!,
         cargo: formData.cargo,
-        ativo: formData.ativo,
-        ...(formData.senha && { senha: formData.senha }),
         permissoes,
+      })
+
+      if (!res.ok) {
+        toast({
+          title: "Erro ao criar usuário",
+          description: res.error,
+          variant: "destructive",
+        })
+        return
       }
 
-      console.log("📤 Salvando usuário:", usuarioData)
-      console.log("Modo:", isEditMode ? "EDIÇÃO" : "CRIAÇÃO")
-
       toast({
-        title: isEditMode ? "Usuário atualizado!" : "Usuário criado!",
-        description: isEditMode
-          ? `${formData.login} foi atualizado com sucesso.`
-          : `${formData.login} foi criado com sucesso.`,
+        title: "Usuário criado!",
+        description: `${formData.login} foi criado com sucesso.`,
       })
-
-      onClose()
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro ao salvar o usuário."
-      console.error("❌ Erro ao salvar usuário:", error)
-      toast({
-        title: "Erro ao salvar",
-        description: errorMessage,
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
     }
-  }, [formData, isEditMode, permissoes, validarFormulario, toast, onClose])
+
+    onClose()
+    
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro ao salvar o usuário."
+    console.error("❌ Erro ao salvar usuário:", error)
+    toast({
+      title: "Erro ao salvar",
+      description: errorMessage,
+      variant: "destructive",
+    })
+  } finally {
+    setIsLoading(false)
+  }
+}, [formData, isEditMode, permissoes, validarFormulario, toast, onClose])
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
