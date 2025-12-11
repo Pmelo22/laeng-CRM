@@ -38,6 +38,7 @@ const PERMISSOES_DEFAULT: PermissoesUsuario = {
 
 interface FormData {
   login: string
+  nomeCompleto: string
   cargo: "admin" | "funcionario"
   ativo: boolean
   senha: string
@@ -56,6 +57,7 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
   const [permissoes, setPermissoes] = useState<PermissoesUsuario>(PERMISSOES_DEFAULT)
   const [formData, setFormData] = useState<FormData>({
     login: "",
+    nomeCompleto: "",
     cargo: "funcionario",
     ativo: true,
     senha: "",
@@ -70,16 +72,18 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
     if (isOpen) {
       setActiveTab("informacoes")
       if (usuario) {
-        setFormData({
-          login: usuario.email || "",
-          cargo: usuario.cargo || "funcionario",
-          ativo: usuario.ativo ?? true,
-          senha: "",
-          confirmarSenha: "",
-        })
+      setFormData({
+        login: usuario?.email || "",
+        nomeCompleto: usuario?.nome_completo || "",
+        cargo: usuario?.cargo || "funcionario",
+        ativo: usuario?.ativo ?? true,
+        senha: "",
+        confirmarSenha: "",
+      })
       } else {
         setFormData({
           login: "",
+          nomeCompleto: "",
           cargo: "funcionario",
           ativo: true,
           senha: "",
@@ -140,6 +144,7 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
     if (!isEditMode) {
       const res = await criarUsuarioAction({
         login: formData.login,
+        nomeCompleto: formData.nomeCompleto,
         senha: formData.senha!,
         cargo: formData.cargo,
         permissoes,
@@ -227,7 +232,22 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
                     className="border-2 focus:border-[#F5C800]"
                   />
                 </div>
-
+                {/* Nome Completo */}
+                <div className="space-y-2">
+                  <Label htmlFor="nomeCompleto" className="font-semibold">
+                    Nome Completo <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="nomeCompleto"
+                    name="nomeCompleto"
+                    value={formData.nomeCompleto}
+                    onChange={handleInputChange}
+                    placeholder="Ex: João da Silva"
+                    required
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800]"
+                  />
+                </div>
                 {/* Senha */}
                 <div className="space-y-2">
                   <Label htmlFor="senha" className="font-semibold">

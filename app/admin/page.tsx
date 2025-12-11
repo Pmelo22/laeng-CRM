@@ -26,6 +26,8 @@ export default async function AdminPage() {
     redirect("/dashboard")
   }
 
+  
+
   // implementar backend, buscar usuários reais do banco quando pronto
   // const { data: usuarios } = await supabase
   //   .from("usuarios")

@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { env } from "@/lib/env";
 
-export async function createClient(supabase_url: string, service_role_key: string, p0: { auth: { autoRefreshToken: boolean; persistSession: boolean; }; }) {
+export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
