@@ -16,7 +16,7 @@ interface AdminPageContentProps {
 
 const EXAMPLE_USER: Usuario = {
   id: "1",
-  email: "admin",
+  login: "admin",
   nome_completo: "Administrador",
   cargo: "admin",
   ativo: true,
