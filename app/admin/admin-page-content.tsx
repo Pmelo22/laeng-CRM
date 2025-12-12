@@ -10,6 +10,7 @@ import { UsuarioDeleteDialog } from "@/components/admin/usuario-delete-dialog"
 import type { Usuario } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
 import { getUsuarios } from "@/components/actions/userGetLogics"
+import { deletarUsuarioAction } from "@/components/actions/userDeleteLogic"
 
 interface AdminPageContentProps {
   usuarios: Usuario[]
@@ -90,8 +91,15 @@ export default function AdminPageContent({ usuarios: initialUsuarios }: AdminPag
     if (!usuario) return
 
     setDeleteState(prev => ({ ...prev, isDeleting: true }))
+
     try {
       console.log("🗑️ Excluindo usuário:", usuario.id)
+
+      const result = await deletarUsuarioAction(usuario.id)
+
+      if (!result.ok) {
+        throw new Error(result.error)
+      }
 
       toast({
         title: "Usuário excluído!",
@@ -100,12 +108,14 @@ export default function AdminPageContent({ usuarios: initialUsuarios }: AdminPag
 
       handleCloseDeleteDialog()
       await handleRefetchUsuarios()
+
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : "Ocorreu um erro ao excluir o usuário."
       
       console.error("❌ Erro ao excluir usuário:", error)
+
       toast({
         title: "Erro ao excluir",
         description: errorMessage,

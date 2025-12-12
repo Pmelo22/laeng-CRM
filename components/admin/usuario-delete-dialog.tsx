@@ -32,7 +32,7 @@ export function UsuarioDeleteDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
+      <AlertDialogContent className = "bg-gray-100" >
         <AlertDialogHeader>
           <AlertDialogTitle className="text-xl font-bold">
             Excluir Usuário?
@@ -50,7 +50,7 @@ export function UsuarioDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>
+          <AlertDialogCancel className = "hover:bg-gray-200" disabled={isDeleting}>
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction
