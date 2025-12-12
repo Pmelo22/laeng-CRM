@@ -26,7 +26,6 @@ const PERMISSOES_DEFAULT: PermissoesUsuario = {
   obras: { view: true},
   financeira: {view: true },
   clientes: { view: false, create: false, delete: false, edit: false },
-  
 }
 
 interface FormData {
@@ -73,6 +72,9 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
         senha: "",
         confirmarSenha: "",
       })
+      
+      setPermissoes(usuario.modulos)
+
       } else {
         setFormData({
           login: "",
@@ -82,8 +84,9 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
           senha: "",
           confirmarSenha: "",
         })
-      }
+      
       setPermissoes(PERMISSOES_DEFAULT)
+      }
     }
   }, [isOpen, usuario])
 

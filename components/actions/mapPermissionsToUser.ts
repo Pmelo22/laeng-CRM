@@ -14,34 +14,23 @@ const mapAcao = (view?: boolean, create?: boolean, edit?: boolean, del?: boolean
 
 export function mapPermissoesToModulos(permissoes: PermissoesUsuario) {
   return {
-    logs: {
-      modulo: "logs",
-      acoes: mapAcao(
-        permissoes.logs?.view
-      ),
-    },
     dashboard: {
-      modulo: "dashboard",
-      acoes: mapAcao(
-        permissoes.dashboard?.view
-      ),
+      view: permissoes.dashboard?.view ?? false
+    },
+    logs: {
+      view: permissoes.logs?.view ?? false
     },
     obras: {
-      modulo: "obras",
-      acoes: mapAcao(
-        permissoes.obras?.view
-      ),
+      view: permissoes.obras?.view ?? false
     },
     financeira: {
-      modulo: "financeira",
-      acoes: mapAcao(  permissoes.financeira?.view
-      ),
+      view: permissoes.financeira?.view ?? false
     },
-   clientes: {
-      modulo: "clientes",
-      acoes: mapAcao(
-        permissoes.clientes?.view, permissoes.clientes?.create, permissoes.clientes?.edit, permissoes.clientes?.delete
-      ),
-    },
+    clientes: {
+      view: permissoes.clientes?.view ?? false,
+      create: permissoes.clientes?.create ?? false,
+      edit: permissoes.clientes?.edit ?? false,
+      delete: permissoes.clientes?.delete ?? false
+    }
   }
 }

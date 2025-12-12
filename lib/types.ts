@@ -185,6 +185,7 @@ export interface Usuario {
   created_at: string;
   updated_at: string;
   ultimo_acesso?: string;
+  modulos: PermissoesUsuario
 }
 
 export interface PermissoesUsuario {

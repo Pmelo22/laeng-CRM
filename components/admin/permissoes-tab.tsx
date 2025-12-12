@@ -67,20 +67,10 @@ export function PermissoesTab({ permissoes, onChange, isLoading }: PermissoesTab
   return (
     <div className="space-y-4">
       {MODULOS.map((modulo) => {
-
-        console.log("Modulo" + modulo)
-
         const moduloId = modulo.id as keyof PermissoesUsuario
-
-        console.log("moduloId" + moduloId)
-
         const permissaoModulo = permissoes[moduloId]
-
-        console.log("permissaoModulo" + permissaoModulo)
-
         const temMultiplasAcoes = modulo.acoes.length > 1
         const IconModulo = modulo.icon
-
         return (
           <div
             key={modulo.id}
