@@ -1,8 +1,8 @@
 "use server"
 
-import { createClient } from "@supabase/supabase-js"
 import { mapPermissoesToModulos } from "@/components/actions/mapPermissionsToUser"
 import type { PermissoesUsuario } from "@/lib/types"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 interface EditUserInput {
   userId: string
@@ -14,19 +14,11 @@ interface EditUserInput {
 }
 
 export async function editarUsuarioAction(input: EditUserInput) {
-  const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const service_role_key = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-  const supabase = createClient(supabase_url, service_role_key, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  })
+  
+  const { supabase, adminAuthClient } = await createAdminClient()
 
   const { userId, login, nomeCompleto, cargo, senha, permissoes } = input
-  const adminAuthClient = supabase.auth.admin
-
+  
   try {
 
     //Atualiza profile

@@ -1,19 +1,10 @@
 "use server"
 
-import { createClient } from "@supabase/supabase-js"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function deletarUsuarioAction(userId: string) {
-  const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const service_role_key = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-  const supabase = createClient(supabase_url, service_role_key, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  })
-
-  const adminAuthClient = supabase.auth.admin
+  
+  const { supabase, adminAuthClient } = await createAdminClient()
 
   try {
     

@@ -1,25 +1,14 @@
 "use server"
 
-import { createClient } from "@supabase/supabase-js"
 import { mapPermissoesToModulos } from "@/components/actions/mapPermissionsToUser"
 import type { PermissoesUsuario } from "@/lib/types"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 interface CreateUserInput {  login: string,  senha: string, cargo: "admin" | "funcionario", permissoes: PermissoesUsuario, nomeCompleto: string }
 
 export async function criarUsuarioAction(input: CreateUserInput) {
 
-  const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const service_role_key = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-  //NÃO CONFUDIR ESSE CREATECLIENT COM O DO SERVER.TS. ESSE DAQUI VEM DE OUTRO IMPORT https://supabase.com/docs/reference/javascript/admin-api
-  const supabase = createClient(supabase_url, service_role_key, {
-      auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-      },
-  })
-
-  const adminAuthClient = supabase.auth.admin
+  const { supabase, adminAuthClient } = await createAdminClient()
 
   const { login, senha, cargo, permissoes } = input
 
