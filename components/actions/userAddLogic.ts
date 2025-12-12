@@ -47,7 +47,7 @@ export async function criarUsuarioAction(input: CreateUserInput) {
     //Permissões da Aplicação
     const modulosJson = mapPermissoesToModulos(permissoes)
 
-    const { error: permError } = await supabase .from("usuario_permissoes_funcionalidades").insert({  usuario_id: userId,  modulos: modulosJson,})
+    const { error: permError } = await supabase.from("usuario_permissoes_funcionalidades").insert({  usuario_id: userId,  modulos: modulosJson,})
 
     if (permError) throw new Error("Erro ao salvar permissões: " + permError.message)
 

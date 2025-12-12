@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 import { PermissoesTab } from "./permissoes-tab"
 import type { Usuario, PermissoesUsuario } from "@/lib/types"
 import { criarUsuarioAction } from "../actions/userAddLogic"
+import { editarUsuarioAction } from "../actions/userEditLogic"
 
 interface UsuarioModalProps {
   usuario?: Usuario | null
@@ -141,31 +142,56 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
   setIsLoading(true)
   try {
 
-    if (!isEditMode) {
-      const res = await criarUsuarioAction({
-        login: formData.login,
-        nomeCompleto: formData.nomeCompleto,
-        senha: formData.senha!,
-        cargo: formData.cargo,
-        permissoes,
-      })
+  if (!isEditMode) {
+    
+    const res = await criarUsuarioAction({
+      login: formData.login,
+      nomeCompleto: formData.nomeCompleto,
+      senha: formData.senha!,
+      cargo: formData.cargo,
+      permissoes,
+    })
 
-      if (!res.ok) {
-        toast({
-          title: "Erro ao criar usuário",
-          description: res.error,
-          variant: "destructive",
-        })
-        return
-      }
-
+    if (!res.ok) {
       toast({
-        title: "Usuário criado!",
-        description: `${formData.login} foi criado com sucesso.`,
+        title: "Erro ao criar usuário",
+        description: res.error,
+        variant: "destructive",
       })
+      return
     }
 
-    onClose()
+    toast({
+      title: "Usuário criado!",
+      description: `${formData.login} foi criado com sucesso.`,
+    })
+  } else {
+
+    const res = await editarUsuarioAction({
+      userId: usuario!.id,
+      login: formData.login,
+      nomeCompleto: formData.nomeCompleto,
+      cargo: formData.cargo,
+      senha: formData.senha || null, 
+      permissoes,
+    })
+
+    if (!res.ok) {
+      toast({
+        title: "Erro ao editar usuário",
+        description: res.error,
+        variant: "destructive",
+      })
+      return
+    }
+
+    toast({
+      title: "Usuário atualizado!",
+      description: `${formData.login} foi atualizado com sucesso.`,
+    })
+  }
+
+onClose()
     
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro ao salvar o usuário."
