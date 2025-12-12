@@ -26,21 +26,21 @@ export function mapPermissoesToModulos(permissoes: PermissoesUsuario) {
         permissoes.dashboard?.view
       ),
     },
-    clientes: {
-      modulo: "clientes",
-      acoes: mapAcao(
-        permissoes.clientes?.view, permissoes.clientes?.create, permissoes.clientes?.edit, permissoes.clientes?.delete
-      ),
-    },
     obras: {
       modulo: "obras",
       acoes: mapAcao(
-        permissoes.obras?.view,  permissoes.obras?.create,  permissoes.obras?.edit, permissoes.obras?.delete
+        permissoes.obras?.view
       ),
     },
     financeira: {
       modulo: "financeira",
-      acoes: mapAcao(  permissoes.financeira?.view,  permissoes.financeira?.create, permissoes.financeira?.edit, permissoes.financeira?.delete
+      acoes: mapAcao(  permissoes.financeira?.view
+      ),
+    },
+   clientes: {
+      modulo: "clientes",
+      acoes: mapAcao(
+        permissoes.clientes?.view, permissoes.clientes?.create, permissoes.clientes?.edit, permissoes.clientes?.delete
       ),
     },
   }

@@ -191,25 +191,20 @@ export interface PermissoesUsuario {
   dashboard: {
     view: boolean;
   };
+  logs?: {
+    view: boolean;
+  };
+  obras: {
+    view: boolean;
+  };
+  financeira: {
+    view: boolean;
+  };
   clientes: {
     view: boolean;
     create: boolean;
     delete: boolean;
     edit: boolean;
   };
-  obras: {
-    view: boolean;
-    create: boolean;
-    delete: boolean;
-    edit: boolean;
-  };
-  financeira: {
-    view: boolean;
-    create: boolean;
-    delete: boolean;
-    edit: boolean;
-  };
-  logs?: {
-    view: boolean;
-  };
+
 }
