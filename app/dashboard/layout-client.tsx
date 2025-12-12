@@ -47,7 +47,7 @@ const menuItems = [
   {
     title: "Logs",
     icon: ScrollText,
-    href: "/dashboard/logs",
+    href: "/logs",
   },
   {
     title: "Admin",
@@ -87,13 +87,25 @@ function Logo({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function Sidebar({ collapsed, onToggle, user, userRole }: { collapsed: boolean; onToggle: () => void; user: SupabaseUser; userRole: string }) {
+function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { collapsed: boolean; onToggle: () => void; user: SupabaseUser; userRole: string, userPermissions: Record<string, any>; }) {
   const pathname = usePathname();
-  
-  // Filtrar menu items baseado no role
-  const filteredItems = userRole === 'admin' 
+
+  const filteredItems = 
+  userRole === "admin"
     ? menuItems 
-    : menuItems.filter(item => item.title !== 'Admin');
+    : menuItems.filter(item => {
+        const moduleKey = item.href.replace("/", ""); 
+        const modulePermissions = userPermissions[moduleKey];
+        
+        console.log(moduleKey)
+        console.log(modulePermissions)
+
+        if (!modulePermissions || !modulePermissions.view) {
+          return false;
+        }
+
+        return true;
+      });
 
   return (
     <aside 
@@ -201,14 +213,23 @@ function Sidebar({ collapsed, onToggle, user, userRole }: { collapsed: boolean; 
   );
 }
 
-function MobileSidebar({ isOpen, onClose, user, userRole }: { isOpen: boolean; onClose: () => void; user: SupabaseUser; userRole: string }) {
+function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { isOpen: boolean; onClose: () => void; user: SupabaseUser; userRole: string, userPermissions: Record<string, any> }) {
 
   const pathname = usePathname();
   
-  // Filtrar menu items baseado no role
-  const filteredItems = userRole === 'admin' 
+  const filteredItems = 
+  userRole === "admin"
     ? menuItems 
-    : menuItems.filter(item => item.title !== 'Admin');
+    : menuItems.filter(item => {
+        const moduleKey = item.href.replace("/", ""); 
+        const modulePermissions = userPermissions[moduleKey];
+        
+        if (!modulePermissions || !modulePermissions.view) {
+          return false;
+        }
+
+        return true;
+      });
 
 
   useEffect(() => {
@@ -325,20 +346,22 @@ interface DashboardLayoutClientProps {
   children: React.ReactNode;
   user: SupabaseUser;
   userRole: string;
+  userPermissions: Record<string, any>;
 }
 
 export default function DashboardLayoutClient({
   children,
   user,
   userRole,
+  userPermissions
 }: DashboardLayoutClientProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} user={user} userRole={userRole} />
-      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} user={user} userRole={userRole} />
+      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} user={user} userRole={userRole} userPermissions={userPermissions} />
+      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} user={user} userRole={userRole} userPermissions={userPermissions} />
       
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile Header */}

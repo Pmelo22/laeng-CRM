@@ -33,6 +33,26 @@ export default async function DashboardLayout({
     console.warn("Erro ao buscar cargo do usuário:", err);
   }
 
-  return <DashboardLayoutClient user={user} userRole={userRole}>{children}</DashboardLayoutClient>;
+  // Buscar permissões do usuário
+  let userPermissions: Record<string, any> = {};
+
+  try {
+    const { data: perms } = await supabase
+      .from("usuario_permissoes_funcionalidades")
+      .select("modulos")
+      .eq("usuario_id", user.id)
+      .single();
+
+    console.log(perms)
+    if (perms?.modulos) {
+      userPermissions = perms.modulos;
+    }
+  } catch (err) {
+    console.warn("Erro ao buscar permissões do usuário:", err);
+  }
+
+
+
+  return <DashboardLayoutClient user={user} userRole={userRole} userPermissions={userPermissions}>{children}</DashboardLayoutClient>;
 }
 
