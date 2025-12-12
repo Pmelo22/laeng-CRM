@@ -22,6 +22,7 @@ interface UsuarioModalProps {
 
 const PERMISSOES_DEFAULT: PermissoesUsuario = {
   dashboard: { view: true },
+  logs: { view: false},
   clientes: {
     view: false, create: false, delete: false,
     edit: false

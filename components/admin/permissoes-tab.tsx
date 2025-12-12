@@ -1,8 +1,9 @@
 "use client"
 
 import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, Plus, Trash2, LayoutDashboard, Users, Building2, DollarSign } from "lucide-react"
+import { Eye, Plus, Trash2, LayoutDashboard, Users, Building2, DollarSign, LogsIcon } from "lucide-react"
 import type { PermissoesUsuario } from "@/lib/types"
+import { icon } from "leaflet"
 
 interface PermissoesTabProps {
   permissoes: PermissoesUsuario
@@ -16,6 +17,13 @@ const MODULOS = [
     label: "Dashboard",
     descricao: "Acesso à página inicial",
     icon: LayoutDashboard,
+    acoes: ["view"],
+  },
+  {
+    id: "logs",
+    label: "Logs",
+    descricao: "Acesso aos logs do sistema",
+    icon: LogsIcon,
     acoes: ["view"],
   },
   {
@@ -57,8 +65,17 @@ export function PermissoesTab({ permissoes, onChange, isLoading }: PermissoesTab
   return (
     <div className="space-y-4">
       {MODULOS.map((modulo) => {
+
+        console.log("Modulo" + modulo)
+
         const moduloId = modulo.id as keyof PermissoesUsuario
+
+        console.log("moduloId" + moduloId)
+
         const permissaoModulo = permissoes[moduloId]
+
+        console.log("permissaoModulo" + permissaoModulo)
+
         const temMultiplasAcoes = modulo.acoes.length > 1
         const IconModulo = modulo.icon
 
@@ -88,7 +105,7 @@ export function PermissoesTab({ permissoes, onChange, isLoading }: PermissoesTab
                     onChange(moduloId, "view", checked as boolean)
                   }
                   disabled={isLoading}
-                  className="h-5 w-5 border-[#F5C800] data-[state=checked]:bg-[#F5C800]"
+                  className="h-5 w-5 rounded-md border-[#F5C800] bg-black/40 data-[state=checked]:bg-[#F5C800] data-[state=checked]:border-[#F5C800] data-[state=checked]:text-blacktransition-all duration-200"
                 />
               )}
             </div>
