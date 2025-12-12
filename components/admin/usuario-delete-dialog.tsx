@@ -40,7 +40,7 @@ export function UsuarioDeleteDialog({
           <AlertDialogDescription className="text-base">
             Você está prestes a excluir o usuário{" "}
             <span className="font-bold text-[#1E1E1E]">{usuario.nome_completo}</span>
-            {" "}(<span className="text-muted-foreground">{usuario.email}</span>).
+            {" "}(<span className="text-muted-foreground">{usuario.login}</span>).
             <br />
             <br />
             <span className="text-red-600 font-semibold">

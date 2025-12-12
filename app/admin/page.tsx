@@ -1,11 +1,12 @@
 import AdminPageContent from "./admin-page-content"
-import type { Usuario } from "@/lib/types"
+import { getUsuarios } from "@/components/actions/userGetLogics"
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic"
 
 export default async function AdminPage() {
+  const usuarios = await getUsuarios()
 
-  const usuarios: Usuario[] = []
+  console.log(usuarios)
 
   return <AdminPageContent usuarios={usuarios} />
 }

@@ -11,7 +11,7 @@ import { Loader2, User, Shield } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { PermissoesTab } from "./permissoes-tab"
 import type { Usuario, PermissoesUsuario } from "@/lib/types"
-import { criarUsuarioAction } from "../actions/userLogic"
+import { criarUsuarioAction } from "../actions/userAddLogic"
 
 interface UsuarioModalProps {
   usuario?: Usuario | null
@@ -73,7 +73,7 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
       setActiveTab("informacoes")
       if (usuario) {
       setFormData({
-        login: usuario?.email || "",
+        login: usuario?.login || "",
         nomeCompleto: usuario?.nome_completo || "",
         cargo: usuario?.cargo || "funcionario",
         ativo: usuario?.ativo ?? true,
