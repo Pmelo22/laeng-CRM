@@ -177,6 +177,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
         <ClienteFinanceiroSection 
           obras={obras || []}
           clienteId={cliente.id}
+          userPermissions={userPermissions}
         />
 
         {/* Card 3: Documentos */}

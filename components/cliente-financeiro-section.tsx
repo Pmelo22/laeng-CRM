@@ -9,11 +9,13 @@ import type { Obra } from "@/lib/types"
 interface ClienteFinanceiroSectionProps {
   obras: Obra[]
   clienteId: string
+  userPermissions: Record<string, any>
 }
 
 export function ClienteFinanceiroSection({
   obras,
   clienteId,
+  userPermissions
 }: ClienteFinanceiroSectionProps) {
   const [editingModal, setEditingModal] = useState<{
     fieldName: string
@@ -28,16 +30,22 @@ export function ClienteFinanceiroSection({
   const subsidio = obras?.reduce((sum, obra) => sum + (obra.subsidio || 0), 0) || 0
   const valorContratual = entrada + valorFinanciado + subsidio
 
-  const handleCardClick = (fieldName: string, title: string, currentValue: number) => {
-    // Se há apenas uma obra, edita diretamente
-    // Se há múltiplas obras, edita a primeira (comportamento simplificado)
+  const canEdit = userPermissions?.clientes?.edit
+
+  const handleCardClick = (
+    fieldName: string,
+    title: string,
+    currentValue: number
+  ) => {
+    if (!canEdit) return
+
     const primeiraObra = obras?.[0]
     if (primeiraObra) {
-      setEditingModal({ 
-        fieldName, 
-        title, 
+      setEditingModal({
+        fieldName,
+        title,
         currentValue,
-        obraId: primeiraObra.id 
+        obraId: primeiraObra.id,
       })
     }
   }
@@ -79,17 +87,34 @@ export function ClienteFinanceiroSection({
             {financeiroFields.map((field) => (
               <button
                 key={field.fieldName}
-                onClick={() => handleCardClick(field.fieldName, field.title, field.value)}
-                className="cursor-pointer transition-all hover:shadow-lg hover:scale-105 active:scale-95"
+                onClick={
+                  canEdit
+                    ? () => handleCardClick(field.fieldName, field.title, field.value)
+                    : undefined
+                }
+                title={
+                  canEdit
+                    ? "Clique para editar"
+                    : "Você não tem permissão para editar valores"
+                }
+                className={`
+                  transition-all
+                  ${canEdit
+                    ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95"
+                    : "cursor-not-allowed opacity-60"}
+                `}
+                disabled={!canEdit}
               >
                 <Card className="border border-yellow-200 bg-yellow-200 h-full">
                   <CardContent className="pt-6 pb-6 px-6">
                     <div className="space-y-2">
-                      <p className="text-sm font-medium text-[#1E1E1E] uppercase">{field.label}</p>
+                      <p className="text-sm font-medium text-[#1E1E1E] uppercase">
+                        {field.label}
+                      </p>
                       <p className="text-2xl sm:text-3xl font-bold text-[#1E1E1E]">
-                        {new Intl.NumberFormat('pt-BR', { 
-                          style: 'currency', 
-                          currency: 'BRL' 
+                        {new Intl.NumberFormat("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
                         }).format(field.value)}
                       </p>
                     </div>
@@ -102,9 +127,9 @@ export function ClienteFinanceiroSection({
       </Card>
 
       {/* Modal para editar valores */}
-      {editingModal && (
+      {editingModal && canEdit && (
         <EditableValueModal
-          isOpen={!!editingModal}
+          isOpen
           onClose={() => setEditingModal(null)}
           title={editingModal.title}
           currentValue={editingModal.currentValue}
