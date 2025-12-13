@@ -1,34 +1,26 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getUserContext } from "../auth/context/userContext";
 import DashboardLayoutClient from "../dashboard/layout-client";
 
-export default async function AdminLayout({ children }: {
+
+export default async function ClienteLayout({
+  children,
+}: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  const { user, userRole, userPermissions } = await getUserContext();
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/auth/login");
-  }
-
-  // Buscar cargo
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("cargo")
-    .eq("id", user.id)
-    .single();
-
-  const userRole = profile?.cargo ?? "funcionario";
-
-  // Permissão de admin
-  if (userRole !== "admin") {
+    if (userRole !== "admin") {
     redirect("/dashboard");
   }
 
+
   return (
-    <DashboardLayoutClient user={user} userRole={userRole}>
+    <DashboardLayoutClient
+      user={user}
+      userRole={userRole}
+      userPermissions={userPermissions}
+    >
       {children}
     </DashboardLayoutClient>
   );
