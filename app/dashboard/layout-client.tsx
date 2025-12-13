@@ -47,7 +47,7 @@ const menuItems = [
   {
     title: "Logs",
     icon: ScrollText,
-    href: "dashboard/logs",
+    href: "/logs",
   },
   {
     title: "Admin",
