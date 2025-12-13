@@ -197,6 +197,7 @@ export interface PermissoesUsuario {
   };
   obras: {
     view: boolean;
+    edit: boolean;
   };
   financeira: {
     view: boolean;

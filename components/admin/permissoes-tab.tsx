@@ -27,18 +27,18 @@ const MODULOS = [
     acoes: ["view"],
   },
   {
-    id: "obras",
-    label: "Obras",
-    descricao: "Gerenciamento de obras",
-    icon: Building2,
-    acoes: ["view"],
-  },
-  {
     id: "financeira",
     label: "Financeira",
     descricao: "Gerenciamento financeiro",
     icon: DollarSign,
     acoes: ["view"],
+  },
+  {
+    id: "obras",
+    label: "Obras",
+    descricao: "Gerenciamento de obras",
+    icon: Building2,
+    acoes: ["view", "edit"],
   },
   {
     id: "clientes",

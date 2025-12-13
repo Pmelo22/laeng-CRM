@@ -11,7 +11,8 @@ export default async function ClienteLayout({
 }) {
   const { user, userRole, userPermissions } = await getUserContext();
 
-  resolveRedirect(userPermissions, (p) => p?.clientes?.view);
+  resolveRedirect(userPermissions, (p) => p?.clientes?.view
+  );
 
   return (
     <DashboardLayoutClient

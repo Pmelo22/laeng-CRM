@@ -32,7 +32,8 @@ interface ObraFinancialData {
   empreiteiro_valor_pago: number
 }
 
-export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
+export function ObraEditModal({ isOpen, onClose, obra}: ObraEditModalProps) {
+
   const { toast } = useToast()
   const router = useRouter()
   const supabase = createClient()
@@ -289,15 +290,15 @@ export function ObraEditModal({ isOpen, onClose, obra }: ObraEditModalProps) {
                   <Label htmlFor="pintor" className="text-sm font-medium">
                     Pintor (R$)
                   </Label>
-                  <Input
-                    id="pintor"
-                    type="text"
-                    value={formatMoneyInput(obraData.pintor)}
-                    onChange={(e) => handleInputChange('pintor', e.target.value)}
-                    disabled={isLoading}
-                    className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
-                    placeholder="0,00"
-                  />
+                <Input
+                  id="pintor"
+                  type="text"
+                  value={formatMoneyInput(obraData.pintor)}
+                  onChange={(e) => handleInputChange('pintor', e.target.value)}
+                  disabled={isLoading}
+                  className="border-2 focus:border-[#F5C800] font-mono text-lg h-12 px-4"
+                />
+
                 </div>
 
                 {/* Eletricista */}
