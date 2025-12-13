@@ -10,10 +10,9 @@ export default async function ClienteLayout({
 }) {
   const { user, userRole, userPermissions } = await getUserContext();
 
-    if (userRole !== "admin") {
+  if (userRole !== "admin") {
     redirect("/dashboard");
   }
-
 
   return (
     <DashboardLayoutClient

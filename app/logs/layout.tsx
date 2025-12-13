@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getUserContext } from "../auth/context/userContext";
 import DashboardLayoutClient from "../dashboard/layout-client";
 
@@ -8,6 +9,10 @@ export default async function LogsLayout({
   children: React.ReactNode;
 }) {
   const { user, userRole, userPermissions } = await getUserContext();
+
+  if (!userPermissions?.logs?.view) {
+    redirect("/error");
+  }
 
   return (
     <DashboardLayoutClient
