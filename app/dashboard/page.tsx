@@ -214,7 +214,7 @@ export default async function DashboardPage() {
         </Link>
         )}
 
-        {( userPermissions?.logs?.view &&
+        { userPermissions?.logs?.view && ( 
         <Link href="/logs" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
             <CardContent className="p-4 sm:p-6 flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4 h-full">

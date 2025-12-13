@@ -2,12 +2,15 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import type { Cliente } from "@/lib/types"
 import ClientesPageContent from "./clientes-page-content"
+import { getUserContext } from "../auth/context/userContext";
 
 export const dynamic = 'force-dynamic';
 
 // Server Component wrapper
 export default async function ClientesPage() {
   const supabase = await createClient()
+  
+  const { userPermissions } = await getUserContext();
 
   const {
     data: { user },
@@ -25,5 +28,5 @@ export default async function ClientesPage() {
 
   const clientes = (clientesData as Cliente[]) || []
 
-  return <ClientesPageContent clientes={clientes} />
+  return <ClientesPageContent clientes={clientes} userPermissions={userPermissions} />
 }

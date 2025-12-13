@@ -13,13 +13,15 @@ import { Badge } from "@/components/ui/badge"
 
 interface ClientesPageContentProps {
   clientes: Cliente[]
+  userPermissions: Record<string, any>
 }
 
-export default function ClientesPageContent({ clientes }: ClientesPageContentProps) {
+export default function ClientesPageContent({ clientes , userPermissions }: ClientesPageContentProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [showFinalizados, setShowFinalizados] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
 
   // Filtrar clientes baseado no toggle de finalizados
   const clientesVisiveis = useMemo(() => {
@@ -165,6 +167,8 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
               </Button>
 
               {/* Botão Novo Cliente */}
+              
+              { userPermissions?.clientes?.create &&(
               <Button 
                 onClick={() => setIsModalOpen(true)}
                 className="flex-1 sm:!w-[180px] !h-10 sm:!h-12 bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold shadow-lg hover:shadow-xl transition-all px-3 sm:px-6 rounded-lg whitespace-nowrap text-sm sm:text-base"
@@ -172,7 +176,8 @@ export default function ClientesPageContent({ clientes }: ClientesPageContentPro
                 <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                 <span className="hidden xs:inline">Novo Cliente</span>
                 <span className="xs:hidden">Novo</span>
-              </Button>
+              </Button> 
+              )}
             </div>
           </div>
         </div>
