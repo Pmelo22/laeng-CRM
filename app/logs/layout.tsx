@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getUserContext } from "../auth/context/userContext";
 import DashboardLayoutClient from "../dashboard/layout-client";
+import { resolveRedirect } from "../auth/routes/resolveRedirect";
 
 
 export default async function LogsLayout({
@@ -10,9 +11,7 @@ export default async function LogsLayout({
 }) {
   const { user, userRole, userPermissions } = await getUserContext();
 
-  if (!userPermissions?.logs?.view) {
-    redirect("/error");
-  }
+  resolveRedirect(userPermissions, (p) => p?.logs?.view);
 
   return (
     <DashboardLayoutClient

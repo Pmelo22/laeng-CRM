@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getUserContext } from "../auth/context/userContext";
 import DashboardLayoutClient from "../dashboard/layout-client";
+import { resolveRedirect } from "../auth/routes/resolveRedirect";
 
 
 export default async function FinanceiraLayout({
@@ -10,9 +11,7 @@ export default async function FinanceiraLayout({
 }) {
   const { user, userRole, userPermissions } = await getUserContext();
 
-  if (!userPermissions?.financeira?.view) {
-    redirect("/error");
-  }
+  resolveRedirect(userPermissions, (p) => p?.financeira?.view);
 
   return (
     <DashboardLayoutClient
