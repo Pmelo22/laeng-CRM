@@ -184,6 +184,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
         <ClienteDocumentosSection 
           clienteId={cliente.id}
           documentos={documentos || []}
+          userPermissions={userPermissions}
         />
       </div>
     </div>

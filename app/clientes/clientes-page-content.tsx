@@ -187,7 +187,7 @@ export default function ClientesPageContent({ clientes , userPermissions }: Clie
       <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
         <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
           <CardContent className="p-0">
-            <ClientesTable clientes={filteredClientes} searchTerm="" />
+            <ClientesTable clientes={filteredClientes} searchTerm="" userPermissions={userPermissions}/>
           </CardContent>
         </Card>
       </div>

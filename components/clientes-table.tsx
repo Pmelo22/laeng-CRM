@@ -16,9 +16,13 @@ import { usePagination } from "@/lib/table-utils"
 interface ClientesTableProps {
   clientes: Cliente[]
   searchTerm?: string
+  userPermissions: Record<string, any>
 }
 
-export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps) {
+export function ClientesTable({ clientes, searchTerm = "" , userPermissions}: ClientesTableProps) {
+
+  const canEdit = userPermissions?.clientes?.edit
+
   const router = useRouter()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
@@ -118,14 +122,16 @@ export function ClientesTable({ clientes, searchTerm = "" }: ClientesTableProps)
               </TableCell>
               <TableCell className="py-3">
                 <div className="flex items-center justify-center gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => handleEditCliente(cliente)}
-                    className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
-                    title="Editar Cliente"
-                  >
-                    <Pencil className="h-4 w-4 text-[#1E1E1E]" />
-                  </Button>
+                  {canEdit && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleEditCliente(cliente)}
+                      className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
+                      title="Editar Cliente"
+                    >
+                      <Pencil className="h-4 w-4 text-[#1E1E1E]" />
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="outline"
