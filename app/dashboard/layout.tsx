@@ -43,16 +43,13 @@ export default async function DashboardLayout({
       .eq("usuario_id", user.id)
       .single();
 
-    console.log(perms)
     if (perms?.modulos) {
       userPermissions = perms.modulos;
     }
   } catch (err) {
     console.warn("Erro ao buscar permissões do usuário:", err);
   }
-
-
-
+  
   return <DashboardLayoutClient user={user} userRole={userRole} userPermissions={userPermissions}>{children}</DashboardLayoutClient>;
 }
 

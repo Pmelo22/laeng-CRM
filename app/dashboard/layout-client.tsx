@@ -17,7 +17,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -47,7 +47,7 @@ const menuItems = [
   {
     title: "Logs",
     icon: ScrollText,
-    href: "/logs",
+    href: "dashboard/logs",
   },
   {
     title: "Admin",
@@ -89,23 +89,31 @@ function Logo({ collapsed }: { collapsed: boolean }) {
 
 function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { collapsed: boolean; onToggle: () => void; user: SupabaseUser; userRole: string, userPermissions: Record<string, any>; }) {
   const pathname = usePathname();
+  
+  let items =
+    userRole === "admin"
+      ? menuItems
+      : menuItems.filter((i) => i.title !== "Admin");
 
-  const filteredItems = 
-  userRole === "admin"
-    ? menuItems 
-    : menuItems.filter(item => {
-        const moduleKey = item.href.replace("/", ""); 
-        const modulePermissions = userPermissions[moduleKey];
-        
-        console.log(moduleKey)
-        console.log(modulePermissions)
+  if (!userPermissions?.dashboard?.view) {
+    items = items.filter((i) => i.title !== "Dashboard")
+  }
 
-        if (!modulePermissions || !modulePermissions.view) {
-          return false;
-        }
+  if (!userPermissions?.clientes?.view) {
+    items = items.filter((i) => i.title !== "Clientes")
+  }
 
-        return true;
-      });
+  if (!userPermissions?.obras?.view) {
+    items = items.filter((i) => i.title !== "Obras")
+  }
+
+  if (!userPermissions?.financeira?.view) {
+    items = items.filter((i) => i.title !== "Financeiro")
+  }
+
+  if (!userPermissions?.logs?.view) {
+    items = items.filter((i) => i.title !== "Logs")
+  }
 
   return (
     <aside 
@@ -129,7 +137,7 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
       </button>
 
       <nav className="flex-1 p-3 space-y-1">
-        {filteredItems.map((item) => {
+        {items.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -217,19 +225,30 @@ function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { i
 
   const pathname = usePathname();
   
-  const filteredItems = 
-  userRole === "admin"
-    ? menuItems 
-    : menuItems.filter(item => {
-        const moduleKey = item.href.replace("/", ""); 
-        const modulePermissions = userPermissions[moduleKey];
-        
-        if (!modulePermissions || !modulePermissions.view) {
-          return false;
-        }
+  let items =
+    userRole === "admin"
+      ? menuItems
+      : menuItems.filter((i) => i.title !== "Admin");
 
-        return true;
-      });
+  if (!userPermissions?.dashboard?.view) {
+    items = items.filter((i) => i.title !== "Dashboard")
+  }
+
+  if (!userPermissions?.clientes?.view) {
+    items = items.filter((i) => i.title !== "Clientes")
+  }
+
+  if (!userPermissions?.obras?.view) {
+    items = items.filter((i) => i.title !== "Obras")
+  }
+
+  if (!userPermissions?.financeiras?.view) {
+    items = items.filter((i) => i.title !== "Financeiro")
+  }
+
+  if (!userPermissions?.logs?.view) {
+    items = items.filter((i) => i.title !== "Logs")
+  }
 
 
   useEffect(() => {
@@ -271,7 +290,7 @@ function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { i
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {filteredItems.map((item) => {
+          {items.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
