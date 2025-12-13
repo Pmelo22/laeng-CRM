@@ -11,12 +11,16 @@ import {
 import { ClienteActions, ClienteStatusBadge, DeleteClienteButton } from "./cliente-actions";
 import { ClienteFinanceiroSection } from "@/components/cliente-financeiro-section";
 import { ClienteDocumentosSection } from "@/components/cliente-documentos-section";
+import { getUserContext } from "@/app/auth/context/userContext";
 
 export const dynamic = 'force-dynamic';
 
 export default async function ClientePerfilPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient();
   const { id } = await params;
+
+  const { userPermissions } = await getUserContext();
+  
 
   // Buscar dados do cliente
   const { data: cliente, error: clienteError } = await supabase
@@ -44,6 +48,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
     .order("data_upload", { ascending: false });
 
   return (
+  
     <div className="space-y-6 p-4 sm:p-6">
       {/* Header com botão de voltar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -56,8 +61,8 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
           <h1 className="text-2xl sm:text-3xl font-bold">Perfil do Cliente</h1>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-          <ClienteActions cliente={cliente} />
-          <DeleteClienteButton cliente={cliente} />
+          <ClienteActions cliente={cliente} userPermissions={userPermissions}/>
+          <DeleteClienteButton cliente={cliente} userPermissions={userPermissions}/>
         </div>
       </div>
 
@@ -94,7 +99,7 @@ export default async function ClientePerfilPage({ params }: { params: Promise<{ 
                 {/* Status */}
                 <div className="flex flex-col gap-2">
                   <span className="text-xs text-muted-foreground font-semibold uppercase block">STATUS</span>
-                  <ClienteStatusBadge cliente={cliente} />
+                  <ClienteStatusBadge cliente={cliente} userPermissions={userPermissions}/>
                 </div>
 
                 {/* Data de Contrato */}
