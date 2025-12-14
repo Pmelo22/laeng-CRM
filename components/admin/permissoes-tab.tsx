@@ -31,7 +31,7 @@ const MODULOS = [
     label: "Financeira",
     descricao: "Gerenciamento financeiro",
     icon: DollarSign,
-    acoes: ["view"],
+    acoes: ["view", "edit"],
   },
   {
     id: "obras",

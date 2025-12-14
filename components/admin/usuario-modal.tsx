@@ -24,7 +24,7 @@ const PERMISSOES_DEFAULT: PermissoesUsuario = {
   dashboard: { view: true },
   logs: { view: false},
   obras: { view: true, edit: false},
-  financeira: {view: true },
+  financeira: {view: true, edit: false},
   clientes: { view: false, create: false, delete: false, edit: false },
 }
 

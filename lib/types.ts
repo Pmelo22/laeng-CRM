@@ -201,6 +201,7 @@ export interface PermissoesUsuario {
   };
   financeira: {
     view: boolean;
+    edit: boolean;
   };
   clientes: {
     view: boolean;

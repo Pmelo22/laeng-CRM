@@ -25,7 +25,8 @@ export function mapPermissoesToModulos(permissoes: PermissoesUsuario) {
       edit: permissoes.obras?.edit ?? false
     },
     financeira: {
-      view: permissoes.financeira?.view ?? false
+      view: permissoes.financeira?.view ?? false,
+      edit: permissoes.financeira?.edit ?? false
     },
     clientes: {
       view: permissoes.clientes?.view ?? false,
