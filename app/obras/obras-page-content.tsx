@@ -12,10 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 
 interface ObrasPageContentProps {
-  obras: ObraComCliente[]
+  obras: ObraComCliente[],
+  userPermissions: Record<string, any>
 }
 
-export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
+export default function ObrasPageContent({ obras , userPermissions}: ObrasPageContentProps) {
   const searchParams = useSearchParams()
   const highlightId = searchParams.get('highlight')
   const [searchTerm, setSearchTerm] = useState("")
@@ -192,7 +193,7 @@ export default function ObrasPageContent({ obras }: ObrasPageContentProps) {
       <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
         <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
           <CardContent className="p-0">
-            <ObrasTableFull obras={filteredObras} highlightId={highlightId} />
+            <ObrasTableFull obras={filteredObras} highlightId={highlightId} userPermissions={userPermissions}/>
           </CardContent>
         </Card>
       </div>

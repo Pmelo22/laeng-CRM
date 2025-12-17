@@ -5,12 +5,16 @@ import Link from "next/link";
 import { DashboardAlerts } from "@/components/dashboard-alerts";
 import { DashboardCharts } from "@/components/dashboard-charts";
 import { calculateDashboardMetrics } from "@/lib/dashboard-metrics";
+import { getUserContext } from "../auth/context/userContext";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Disable caching completely
 
+
 export default async function DashboardPage() {
   const supabase = await createClient();
+
+  const { userPermissions } = await getUserContext();
 
   // Buscar dados em paralelo com no-cache
   const [
@@ -23,7 +27,7 @@ export default async function DashboardPage() {
       .select("*"),
     supabase
       .from("obras")
-      .select("*"),
+      .select("*, clientes(data_contrato)"),
     supabase
       .from("avisos")
       .select("*")
@@ -161,7 +165,8 @@ export default async function DashboardPage() {
       <DashboardCharts obras={obras || []} />
 
       {/* Quick Links */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 justify-center [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))] max-w-5xl mx-auto ">
+        { userPermissions?.clientes?.view && (
         <Link href="/clientes" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
             <CardContent className="p-4 sm:p-6 flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4 h-full">
@@ -175,7 +180,9 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
+        )}
 
+        { userPermissions?.obras?.view &&(
         <Link href="/obras" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
             <CardContent className="p-4 sm:p-6 flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4 h-full">
@@ -189,7 +196,9 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
+        )}
 
+        { userPermissions?.financeira?.view &&(
         <Link href="/financeira" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
             <CardContent className="p-4 sm:p-6 flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4 h-full">
@@ -203,8 +212,10 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
+        )}
 
-        <Link href="/dashboard/logs" className="group h-full">
+        { userPermissions?.logs?.view && ( 
+        <Link href="/logs" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
             <CardContent className="p-4 sm:p-6 flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4 h-full">
               <div className="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-500 transition-colors flex-shrink-0">
@@ -217,6 +228,8 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
+        )}
+        
       </div>
     </div>
   );

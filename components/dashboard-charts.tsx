@@ -1,74 +1,17 @@
 "use client";
 
 import { Obra } from "@/lib/types";
-import { BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Cell } from 'recharts';
+
+interface ObraComClientes extends Obra {
+  clientes?: {
+    data_contrato?: string;
+  };
+}
 
 interface DashboardChartsProps {
-  obras: Obra[];
+  obras: ObraComClientes[];
 }
-
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: Array<{ value: number; payload: { name: string } }>;
-}
-
-const CustomTooltip = (props: CustomTooltipProps) => {
-  const { active, payload } = props;
-  if (active && payload && payload.length) {
-    const formatCurrency = (value: number) => {
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(value);
-    };
-    return (
-      <div
-        style={{
-          backgroundColor: '#1E1E1E',
-          border: '2px solid #F5C800',
-          borderRadius: '6px',
-          padding: '8px 12px',
-          fontSize: '13px',
-        }}
-      >
-        <p style={{ color: '#F5C800', fontWeight: 'bold', margin: 0 }}>
-          {payload[0].payload.name}
-        </p>
-        <p style={{ color: '#F5C800', fontWeight: 'bold', margin: '4px 0 0 0' }}>
-          {formatCurrency(payload[0].value)}
-        </p>
-      </div>
-    );
-  }
-  return null;
-};
-
-const CustomTooltipPie = (props: CustomTooltipProps) => {
-  const { active, payload } = props;
-  if (active && payload && payload.length) {
-    return (
-      <div
-        style={{
-          backgroundColor: '#1E1E1E',
-          border: '2px solid #F5C800',
-          borderRadius: '6px',
-          padding: '8px 12px',
-          fontSize: '13px',
-        }}
-      >
-        <p style={{ color: '#F5C800', fontWeight: 'bold', margin: 0 }}>
-          {payload[0].payload.name}
-        </p>
-        <p style={{ color: '#F5C800', fontWeight: 'bold', margin: '4px 0 0 0' }}>
-          {payload[0].value}
-        </p>
-      </div>
-    );
-  }
-  return null;
-};
 
 export function DashboardCharts({ obras }: DashboardChartsProps) {
   const COLORS = {
@@ -120,14 +63,19 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
 
   // Faturamento por Ano (não utilizado - mantém compatibilidade)
 
-  // Obras por Ano
+  // Obras por Ano (dinâmico - sem filtro de 5 obras)
   const obrasPorAno = (() => {
-    // Agrupar obras por ano_obra
+    // Agrupar obras por ano extraído de data_contrato do cliente
     const obrasPorAnoMap: { [key: number]: number } = {};
     
     obras.forEach((obra) => {
-      // Usar ano_obra se existir, senão usar o ano do created_at
-      const ano = obra.ano_obra || new Date(obra.created_at || new Date()).getFullYear();
+      // Extrair ano da data_contrato do cliente
+      let ano = new Date().getFullYear(); // fallback
+      
+      if (obra.clientes && obra.clientes.data_contrato) {
+        const anoStr = obra.clientes.data_contrato.split('-')[0];
+        ano = parseInt(anoStr, 10) || ano;
+      }
       
       if (!obrasPorAnoMap[ano]) {
         obrasPorAnoMap[ano] = 0;
@@ -135,10 +83,9 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
       obrasPorAnoMap[ano] += 1;
     });
 
-    // Filtrar apenas anos com mais de 5 obras e ordenar
+    // Incluir TODOS os anos (sem filtrar)
     return Object.keys(obrasPorAnoMap)
       .map(Number)
-      .filter(ano => obrasPorAnoMap[ano] > 5)
       .sort((a, b) => a - b)
       .map(ano => ({
         ano,
@@ -163,53 +110,49 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
 
   const getPieColors = () => [COLORS.emAndamento, COLORS.finalizado, COLORS.pendente];
 
-  const gerarDadosComProjecao = () => {
-    // Agrupar obras por ano_obra - contar quantidade e somar valores
-    const obrasPorAnoMap: { [key: number]: { quantidade: number; valor: number } } = {};
+  const gerarDadosFaturamentoPorAno = () => {
+    // Agrupar obras por ano extraído de data_contrato do cliente
+    const obrasPorAno: { [key: number]: number } = {};
     
     obras.forEach((obra) => {
-      // Usar ano_obra se existir, senão usar o ano do created_at
-      const ano = obra.ano_obra || new Date(obra.created_at || new Date()).getFullYear();
+      // Extrair ano da data_contrato do cliente
+      let ano = new Date().getFullYear(); // fallback
+      
+      if (obra.clientes && obra.clientes.data_contrato) {
+        const anoStr = obra.clientes.data_contrato.split('-')[0];
+        ano = parseInt(anoStr, 10) || ano;
+      }
+      
       const valor = Number(obra.valor_total) || 0;
       
-      if (!obrasPorAnoMap[ano]) {
-        obrasPorAnoMap[ano] = { quantidade: 0, valor: 0 };
+      if (!obrasPorAno[ano]) {
+        obrasPorAno[ano] = 0;
       }
-      obrasPorAnoMap[ano].quantidade += 1;
-      obrasPorAnoMap[ano].valor += valor;
+      obrasPorAno[ano] += valor;
     });
 
-    // Filtrar apenas anos com mais de 5 obras
-    const anosValidos = Object.keys(obrasPorAnoMap)
+    // Obter todos os anos únicos e ordenar
+    const todosOsAnos = Object.keys(obrasPorAno)
       .map(Number)
-      .filter(ano => obrasPorAnoMap[ano].quantidade > 5)
       .sort((a, b) => a - b);
 
-    // Se não houver anos válidos, retornar array vazio
-    if (anosValidos.length === 0) {
+    // Se não houver dados, retornar array vazio
+    if (todosOsAnos.length === 0) {
       return [];
     }
 
-    // Calcular projeção como média dos 3 últimos anos válidos
-    const ultimosTresAnos = anosValidos.slice(-3).map(ano => obrasPorAnoMap[ano].valor);
-    const mediaProjecao = ultimosTresAnos.length > 0 
-      ? ultimosTresAnos.reduce((a, b) => a + b, 0) / ultimosTresAnos.length
-      : 0;
+    // Obter o ano MÁXIMO (mais no futuro)
+    const anoMaximo = Math.max(...todosOsAnos);
+    
+    // Selecionar 4 anos: do (anoMaximo - 3) até anoMaximo
+    const anoMinimo = anoMaximo - 3;
+    const anosExibicao = todosOsAnos.filter(ano => ano >= anoMinimo && ano <= anoMaximo);
 
-    // Montar dados do gráfico: histórico + 1 projeção
-    const dados = anosValidos.map(ano => ({
+    // Montar dados do gráfico
+    const dados = anosExibicao.map(ano => ({
       ano,
-      valor: obrasPorAnoMap[ano].valor,
-      isProjecao: false
+      valor: obrasPorAno[ano]
     }));
-
-    // Adicionar projeção para o próximo ano após o último ano válido
-    const proximoAnoProjecao = Math.max(...anosValidos) + 1;
-    dados.push({
-      ano: proximoAnoProjecao,
-      valor: Math.round(mediaProjecao),
-      isProjecao: true
-    });
 
     return dados;
   };
@@ -223,11 +166,9 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
         </div>
         <div className="p-6 bg-white flex flex-col items-center justify-center" style={{ height: '360px' }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={faturamentoPorStatusOrdenado} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
+            <BarChart data={faturamentoPorStatusOrdenado} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="name" tick={{ fontSize: 0 }} />
-              <YAxis tick={{ fontSize: 12, fill: '#666' }} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(224, 187, 20, 0.1)' }} />
               <Bar dataKey="value" name="Valor" radius={[6, 6, 0, 0]} label={{ position: 'top', formatter: (value: number) => formatCurrency(value), fontSize: 12, fontWeight: 'bold', fill: '#1E1E1E' }}>
                 {faturamentoPorStatusOrdenado.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={getBarColor(entry.name)} />
@@ -267,7 +208,6 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                   <Cell key={`pie-${index}`} fill={getPieColors()[index]} />
                 ))}
               </Pie>
-              <Tooltip content={<CustomTooltipPie />} />
               <Legend 
                 wrapperStyle={{ paddingTop: '40px', display: 'flex', justifyContent: 'center' }}
                 payload={obrasPorStatusOrdenado.map((entry, index) => ({
@@ -281,29 +221,16 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
         </div>
       </div>
 
-      {/* Card 3: FATURAMENTO x ANO (COM PROJEÇÃO) */}
+      {/* Card 3: FATURAMENTO x ANO */}
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="bg-[#1E1E1E] px-6 py-4">
-          <h3 className="text-base font-bold text-[#F5C800] uppercase tracking-wide">Faturamento x Ano (Projeção)</h3>
+          <h3 className="text-base font-bold text-[#F5C800] uppercase tracking-wide">Faturamento x Ano</h3>
         </div>
-        <div className="p-6 bg-white" style={{ height: '360px' }}>
+        <div className="p-8 bg-white" style={{ height: '480px' }}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={gerarDadosComProjecao()} margin={{ top: 10, right: 20, left: 60, bottom: 10 }}>
+            <LineChart data={gerarDadosFaturamentoPorAno()} margin={{ top: 50, right: 50, left: 50, bottom: 50 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="ano" tick={{ fontSize: 12, fill: '#666' }} />
-              <Tooltip 
-                formatter={(value: number) => formatCurrency(value)}
-                contentStyle={{ 
-                  backgroundColor: '#1E1E1E', 
-                  border: '2px solid #F5C800', 
-                  borderRadius: '6px',
-                  color: '#F5C800',
-                  padding: '8px 12px',
-                  fontSize: '13px'
-                }}
-                labelStyle={{ color: '#F5C800', fontWeight: 'bold' }}
-                cursor={{ stroke: '#F5C800', strokeWidth: 1 }}
-              />
+              <XAxis dataKey="ano" tick={{ fontSize: 14, fill: '#666' }} />
               <Line 
                 type="monotone" 
                 dataKey="valor" 
@@ -311,12 +238,12 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
                 strokeWidth={3}
                 dot={{
                   fill: COLORS.yellow,
-                  r: 5,
-                  strokeWidth: 1,
+                  r: 7,
+                  strokeWidth: 2,
                   stroke: '#1E1E1E',
                 }}
-                activeDot={{ r: 7 }}
-                label={{ position: 'top', formatter: (value: number) => formatCurrency(value), fontSize: 13, fontWeight: 'bold', fill: '#1E1E1E' }}
+                activeDot={{ r: 9 }}
+                label={{ position: 'top', offset: 20, formatter: (value: number) => formatCurrency(value), fontSize: 11, fontWeight: 'bold', fill: '#1E1E1E' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -328,30 +255,19 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
         <div className="bg-[#1E1E1E] px-6 py-4">
           <h3 className="text-base font-bold text-[#F5C800] uppercase tracking-wide">Obra x Ano</h3>
         </div>
-        <div className="p-6 bg-white" style={{ height: '360px' }}>
+        <div className="p-8 bg-white" style={{ height: '480px' }}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={obrasPorAno} margin={{ top: 10, right: 20, left: 60, bottom: 10 }}>
+            <LineChart data={obrasPorAno} margin={{ top: 50, right: 50, left: 50, bottom: 50 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="ano" tick={{ fontSize: 12, fill: '#666' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1E1E1E', 
-                  border: '2px solid #F5C800', 
-                  borderRadius: '6px',
-                  color: '#F5C800',
-                  padding: '8px 12px',
-                  fontSize: '13px'
-                }}
-                cursor={{ stroke: '#F5C800', strokeWidth: 1 }}
-              />
+              <XAxis dataKey="ano" tick={{ fontSize: 14, fill: '#666' }} />
               <Line 
                 type="monotone" 
                 dataKey="quantidade" 
                 stroke={COLORS.yellow}
                 strokeWidth={3}
-                dot={{ fill: COLORS.yellow, r: 5, strokeWidth: 1, stroke: '#1E1E1E' }}
-                activeDot={{ r: 7 }}
-                label={{ position: 'top', fontSize: 13, fontWeight: 'bold', fill: '#1E1E1E' }}
+                dot={{ fill: COLORS.yellow, r: 7, strokeWidth: 2, stroke: '#1E1E1E' }}
+                activeDot={{ r: 9 }}
+                label={{ position: 'top', offset: 20, fontSize: 11, fontWeight: 'bold', fill: '#1E1E1E' }}
               />
             </LineChart>
           </ResponsiveContainer>

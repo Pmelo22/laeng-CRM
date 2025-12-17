@@ -20,16 +20,18 @@ import { ClienteFormModal } from "@/components/cliente-form-modal";
 
 interface ClienteActionsProps {
   cliente: Cliente;
+  userPermissions: Record<string, any>
 }
 
 // ============================================
 // BOTÃO DE EDIÇÃO
 // ============================================
-export function ClienteActions({ cliente }: ClienteActionsProps) {
+export function ClienteActions({ cliente, userPermissions }: ClienteActionsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
+      { userPermissions?.clientes?.edit &&(
       <Button
         onClick={() => setIsModalOpen(true)}
         className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold"
@@ -37,7 +39,7 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
         <Edit className="mr-2 h-4 w-4" />
         Editar Cliente
       </Button>
-
+      )}
       <ClienteFormModal
         cliente={cliente}
         isOpen={isModalOpen}
@@ -50,7 +52,7 @@ export function ClienteActions({ cliente }: ClienteActionsProps) {
 // ============================================
 // BOTÃO DE DELETAR COM CONFIRMAÇÃO ÚNICA
 // ============================================
-export function DeleteClienteButton({ cliente }: ClienteActionsProps) {
+export function DeleteClienteButton({ cliente, userPermissions }: ClienteActionsProps) {
   const router = useRouter();
   const supabase = createClient();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -79,6 +81,7 @@ export function DeleteClienteButton({ cliente }: ClienteActionsProps) {
 
   return (
     <>
+    { userPermissions?.clientes?.delete &&(
       <Button
         onClick={() => setIsConfirmOpen(true)}
         variant="destructive"
@@ -87,6 +90,7 @@ export function DeleteClienteButton({ cliente }: ClienteActionsProps) {
         <Trash2 className="mr-1 h-4 w-4" />
         Excluir Cliente
       </Button>
+    )}
 
       {/* Diálogo de confirmação */}
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
@@ -140,13 +144,15 @@ export function DeleteClienteButton({ cliente }: ClienteActionsProps) {
 // ============================================
 // BADGE DE STATUS CLICÁVEL
 // ============================================
-export function ClienteStatusBadge({ cliente }: ClienteActionsProps) {
+export function ClienteStatusBadge({ cliente , userPermissions}: ClienteActionsProps) {
   const router = useRouter();
   const supabase = createClient();
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const canEdit = userPermissions?.clientes?.edit;
+
   const handleClick = async () => {
-    if (isUpdating) return;
+    if (isUpdating || !canEdit) return;
     
     setIsUpdating(true);
 
@@ -198,16 +204,21 @@ export function ClienteStatusBadge({ cliente }: ClienteActionsProps) {
   const config = statusConfig[cliente.status as keyof typeof statusConfig] || statusConfig["PENDENTE"];
 
   return (
-    <Badge 
-      className={`${config.color} font-semibold text-sm px-3 py-1.5 cursor-pointer transition-all border-0 inline-block ${isUpdating ? 'opacity-50' : ''}`}
-      onClick={handleClick}
-      title="Clique para alterar o status"
+    <Badge
+      onClick={canEdit ? handleClick : undefined}
+      title={
+        canEdit
+          ? "Clique para alterar o status"
+          : "Você não tem permissão para alterar o status"
+      }
+      className={`
+        ${config.color}
+        font-semibold text-sm px-3 py-1.5 border-0 inline-block transition-all
+        ${canEdit ? "cursor-pointer" : "cursor-not-allowed opacity-60"}
+        ${isUpdating ? "opacity-50" : ""}
+      `}
     >
-      {isUpdating ? (
-        <span className="font-bold">Atualizando...</span>
-      ) : (
-        <span className="font-bold">{config.label}</span>
-      )}
+      {isUpdating ? "Atualizando..." : config.label}
     </Badge>
   );
 }

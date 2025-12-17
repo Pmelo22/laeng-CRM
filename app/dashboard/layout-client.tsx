@@ -17,7 +17,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -47,7 +47,7 @@ const menuItems = [
   {
     title: "Logs",
     icon: ScrollText,
-    href: "/dashboard/logs",
+    href: "/logs",
   },
   {
     title: "Admin",
@@ -87,13 +87,33 @@ function Logo({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function Sidebar({ collapsed, onToggle, user, userRole }: { collapsed: boolean; onToggle: () => void; user: SupabaseUser; userRole: string }) {
+function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { collapsed: boolean; onToggle: () => void; user: SupabaseUser; userRole: string, userPermissions: Record<string, any>; }) {
   const pathname = usePathname();
   
-  // Filtrar menu items baseado no role
-  const filteredItems = userRole === 'admin' 
-    ? menuItems 
-    : menuItems.filter(item => item.title !== 'Admin');
+  let items =
+    userRole === "admin"
+      ? menuItems
+      : menuItems.filter((i) => i.title !== "Admin");
+
+  if (!userPermissions?.dashboard?.view) {
+    items = items.filter((i) => i.title !== "Dashboard")
+  }
+
+  if (!userPermissions?.clientes?.view) {
+    items = items.filter((i) => i.title !== "Clientes")
+  }
+
+  if (!userPermissions?.obras?.view) {
+    items = items.filter((i) => i.title !== "Obras")
+  }
+
+  if (!userPermissions?.financeira?.view) {
+    items = items.filter((i) => i.title !== "Financeiro")
+  }
+
+  if (!userPermissions?.logs?.view) {
+    items = items.filter((i) => i.title !== "Logs")
+  }
 
   return (
     <aside 
@@ -117,7 +137,7 @@ function Sidebar({ collapsed, onToggle, user, userRole }: { collapsed: boolean; 
       </button>
 
       <nav className="flex-1 p-3 space-y-1">
-        {filteredItems.map((item) => {
+        {items.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -201,14 +221,34 @@ function Sidebar({ collapsed, onToggle, user, userRole }: { collapsed: boolean; 
   );
 }
 
-function MobileSidebar({ isOpen, onClose, user, userRole }: { isOpen: boolean; onClose: () => void; user: SupabaseUser; userRole: string }) {
+function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { isOpen: boolean; onClose: () => void; user: SupabaseUser; userRole: string, userPermissions: Record<string, any> }) {
 
   const pathname = usePathname();
   
-  // Filtrar menu items baseado no role
-  const filteredItems = userRole === 'admin' 
-    ? menuItems 
-    : menuItems.filter(item => item.title !== 'Admin');
+  let items =
+    userRole === "admin"
+      ? menuItems
+      : menuItems.filter((i) => i.title !== "Admin");
+
+  if (!userPermissions?.dashboard?.view) {
+    items = items.filter((i) => i.title !== "Dashboard")
+  }
+
+  if (!userPermissions?.clientes?.view) {
+    items = items.filter((i) => i.title !== "Clientes")
+  }
+
+  if (!userPermissions?.obras?.view) {
+    items = items.filter((i) => i.title !== "Obras")
+  }
+
+  if (!userPermissions?.financeiras?.view) {
+    items = items.filter((i) => i.title !== "Financeiro")
+  }
+
+  if (!userPermissions?.logs?.view) {
+    items = items.filter((i) => i.title !== "Logs")
+  }
 
 
   useEffect(() => {
@@ -250,7 +290,7 @@ function MobileSidebar({ isOpen, onClose, user, userRole }: { isOpen: boolean; o
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {filteredItems.map((item) => {
+          {items.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -325,20 +365,22 @@ interface DashboardLayoutClientProps {
   children: React.ReactNode;
   user: SupabaseUser;
   userRole: string;
+  userPermissions: Record<string, any>;
 }
 
 export default function DashboardLayoutClient({
   children,
   user,
   userRole,
+  userPermissions
 }: DashboardLayoutClientProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} user={user} userRole={userRole} />
-      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} user={user} userRole={userRole} />
+      <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} user={user} userRole={userRole} userPermissions={userPermissions} />
+      <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} user={user} userRole={userRole} userPermissions={userPermissions} />
       
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile Header */}

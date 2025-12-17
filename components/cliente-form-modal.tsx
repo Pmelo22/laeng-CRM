@@ -85,7 +85,6 @@ export function ClienteFormModal({
     responsavel: "",
     entidade: "",
     fase: "",
-    ano_obra: new Date().getFullYear(),
     data_conclusao: "",
     observacoes_obra: "",
   });
@@ -142,7 +141,6 @@ export function ClienteFormModal({
           responsavel: "",
           entidade: "",
           fase: "",
-          ano_obra: new Date().getFullYear(),
           data_conclusao: "",
           observacoes_obra: "",
         });
@@ -254,7 +252,6 @@ export function ClienteFormModal({
           responsavel: obraData.responsavel || "Não informado",
           entidade: obraData.entidade || null,
           fase: obraData.fase || null,
-          ano_obra: obraData.ano_obra || new Date().getFullYear(),
           data_conclusao: obraData.data_conclusao || null,
           medicao_01: 0,
           medicao_02: 0,

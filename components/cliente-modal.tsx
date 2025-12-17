@@ -37,7 +37,7 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     cidade: "",
     estado: "",
     cep: "",
-    data_contrato: formatDateForInput(null),
+    data_contrato: "",
   });
 
   // Dados da obra
@@ -71,7 +71,6 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
     responsavel: "",
     entidade: "",
     fase: "",
-    ano_obra: new Date().getFullYear(),
     data_conclusao: "",
     observacoes_obra: "",
   });
@@ -125,7 +124,7 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           cidade: "",
           estado: "",
           cep: "",
-          data_contrato: formatDateForInput(null),
+          data_contrato: "",
         });
         setObraData({
           endereco_obra: "",
@@ -157,7 +156,6 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           responsavel: "",
           entidade: "",
           fase: "",
-          ano_obra: new Date().getFullYear(),
           data_conclusao: "",
           observacoes_obra: "",
         });
@@ -269,7 +267,6 @@ export function ClienteModal({ cliente, isOpen, onClose }: ClienteModalProps) {
           responsavel: obraData.responsavel || "Não informado",
           entidade: obraData.entidade || null,
           fase: obraData.fase || null,
-          ano_obra: obraData.ano_obra || new Date().getFullYear(),
           data_conclusao: obraData.data_conclusao || null,
           // Inicializar medições com 0
           medicao_01: 0,

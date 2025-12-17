@@ -14,9 +14,10 @@ import { StatusSelectContent } from "@/lib/status-utils"
 interface FinanceiraPageContentProps {
   dashboard: DashboardFinanceiro
   obras: ObraFinanceiroAggregated[]
+  userPermissions: Record<string, any>
 }
 
-export default function FinanceiraPageContent({ obras }: FinanceiraPageContentProps) {
+export default function FinanceiraPageContent({ obras, userPermissions }: FinanceiraPageContentProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [showHidden, setShowHidden] = useState(false)
@@ -145,7 +146,7 @@ export default function FinanceiraPageContent({ obras }: FinanceiraPageContentPr
       <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
         <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
           <CardContent className="p-0">
-            <FinanceiraTable obras={filteredObras} />
+            <FinanceiraTable obras={filteredObras} userPermissions={userPermissions} />
           </CardContent>
         </Card>
       </div>

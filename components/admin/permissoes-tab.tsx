@@ -1,8 +1,9 @@
 "use client"
 
 import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, Plus, Trash2, LayoutDashboard, Users, Building2, DollarSign } from "lucide-react"
+import { Eye, Plus, Trash2, LayoutDashboard, Users, Building2, DollarSign, LogsIcon, Pencil } from "lucide-react"
 import type { PermissoesUsuario } from "@/lib/types"
+import { icon } from "leaflet"
 
 interface PermissoesTabProps {
   permissoes: PermissoesUsuario
@@ -19,25 +20,32 @@ const MODULOS = [
     acoes: ["view"],
   },
   {
-    id: "clientes",
-    label: "Clientes",
-    descricao: "Gerenciamento de clientes",
-    icon: Users,
-    acoes: ["view", "create", "delete"],
-  },
-  {
-    id: "obras",
-    label: "Obras",
-    descricao: "Gerenciamento de obras",
-    icon: Building2,
-    acoes: ["view", "create", "delete"],
+    id: "logs",
+    label: "Logs",
+    descricao: "Acesso aos logs do sistema",
+    icon: LogsIcon,
+    acoes: ["view"],
   },
   {
     id: "financeira",
     label: "Financeira",
     descricao: "Gerenciamento financeiro",
     icon: DollarSign,
-    acoes: ["view", "create", "delete"],
+    acoes: ["view", "edit"],
+  },
+  {
+    id: "obras",
+    label: "Obras",
+    descricao: "Gerenciamento de obras",
+    icon: Building2,
+    acoes: ["view", "edit"],
+  },
+  {
+    id: "clientes",
+    label: "Clientes",
+    descricao: "Gerenciamento de clientes",
+    icon: Users,
+    acoes: ["view", "create", "edit", "delete"],
   },
 ] as const
 
@@ -45,12 +53,14 @@ const ICONS_ACAO = {
   view: Eye,
   create: Plus,
   delete: Trash2,
+  edit: Pencil, 
 }
 
 const LABELS_ACAO = {
   view: "Ver",
   create: "Criar",
   delete: "Deletar",
+  edit: "Editar",  
 }
 
 export function PermissoesTab({ permissoes, onChange, isLoading }: PermissoesTabProps) {
@@ -61,7 +71,6 @@ export function PermissoesTab({ permissoes, onChange, isLoading }: PermissoesTab
         const permissaoModulo = permissoes[moduloId]
         const temMultiplasAcoes = modulo.acoes.length > 1
         const IconModulo = modulo.icon
-
         return (
           <div
             key={modulo.id}
@@ -80,7 +89,7 @@ export function PermissoesTab({ permissoes, onChange, isLoading }: PermissoesTab
               </div>
 
               {/* Checkbox único para módulos com uma ação */}
-              {!temMultiplasAcoes && (
+              {!temMultiplasAcoes && permissaoModulo && (
                 <Checkbox
                   id={`${modulo.id}-view`}
                   checked={permissaoModulo.view as boolean}
@@ -88,14 +97,14 @@ export function PermissoesTab({ permissoes, onChange, isLoading }: PermissoesTab
                     onChange(moduloId, "view", checked as boolean)
                   }
                   disabled={isLoading}
-                  className="h-5 w-5 border-[#F5C800] data-[state=checked]:bg-[#F5C800]"
+                  className="h-5 w-5 rounded-md border-[#F5C800] bg-black/40 data-[state=checked]:bg-[#F5C800] data-[state=checked]:border-[#F5C800] data-[state=checked]:text-blacktransition-all duration-200"
                 />
               )}
             </div>
 
             {/* Grid de Ações */}
             {temMultiplasAcoes && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {modulo.acoes.map((acao) => {
                   const IconAcao = ICONS_ACAO[acao as keyof typeof ICONS_ACAO]
                   const labelAcao = LABELS_ACAO[acao as keyof typeof LABELS_ACAO]
@@ -130,3 +139,4 @@ export function PermissoesTab({ permissoes, onChange, isLoading }: PermissoesTab
     </div>
   )
 }
+  

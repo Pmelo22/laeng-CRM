@@ -11,6 +11,8 @@ import { Loader2, User, Shield } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { PermissoesTab } from "./permissoes-tab"
 import type { Usuario, PermissoesUsuario } from "@/lib/types"
+import { criarUsuarioAction } from "../actions/userAddLogic"
+import { editarUsuarioAction } from "../actions/userEditLogic"
 
 interface UsuarioModalProps {
   usuario?: Usuario | null
@@ -20,13 +22,15 @@ interface UsuarioModalProps {
 
 const PERMISSOES_DEFAULT: PermissoesUsuario = {
   dashboard: { view: true },
-  clientes: { view: false, create: false, delete: false },
-  obras: { view: false, create: false, delete: false },
-  financeira: { view: false, create: false, delete: false },
+  logs: { view: false},
+  obras: { view: true, edit: false},
+  financeira: {view: true, edit: false},
+  clientes: { view: false, create: false, delete: false, edit: false },
 }
 
 interface FormData {
   login: string
+  nomeCompleto: string
   cargo: "admin" | "funcionario"
   ativo: boolean
   senha: string
@@ -45,6 +49,7 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
   const [permissoes, setPermissoes] = useState<PermissoesUsuario>(PERMISSOES_DEFAULT)
   const [formData, setFormData] = useState<FormData>({
     login: "",
+    nomeCompleto: "",
     cargo: "funcionario",
     ativo: true,
     senha: "",
@@ -59,23 +64,29 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
     if (isOpen) {
       setActiveTab("informacoes")
       if (usuario) {
-        setFormData({
-          login: usuario.email || "",
-          cargo: usuario.cargo || "funcionario",
-          ativo: usuario.ativo ?? true,
-          senha: "",
-          confirmarSenha: "",
-        })
+      setFormData({
+        login: usuario?.login || "",
+        nomeCompleto: usuario?.nome_completo || "",
+        cargo: usuario?.cargo || "funcionario",
+        ativo: usuario?.ativo ?? true,
+        senha: "",
+        confirmarSenha: "",
+      })
+      
+      setPermissoes(usuario.modulos)
+
       } else {
         setFormData({
           login: "",
+          nomeCompleto: "",
           cargo: "funcionario",
           ativo: true,
           senha: "",
           confirmarSenha: "",
         })
-      }
+      
       setPermissoes(PERMISSOES_DEFAULT)
+      }
     }
   }, [isOpen, usuario])
 
@@ -110,52 +121,85 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
     return null
   }, [formData, isPasswordRequired])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
+ const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  e.preventDefault()
+  
+  const erroValidacao = validarFormulario()
+  if (erroValidacao) {
+    toast({
+      title: "Erro de validação",
+      description: erroValidacao,
+      variant: "destructive",
+    })
+    return
+  }
+
+  setIsLoading(true)
+  try {
+
+  if (!isEditMode) {
     
-    const erroValidacao = validarFormulario()
-    if (erroValidacao) {
+    const res = await criarUsuarioAction({
+      login: formData.login,
+      nomeCompleto: formData.nomeCompleto,
+      senha: formData.senha!,
+      cargo: formData.cargo,
+      permissoes,
+    })
+
+    if (!res.ok) {
       toast({
-        title: "Erro de validação",
-        description: erroValidacao,
+        title: "Erro ao criar usuário",
+        description: res.error,
         variant: "destructive",
       })
       return
     }
 
-    setIsLoading(true)
-    try {
-      const usuarioData = {
-        login: formData.login,
-        cargo: formData.cargo,
-        ativo: formData.ativo,
-        ...(formData.senha && { senha: formData.senha }),
-        permissoes,
-      }
+    toast({
+      title: "Usuário criado!",
+      description: `${formData.login} foi criado com sucesso.`,
+    })
+  } else {
 
-      console.log("📤 Salvando usuário:", usuarioData)
-      console.log("Modo:", isEditMode ? "EDIÇÃO" : "CRIAÇÃO")
+    const res = await editarUsuarioAction({
+      userId: usuario!.id,
+      login: formData.login,
+      nomeCompleto: formData.nomeCompleto,
+      cargo: formData.cargo,
+      senha: formData.senha || null, 
+      permissoes,
+    })
 
+    if (!res.ok) {
       toast({
-        title: isEditMode ? "Usuário atualizado!" : "Usuário criado!",
-        description: isEditMode
-          ? `${formData.login} foi atualizado com sucesso.`
-          : `${formData.login} foi criado com sucesso.`,
-      })
-
-      onClose()
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro ao salvar o usuário."
-      console.error("❌ Erro ao salvar usuário:", error)
-      toast({
-        title: "Erro ao salvar",
-        description: errorMessage,
+        title: "Erro ao editar usuário",
+        description: res.error,
         variant: "destructive",
       })
-    } finally {
-      setIsLoading(false)
+      return
     }
-  }, [formData, isEditMode, permissoes, validarFormulario, toast, onClose])
+
+    toast({
+      title: "Usuário atualizado!",
+      description: `${formData.login} foi atualizado com sucesso.`,
+    })
+  }
+
+onClose()
+    
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro ao salvar o usuário."
+    console.error("❌ Erro ao salvar usuário:", error)
+    toast({
+      title: "Erro ao salvar",
+      description: errorMessage,
+      variant: "destructive",
+    })
+  } finally {
+    setIsLoading(false)
+  }
+}, [formData, isEditMode, permissoes, validarFormulario, toast, onClose])
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -209,7 +253,22 @@ export function UsuarioModal({ usuario, isOpen, onClose }: UsuarioModalProps) {
                     className="border-2 focus:border-[#F5C800]"
                   />
                 </div>
-
+                {/* Nome Completo */}
+                <div className="space-y-2">
+                  <Label htmlFor="nomeCompleto" className="font-semibold">
+                    Nome Completo <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="nomeCompleto"
+                    name="nomeCompleto"
+                    value={formData.nomeCompleto}
+                    onChange={handleInputChange}
+                    placeholder="Ex: João da Silva"
+                    required
+                    disabled={isLoading}
+                    className="border-2 focus:border-[#F5C800]"
+                  />
+                </div>
                 {/* Senha */}
                 <div className="space-y-2">
                   <Label htmlFor="senha" className="font-semibold">

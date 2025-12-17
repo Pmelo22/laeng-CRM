@@ -1,6 +1,5 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
@@ -13,9 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
+import { loginAction } from "./actions";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,23 +24,22 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
     setError(null);
+    setIsLoading(true);
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      router.push("/dashboard");
-      router.refresh();
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Erro ao fazer login");
-    } finally {
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("password", password);
+
+    const result = await loginAction(formData);
+
+    if (result.error) {
+      setError(result.error);
       setIsLoading(false);
+      return;
     }
+
+    router.push("/dashboard");
   };
 
   return (
@@ -67,15 +67,16 @@ export default function LoginPage() {
           <CardContent className="pb-8">
             <form onSubmit={handleLogin}>
               <div className="flex flex-col gap-5">
+                {/* Username */}
                 <div className="grid gap-2">
-                  <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                  <Label htmlFor="username" className="text-sm font-medium">Usuário</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
+                    id="username"
+                    type="text"
+                    placeholder="usuario"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="h-11 border-slate-200 focus:border-[#F5C800] focus:ring-[#F5C800]"
                   />
                 </div>

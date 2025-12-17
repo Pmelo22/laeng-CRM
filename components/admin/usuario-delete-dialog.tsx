@@ -32,7 +32,7 @@ export function UsuarioDeleteDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
+      <AlertDialogContent className = "bg-gray-100" >
         <AlertDialogHeader>
           <AlertDialogTitle className="text-xl font-bold">
             Excluir Usuário?
@@ -40,7 +40,7 @@ export function UsuarioDeleteDialog({
           <AlertDialogDescription className="text-base">
             Você está prestes a excluir o usuário{" "}
             <span className="font-bold text-[#1E1E1E]">{usuario.nome_completo}</span>
-            {" "}(<span className="text-muted-foreground">{usuario.email}</span>).
+            {" "}(<span className="text-muted-foreground">{usuario.login}</span>).
             <br />
             <br />
             <span className="text-red-600 font-semibold">
@@ -50,7 +50,7 @@ export function UsuarioDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>
+          <AlertDialogCancel className = "hover:bg-gray-200" disabled={isDeleting}>
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction

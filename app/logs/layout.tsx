@@ -4,14 +4,14 @@ import DashboardLayoutClient from "../dashboard/layout-client";
 import { resolveRedirect } from "../auth/routes/resolveRedirect";
 
 
-export default async function ObrasLayout({
+export default async function LogsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const { user, userRole, userPermissions } = await getUserContext();
 
-  resolveRedirect(userPermissions, (p) => p?.obras?.view);
+  resolveRedirect(userPermissions, (p) => p?.logs?.view);
 
   return (
     <DashboardLayoutClient

@@ -9,20 +9,11 @@ import { UsuarioModal } from "@/components/admin/usuario-modal"
 import { UsuarioDeleteDialog } from "@/components/admin/usuario-delete-dialog"
 import type { Usuario } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
+import { getUsuarios } from "@/components/actions/userGetLogics"
+import { deletarUsuarioAction } from "@/components/actions/userDeleteLogic"
 
 interface AdminPageContentProps {
   usuarios: Usuario[]
-}
-
-const EXAMPLE_USER: Usuario = {
-  id: "1",
-  email: "admin",
-  nome_completo: "Administrador",
-  cargo: "admin",
-  ativo: true,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  ultimo_acesso: new Date().toISOString(),
 }
 
 interface ModalState {
@@ -38,7 +29,7 @@ interface DeleteState {
 
 export default function AdminPageContent({ usuarios: initialUsuarios }: AdminPageContentProps) {
   const { toast } = useToast()
-  const [usuarios] = useState<Usuario[]>([...initialUsuarios, EXAMPLE_USER])
+  const [usuarios, setUsuarios] = useState<Usuario[]>(initialUsuarios)
   const [isRefreshing, setIsRefreshing] = useState(false)
   
   const [modalState, setModalState] = useState<ModalState>({
@@ -55,9 +46,10 @@ export default function AdminPageContent({ usuarios: initialUsuarios }: AdminPag
   const handleRefetchUsuarios = useCallback(async () => {
     setIsRefreshing(true)
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      const novosUsuarios = await getUsuarios()
+      setUsuarios(novosUsuarios)
     } catch (error) {
-      console.error("❌ Erro ao recarregar usuários:", error)
+      console.error("Erro ao recarregar usuários:", error)
     } finally {
       setIsRefreshing(false)
     }
@@ -99,8 +91,15 @@ export default function AdminPageContent({ usuarios: initialUsuarios }: AdminPag
     if (!usuario) return
 
     setDeleteState(prev => ({ ...prev, isDeleting: true }))
+
     try {
       console.log("🗑️ Excluindo usuário:", usuario.id)
+
+      const result = await deletarUsuarioAction(usuario.id)
+
+      if (!result.ok) {
+        throw new Error(result.error)
+      }
 
       toast({
         title: "Usuário excluído!",
@@ -109,12 +108,14 @@ export default function AdminPageContent({ usuarios: initialUsuarios }: AdminPag
 
       handleCloseDeleteDialog()
       await handleRefetchUsuarios()
+
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : "Ocorreu um erro ao excluir o usuário."
       
       console.error("❌ Erro ao excluir usuário:", error)
+
       toast({
         title: "Erro ao excluir",
         description: errorMessage,

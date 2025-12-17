@@ -1,38 +1,26 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getUserContext } from "../auth/context/userContext";
 import DashboardLayoutClient from "../dashboard/layout-client";
+import { resolveRedirect } from "../auth/routes/resolveRedirect";
 
-export default async function ClientesLayout({
+
+export default async function ClienteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  const { user, userRole, userPermissions } = await getUserContext();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  resolveRedirect(userPermissions, (p) => p?.clientes?.view
+  );
 
-  if (!user) {
-    redirect("/auth/login");
-  }
-
-  // Buscar dados do usuário NO SERVIDOR
-  let userRole = "funcionario"; // default
-  try {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("cargo")
-      .eq("id", user.id)
-      .single();
-    
-    if (profile?.cargo) {
-      userRole = profile.cargo;
-    }
-  } catch (err) {
-    console.warn("Erro ao buscar cargo do usuário:", err);
-  }
-
-  return <DashboardLayoutClient user={user} userRole={userRole}>{children}</DashboardLayoutClient>;
+  return (
+    <DashboardLayoutClient
+      user={user}
+      userRole={userRole}
+      userPermissions={userPermissions}
+    >
+      {children}
+    </DashboardLayoutClient>
+  );
 }
-

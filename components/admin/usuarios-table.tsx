@@ -32,7 +32,7 @@ export function UsuariosTable({
     const term = searchTerm.toLowerCase()
     return usuarios.filter(usuario => 
       usuario.nome_completo?.toLowerCase().includes(term) ||
-      usuario.email?.toLowerCase().includes(term)
+      usuario.login?.toLowerCase().includes(term)
     )
   }, [usuarios, searchTerm])
 
@@ -78,6 +78,9 @@ export function UsuariosTable({
                 <TableHead className="text-[#F5C800] font-bold py-3 flex-1">
                   LOGIN
                 </TableHead>
+                <TableHead className="text-[#F5C800] font-bold py-3 flex-1">
+                NOME COMPLETO
+                </TableHead>
                 <TableHead className="text-[#F5C800] font-bold py-3 flex-1 text-center">
                   CARGO
                 </TableHead>
@@ -103,7 +106,10 @@ export function UsuariosTable({
               {!isRefreshing && paginatedUsuarios.map((usuario) => (
                 <TableRow key={usuario.id} className="hover:bg-[#F5C800]/5 border-b">
                   <TableCell className="font-medium py-3 flex-1">
-                    <span className="font-semibold text-sm">{usuario.email}</span>
+                    <span className="font-semibold text-sm">{usuario.login}</span>
+                  </TableCell>
+                  <TableCell className="font-medium py-3 flex-1">
+                  <span className="text-sm">{usuario.nome_completo}</span>
                   </TableCell>
                   <TableCell className="py-3 flex-1 text-center">
                     {getCargoBadge(usuario.cargo)}
