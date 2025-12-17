@@ -178,32 +178,36 @@ export interface FluxoResumo {
 // Tipos para administração de usuários
 export interface Usuario {
   id: string;
-  email: string;
+  login: string;
   nome_completo: string;
   cargo: 'admin' | 'funcionario';
   ativo: boolean;
   created_at: string;
   updated_at: string;
   ultimo_acesso?: string;
+  modulos: PermissoesUsuario
 }
 
 export interface PermissoesUsuario {
   dashboard: {
     view: boolean;
   };
+  logs?: {
+    view: boolean;
+  };
+  obras: {
+    view: boolean;
+    edit: boolean;
+  };
+  financeira: {
+    view: boolean;
+    edit: boolean;
+  };
   clientes: {
     view: boolean;
     create: boolean;
     delete: boolean;
+    edit: boolean;
   };
-  obras: {
-    view: boolean;
-    create: boolean;
-    delete: boolean;
-  };
-  financeira: {
-    view: boolean;
-    create: boolean;
-    delete: boolean;
-  };
+
 }

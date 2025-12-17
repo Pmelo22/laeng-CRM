@@ -18,6 +18,7 @@ import { useSortTable, usePagination, useExpandableRows, ExpandToggleButton } fr
 
 interface FinanceiraTableProps {
   obras: ObraFinanceiroAggregated[]
+  userPermissions: Record<string, any>
 }
 
 interface MedicaoData {
@@ -26,7 +27,10 @@ interface MedicaoData {
   dataComputacao?: string
 }
 
-export function FinanceiraTable({ obras }: FinanceiraTableProps) {
+export function FinanceiraTable({ obras , userPermissions}: FinanceiraTableProps) {
+
+  const canEdit = userPermissions?.financeira?.edit === true
+
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
@@ -47,7 +51,14 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
     }
   }, [medicaoEditando])
 
-  const abrirEditorMedicao = (obraId: string, numeroMedicao: number, valorAtual: number, dataComputacao?: string) => {
+  const abrirEditorMedicao = (
+    obraId: string,
+    numeroMedicao: number,
+    valorAtual: number,
+    dataComputacao?: string
+  ) => {
+    if (!canEdit) return
+
     setObraIdEditando(obraId)
     setMedicaoEditando({
       numero: numeroMedicao,
@@ -55,6 +66,7 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
       dataComputacao: dataComputacao || undefined,
     })
   }
+
 
   const fecharEditorMedicao = () => {
     setMedicaoEditando(null)
@@ -286,10 +298,31 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                             </h4>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                               {/* Medição 01 */}
-                              <button
-                                onClick={() => abrirEditorMedicao(obra.id, 1, obra.medicao_01 || 0, obra.medicao_01_data_computacao)}
-                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
-                              >
+                            <button
+                              onClick={
+                                canEdit
+                                  ? () =>
+                                      abrirEditorMedicao(
+                                        obra.id,
+                                        1,
+                                        obra.medicao_01 || 0,
+                                        obra.medicao_01_data_computacao
+                                      )
+                                  : undefined
+                              }
+                              disabled={!canEdit}
+                              title={
+                                canEdit
+                                  ? "Clique para editar Medição 01"
+                                  : "Você não tem permissão para editar medições"
+                              }
+                              className={`
+                                rounded-lg p-4 border border-gray-200 transition-all group relative
+                                ${canEdit
+                                  ? "bg-[#F5C800] hover:bg-[#F5C800]/90 cursor-pointer hover:shadow-md active:scale-95"
+                                  : "bg-gray-200 cursor-not-allowed opacity-60"}
+                              `}
+                            >
                                 <div className="text-left">
                                   <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 01</p>
                                   <p className="text-base font-bold text-[#1E1E1E]">
@@ -304,10 +337,31 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                               </button>
                               
                               {/* Medição 02 */}
-                              <button
-                                onClick={() => abrirEditorMedicao(obra.id, 2, obra.medicao_02 || 0, obra.medicao_02_data_computacao)}
-                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
-                              >
+                            <button
+                              onClick={
+                                canEdit
+                                  ? () =>
+                                      abrirEditorMedicao(
+                                        obra.id,
+                                        2,
+                                        obra.medicao_02 || 0,
+                                        obra.medicao_02_data_computacao
+                                      )
+                                  : undefined
+                              }
+                              disabled={!canEdit}
+                              title={
+                                canEdit
+                                  ? "Clique para editar Medição 02"
+                                  : "Você não tem permissão para editar medições"
+                              }
+                              className={`
+                                rounded-lg p-4 border border-gray-200 transition-all group relative
+                                ${canEdit
+                                  ? "bg-[#F5C800] hover:bg-[#F5C800]/90 cursor-pointer hover:shadow-md active:scale-95"
+                                  : "bg-gray-200 cursor-not-allowed opacity-60"}
+                              `}
+                            >
                                 <div className="text-left">
                                   <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 02</p>
                                   <p className="text-base font-bold text-[#1E1E1E]">
@@ -322,10 +376,31 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                               </button>
                               
                               {/* Medição 03 */}
-                              <button
-                                onClick={() => abrirEditorMedicao(obra.id, 3, obra.medicao_03 || 0, obra.medicao_03_data_computacao)}
-                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
-                              >
+                            <button
+                              onClick={
+                                canEdit
+                                  ? () =>
+                                      abrirEditorMedicao(
+                                        obra.id,
+                                        3,
+                                        obra.medicao_03 || 0,
+                                        obra.medicao_03_data_computacao
+                                      )
+                                  : undefined
+                              }
+                              disabled={!canEdit}
+                              title={
+                                canEdit
+                                  ? "Clique para editar Medição 03"
+                                  : "Você não tem permissão para editar medições"
+                              }
+                              className={`
+                                rounded-lg p-4 border border-gray-200 transition-all group relative
+                                ${canEdit
+                                  ? "bg-[#F5C800] hover:bg-[#F5C800]/90 cursor-pointer hover:shadow-md active:scale-95"
+                                  : "bg-gray-200 cursor-not-allowed opacity-60"}
+                              `}
+                            >
                                 <div className="text-left">
                                   <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 03</p>
                                   <p className="text-base font-bold text-[#1E1E1E]">
@@ -340,10 +415,31 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                               </button>
                               
                               {/* Medição 04 */}
-                              <button
-                                onClick={() => abrirEditorMedicao(obra.id, 4, obra.medicao_04 || 0, obra.medicao_04_data_computacao)}
-                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
-                              >
+                            <button
+                              onClick={
+                                canEdit
+                                  ? () =>
+                                      abrirEditorMedicao(
+                                        obra.id,
+                                        4,
+                                        obra.medicao_04 || 0,
+                                        obra.medicao_04_data_computacao
+                                      )
+                                  : undefined
+                              }
+                              disabled={!canEdit}
+                              title={
+                                canEdit
+                                  ? "Clique para editar Medição 04"
+                                  : "Você não tem permissão para editar medições"
+                              }
+                              className={`
+                                rounded-lg p-4 border border-gray-200 transition-all group relative
+                                ${canEdit
+                                  ? "bg-[#F5C800] hover:bg-[#F5C800]/90 cursor-pointer hover:shadow-md active:scale-95"
+                                  : "bg-gray-200 cursor-not-allowed opacity-60"}
+                              `}
+                            >
                                 <div className="text-left">
                                   <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 04</p>
                                   <p className="text-base font-bold text-[#1E1E1E]">
@@ -358,10 +454,31 @@ export function FinanceiraTable({ obras }: FinanceiraTableProps) {
                               </button>
                               
                               {/* Medição 05 */}
-                              <button
-                                onClick={() => abrirEditorMedicao(obra.id, 5, obra.medicao_05 || 0, obra.medicao_05_data_computacao)}
-                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 rounded-lg p-4 border border-gray-200 cursor-pointer transition-all hover:shadow-md active:scale-95 group relative"
-                              >
+                            <button
+                              onClick={
+                                canEdit
+                                  ? () =>
+                                      abrirEditorMedicao(
+                                        obra.id,
+                                        5,
+                                        obra.medicao_05 || 0,
+                                        obra.medicao_05_data_computacao
+                                      )
+                                  : undefined
+                              }
+                              disabled={!canEdit}
+                              title={
+                                canEdit
+                                  ? "Clique para editar Medição 05"
+                                  : "Você não tem permissão para editar medições"
+                              }
+                              className={`
+                                rounded-lg p-4 border border-gray-200 transition-all group relative
+                                ${canEdit
+                                  ? "bg-[#F5C800] hover:bg-[#F5C800]/90 cursor-pointer hover:shadow-md active:scale-95"
+                                  : "bg-gray-200 cursor-not-allowed opacity-60"}
+                              `}
+                            >
                                 <div className="text-left">
                                   <p className="text-xs text-[#1E1E1E] font-semibold mb-1.5 uppercase">MEDIÇÃO 05</p>
                                   <p className="text-base font-bold text-[#1E1E1E]">

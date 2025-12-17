@@ -18,9 +18,13 @@ import { EditableValueModal } from "@/components/editable-value-modal"
 interface ObrasTableFullProps {
   obras: ObraComCliente[]
   highlightId?: string | null
+  userPermissions: Record<string, any>
 }
 
-export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
+export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTableFullProps) {
+
+  const canEdit = userPermissions?.obras?.edit
+  
   const router = useRouter()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedObra, setSelectedObra] = useState<ObraComCliente | null>(null)
@@ -41,7 +45,14 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
     setSelectedObra(null)
   }
 
-  const handleEditValue = (obra: ObraComCliente, fieldName: string, title: string, currentValue: number) => {
+  const handleEditValue = (
+    obra: ObraComCliente,
+    fieldName: string,
+    title: string,
+    currentValue: number
+  ) => {
+    if (!canEdit) return
+
     setEditingValue({
       fieldName,
       title,
@@ -49,6 +60,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
       obraId: obra.id
     })
   }
+
 
   // Hooks centralizados
   const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(obras, 20)
@@ -166,34 +178,80 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                         </div>
                       </TableCell>
                       <TableCell className="text-center py-3 font-bold min-w-[110px]">
-                        <button
-                          onClick={() => handleEditValue(obra, 'material', 'Material', obra.material || 0)}
-                          className="text-sm text-black hover:text-[#F5C800] transition-colors cursor-pointer font-bold inline-block"
-                        >
-                          {formatCurrency(obra.material || 0)}
-                        </button>
+                      <button
+                        onClick={
+                          canEdit
+                            ? () =>
+                                handleEditValue(
+                                  obra,
+                                  "material",
+                                  "Material",
+                                  obra.material || 0
+                                )
+                            : undefined
+                        }
+                        disabled={!canEdit}
+                        title={
+                          canEdit
+                            ? "Clique para editar Material"
+                            : "Você não tem permissão para editar Material"
+                        }
+                        className={`
+                          text-sm font-bold inline-block transition-colors
+                          ${canEdit
+                            ? "text-black hover:text-[#F5C800] cursor-pointer"
+                            : "text-gray-400 cursor-not-allowed"}
+                        `}
+                      >
+                        {formatCurrency(obra.material || 0)}
+                      </button>
+
                       </TableCell>
                       <TableCell className="text-center py-3 font-bold min-w-[110px]">
-                        <button
-                          onClick={() => handleEditValue(obra, 'valor_terreno', 'Terreno', obra.valor_terreno || 0)}
-                          className="text-sm text-black hover:text-[#F5C800] transition-colors cursor-pointer font-bold inline-block"
-                        >
-                          {formatCurrency(obra.valor_terreno || 0)}
-                        </button>
+                      <button
+                        onClick={
+                          canEdit
+                            ? () =>
+                                handleEditValue(
+                                  obra,
+                                  "valor_terreno",
+                                  "Terreno",
+                                  obra.valor_terreno || 0
+                                )
+                            : undefined
+                        }
+                        disabled={!canEdit}
+                        title={
+                          canEdit
+                            ? "Clique para editar Terreno"
+                            : "Você não tem permissão para editar Terreno"
+                        }
+                        className={`
+                          text-sm font-bold inline-block transition-colors
+                          ${canEdit
+                            ? "text-black hover:text-[#F5C800] cursor-pointer"
+                            : "text-gray-400 cursor-not-allowed"}
+                        `}
+                      >
+                        {formatCurrency(obra.valor_terreno || 0)}
+                      </button>
+
                       </TableCell>
                       <TableCell className="text-center py-3 font-bold min-w-[120px]">
                         <span className="text-sm text-green-700 inline-block">{formatCurrency(valorTotalObra)}</span>
                       </TableCell>
                       <TableCell className="py-3">
                         <div className="flex items-center justify-center gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => handleEditObra(obra)}
-                            className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
-                            title="Editar Obra"
-                          >
-                            <Pencil className="h-4 w-4 text-[#1E1E1E]" />
-                          </Button>
+                      {canEdit && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleEditObra(obra)}
+                          className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
+                          title="Editar Obra"
+                        >
+                          <Pencil className="h-4 w-4 text-[#1E1E1E]" />
+                        </Button>
+                      )}
                           <Button
                             size="sm"
                             variant="outline"
@@ -214,7 +272,7 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
                             <h4 className="text-sm font-bold text-[#1E1E1E] mb-5 uppercase">
                               Detalhamento dos Custos Terceirizados
                             </h4>
-                            <ObraTerceirizadoSection obra={obra} />
+                            <ObraTerceirizadoSection obra={obra} userPermissions={userPermissions}/>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -395,9 +453,9 @@ export function ObrasTableFull({ obras, highlightId }: ObrasTableFullProps) {
       />
 
       {/* Modal para editar Material e Terreno */}
-      {editingValue && (
+      {editingValue && canEdit && (
         <EditableValueModal
-          isOpen={!!editingValue}
+          isOpen
           onClose={() => setEditingValue(null)}
           title={editingValue.title}
           currentValue={editingValue.currentValue}

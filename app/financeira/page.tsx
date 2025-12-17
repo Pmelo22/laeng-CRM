@@ -2,11 +2,14 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import type { DashboardFinanceiro, ObraFinanceiroAggregated } from "@/lib/types"
 import FinanceiraPageContent from "./financeira-page-content"
+import { getUserContext } from "../auth/context/userContext";
 
 export const dynamic = 'force-dynamic';
 
 export default async function FinanceiraPage() {
   const supabase = await createClient()
+
+  const { userPermissions } = await getUserContext();
 
   const {
     data: { user },
@@ -45,5 +48,5 @@ export default async function FinanceiraPage() {
 
   const obras = (obrasData as unknown as ObraFinanceiroAggregated[]) || []
 
-  return <FinanceiraPageContent dashboard={dashboard} obras={obras} />
+  return <FinanceiraPageContent dashboard={dashboard} obras={obras} userPermissions={userPermissions}/>
 }

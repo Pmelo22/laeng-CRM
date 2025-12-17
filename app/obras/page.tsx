@@ -2,11 +2,14 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import type { ObraComCliente } from "@/lib/types"
 import ObrasPageContent from "./obras-page-content"
+import { getUserContext } from "../auth/context/userContext";
 
 export const dynamic = 'force-dynamic';
 
 export default async function ObrasPage() {
   const supabase = await createClient()
+
+  const { userPermissions } = await getUserContext();
 
   const {
     data: { user },
@@ -39,5 +42,5 @@ export default async function ObrasPage() {
     cliente_telefone: (obra.clientes as { telefone?: string })?.telefone || '',
   }))
 
-  return <ObrasPageContent obras={obras} />
+  return <ObrasPageContent obras={obras} userPermissions={userPermissions} />
 }

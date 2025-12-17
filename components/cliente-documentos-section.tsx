@@ -19,6 +19,7 @@ interface ClienteDocumentosSectionProps {
     tamanho_bytes: number
     data_upload: string
   }>
+  userPermissions: Record<string, any>
 }
 
 type TipoDocumento = 
@@ -48,7 +49,11 @@ const TIPOS_DOCUMENTOS: { tipo: TipoDocumento; label: string }[] = [
   { tipo: 'cnd', label: 'CND' },
 ]
 
-export function ClienteDocumentosSection({ clienteId, documentos = [] }: ClienteDocumentosSectionProps) {
+export function ClienteDocumentosSection({ clienteId, documentos = [], userPermissions }: ClienteDocumentosSectionProps) {
+
+  const canEdit = userPermissions?.clientes?.edit
+  const canDelete = userPermissions?.clientes?.delete
+
   const { uploadDocument, deleteDocument, uploadState } = useDocumentUpload()
   const [uploadingType, setUploadingType] = useState<TipoDocumento | null>(null)
   const [viewingDoc, setViewingDoc] = useState<typeof documentos[0] | null>(null)
@@ -72,7 +77,12 @@ export function ClienteDocumentosSection({ clienteId, documentos = [] }: Cliente
     return acc
   }, {} as Record<TipoDocumento, typeof documentos[0]>)
 
-  const handleFileSelect = async (tipoDocumento: TipoDocumento, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    tipoDocumento: TipoDocumento,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!canEdit) return
+
     const file = event.target.files?.[0]
     if (!file) return
 
@@ -85,14 +95,16 @@ export function ClienteDocumentosSection({ clienteId, documentos = [] }: Cliente
     })
 
     setUploadingType(null)
-    // Limpar input
+
     if (fileInputRefs.current[tipoDocumento]) {
-      fileInputRefs.current[tipoDocumento]!.value = ''
+      fileInputRefs.current[tipoDocumento]!.value = ""
     }
   }
 
   const handleDelete = async (tipoDocumento: TipoDocumento) => {
-    if (confirm('Tem certeza que deseja deletar este documento?')) {
+    if (!canDelete) return
+
+    if (confirm("Tem certeza que deseja deletar este documento?")) {
       await deleteDocument(clienteId, tipoDocumento)
     }
   }
@@ -207,36 +219,52 @@ export function ClienteDocumentosSection({ clienteId, documentos = [] }: Cliente
                           <Download className="h-3 w-3 mr-1" />
                           Baixar
                         </Button>
-                        <Button
-                          size="sm"
-                          className="flex-1 text-xs bg-red-600 hover:bg-red-700 text-white"
-                          onClick={() => handleDelete(tipo)}
-                          disabled={isUploading}
-                        >
-                          <Trash2 className="h-3 w-3 mr-1" />
-                          Remover
-                        </Button>
+                      <Button
+                        size="sm"
+                        className="flex-1 text-xs bg-red-600 hover:bg-red-700 text-white"
+                        onClick={() => handleDelete(tipo)}
+                        disabled={isUploading || !canDelete}
+                        title={
+                          canEdit
+                            ? "Remover documento"
+                            : "Você não tem permissão para remover documentos"
+                        }
+                      >
+                        <Trash2 className="h-3 w-3 mr-1" />
+                        Remover
+                      </Button>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <input
-                        ref={(el) => {
-                          if (el) fileInputRefs.current[tipo] = el
-                        }}
-                        type="file"
-                        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                        onChange={(e) => handleFileSelect(tipo, e)}
-                        disabled={isUploading}
-                        className="hidden"
-                      />
-
+                    <input
+                      ref={(el) => {
+                        if (el) fileInputRefs.current[tipo] = el
+                      }}
+                      type="file"
+                      disabled={!canEdit || isUploading}
+                      className="hidden"
+                    />
                       <Button
-                        size="sm"
-                        onClick={() => fileInputRefs.current[tipo]?.click()}
-                        disabled={isUploading}
-                        className="w-full bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-semibold text-xs"
-                      >
+                          size="sm"
+                          onClick={
+                            canEdit
+                              ? () => fileInputRefs.current[tipo]?.click()
+                              : undefined
+                          }
+                          disabled={isUploading || !canEdit}
+                          title={
+                            canEdit
+                              ? "Anexar documento"
+                              : "Você não tem permissão para anexar documentos"
+                          }
+                          className={`
+                            w-full font-semibold text-xs
+                            ${canEdit
+                              ? "bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E]"
+                              : "cursor-not-allowed opacity-60"}
+                          `}
+                        >
                         {isUploading ? (
                           <>
                             <Clock className="h-3 w-3 mr-1 animate-spin" />
