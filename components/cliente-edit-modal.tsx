@@ -38,7 +38,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
     cidade: "",
     estado: "",
     cep: "",
-    data_contrato: formatDateForInput(null),
+    data_contrato: "",
   });
 
   // Carregar dados quando modal abrir
@@ -66,7 +66,7 @@ export function ClienteEditModal({ cliente, isOpen, onClose }: ClienteEditModalP
         cidade: "",
         estado: "",
         cep: "",
-        data_contrato: formatDateForInput(null),
+        data_contrato: "",
       });
     }
     setError(null);

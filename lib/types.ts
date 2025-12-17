@@ -80,7 +80,6 @@ export interface Obra extends ObraFinanceiro, ObraCustos, ObraMedicoes {
   estado_obra?: string;
   status: 'FINALIZADO' | 'EM ANDAMENTO' | 'PENDENTE';
   data_conclusao?: string; // Data de conclusão da obra
-  ano_obra?: number;
   local_obra?: string;
   fase?: string;
   created_by?: string;

@@ -15,6 +15,7 @@ const ObraTableFullContent = dynamic(() => import("./obras-table-full").then(mod
 
 interface ObraTableFullLazyProps {
   obras: ObraComCliente[]
+  userPermissions: Record<string, any>
 }
 
 /**
@@ -22,6 +23,6 @@ interface ObraTableFullLazyProps {
  * Melhora performance carregando o componente sob demanda
  * Economiza ~20KB do bundle principal
  */
-export function ObraTableFullLazy({ obras }: ObraTableFullLazyProps) {
-  return <ObraTableFullContent obras={obras} />
+export function ObraTableFullLazy({ obras, userPermissions }: ObraTableFullLazyProps) {
+  return <ObraTableFullContent obras={obras} userPermissions={userPermissions} />
 }

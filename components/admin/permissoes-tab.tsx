@@ -89,7 +89,7 @@ export function PermissoesTab({ permissoes, onChange, isLoading }: PermissoesTab
               </div>
 
               {/* Checkbox único para módulos com uma ação */}
-              {!temMultiplasAcoes && (
+              {!temMultiplasAcoes && permissaoModulo && (
                 <Checkbox
                   id={`${modulo.id}-view`}
                   checked={permissaoModulo.view as boolean}

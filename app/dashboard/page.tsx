@@ -27,7 +27,7 @@ export default async function DashboardPage() {
       .select("*"),
     supabase
       .from("obras")
-      .select("*"),
+      .select("*, clientes(data_contrato)"),
     supabase
       .from("avisos")
       .select("*")

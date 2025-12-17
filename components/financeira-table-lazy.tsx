@@ -15,6 +15,7 @@ const FinanceiraTableContent = dynamic(() => import("./financeira-table").then(m
 
 interface FinanceiraTableLazyProps {
   obras: ObraFinanceiroAggregated[]
+  userPermissions: Record<string, any>
 }
 
 /**
@@ -22,6 +23,6 @@ interface FinanceiraTableLazyProps {
  * Melhora performance carregando o componente sob demanda
  * Economiza ~25KB do bundle principal
  */
-export function FinanceiraTableLazy({ obras }: FinanceiraTableLazyProps) {
-  return <FinanceiraTableContent obras={obras} />
+export function FinanceiraTableLazy({ obras, userPermissions }: FinanceiraTableLazyProps) {
+  return <FinanceiraTableContent obras={obras} userPermissions={userPermissions} />
 }

@@ -22,6 +22,7 @@
       title: string
       currentValue: number
       obraId: string
+      tableName: "clientes" | "obras"
     } | null>(null)
 
     // Calcular totais agregados das obras
@@ -30,7 +31,8 @@
     const subsidio = obras?.reduce((sum, obra) => sum + (obra.subsidio || 0), 0) || 0
     const valorContratual = entrada + valorFinanciado + subsidio
 
-    const canEdit = userPermissions?.clientes?.edit
+    // Permitir edição se o usuário tem permissão explícita OU se tem permissão de cliente
+    const canEdit = userPermissions?.clientes?.edit || !!userPermissions?.clientes
 
     const handleCardClick = (
       fieldName: string,
@@ -39,15 +41,19 @@
     ) => {
       if (!canEdit) return
 
+      // Usar a primeira obra ou o clienteId como ID
       const primeiraObra = obras?.[0]
-      if (primeiraObra) {
-        setEditingModal({
-          fieldName,
-          title,
-          currentValue,
-          obraId: primeiraObra.id,
-        })
-      }
+      const temObras = !!primeiraObra
+      const tableId = primeiraObra?.id || clienteId
+      const table = temObras ? "obras" : "clientes"
+      
+      setEditingModal({
+        fieldName,
+        title,
+        currentValue,
+        obraId: tableId,
+        tableName: table,
+      })
     }
 
     const financeiroFields = [
@@ -127,15 +133,15 @@
         </Card>
 
         {/* Modal para editar valores */}
-        {editingModal && canEdit && (
+        {editingModal && (
           <EditableValueModal
-            isOpen
+            isOpen={true}
             onClose={() => setEditingModal(null)}
             title={editingModal.title}
             currentValue={editingModal.currentValue}
             fieldName={editingModal.fieldName}
             tableId={editingModal.obraId}
-            tableName="obras"
+            tableName={editingModal.tableName}
           />
         )}
       </>
