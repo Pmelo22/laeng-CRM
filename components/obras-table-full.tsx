@@ -265,19 +265,6 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
                       </TableCell>
                     </TableRow>
                     
-                    {isExpanded && (
-                      <TableRow key={`${obra.id}-details`} className="bg-yellow-50 border-l-4 border-[#F5C800]">
-                        <TableCell colSpan={9} className="py-6 px-8">
-                          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                            <h4 className="text-sm font-bold text-[#1E1E1E] mb-5 uppercase">
-                              Detalhamento dos Custos Terceirizados
-                            </h4>
-                            <ObraTerceirizadoSection obra={obra} userPermissions={userPermissions}/>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    
                     {isEmpreiteiroExpanded && (
                       <TableRow key={`${obra.id}-empreiteiro`} className="bg-yellow-50 border-l-4 border-[#F5C800]">
                         <TableCell colSpan={9} className="py-6 px-8">
@@ -363,6 +350,19 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
                                 </div>
                               </div>
                             </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    
+                    {isExpanded && (
+                      <TableRow key={`${obra.id}-details`} className="bg-yellow-50 border-l-4 border-[#F5C800]">
+                        <TableCell colSpan={9} className="py-6 px-8">
+                          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                            <h4 className="text-sm font-bold text-[#1E1E1E] mb-5 uppercase">
+                              Detalhamento dos Custos Terceirizados
+                            </h4>
+                            <ObraTerceirizadoSection obra={obra} userPermissions={userPermissions}/>
                           </div>
                         </TableCell>
                       </TableRow>
