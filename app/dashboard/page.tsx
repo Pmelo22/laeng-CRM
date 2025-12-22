@@ -69,8 +69,8 @@ export default async function DashboardPage() {
         {/* COLUNA ESQUERDA (2/3) - MÉTRICAS */}
         <div className="lg:col-span-2 space-y-6">
           {/* PRIMEIRA LINHA - CLIENTES */}
-          <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
-            <Card className="border-0 shadow-lg bg-yellow-400 hover:shadow-xl transition-shadow flex flex-col h-full">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4 auto-rows-fr">
+            <Card className="border-0 shadow-lg bg-yellow-400 hover:shadow-xl transition-shadow flex flex-col h-full min-h-40">
               <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-bold text-black uppercase">Total de Clientes</CardTitle>
               </CardHeader>
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-green-600 hover:shadow-xl transition-shadow flex flex-col h-full">
+            <Card className="border-0 shadow-lg bg-green-600 hover:shadow-xl transition-shadow flex flex-col h-full min-h-40">
               <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-bold text-white uppercase">Finalizados</CardTitle>
               </CardHeader>
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-red-600 hover:shadow-xl transition-shadow flex flex-col h-full">
+            <Card className="border-0 shadow-lg bg-red-600 hover:shadow-xl transition-shadow flex flex-col h-full min-h-40">
               <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-bold text-white uppercase">Em Andamento</CardTitle>
               </CardHeader>
@@ -97,7 +97,7 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-blue-600 hover:shadow-xl transition-shadow flex flex-col h-full">
+            <Card className="border-0 shadow-lg bg-blue-600 hover:shadow-xl transition-shadow flex flex-col h-full min-h-40">
               <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-bold text-white uppercase">Pendente</CardTitle>
               </CardHeader>
@@ -108,8 +108,8 @@ export default async function DashboardPage() {
           </div>
 
           {/* SEGUNDA LINHA - FINANCEIRO */}
-          <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-slate-50 to-slate-100/50 hover:shadow-xl transition-shadow flex flex-col h-full">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4 auto-rows-fr">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-slate-50 to-slate-100/50 hover:shadow-xl transition-shadow flex flex-col h-full min-h-40">
               <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-medium text-slate-600 uppercase">Receita</CardTitle>
               </CardHeader>
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100/50 hover:shadow-xl transition-shadow flex flex-col h-full">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100/50 hover:shadow-xl transition-shadow flex flex-col h-full min-h-40">
               <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-medium text-slate-600 uppercase">Recebido</CardTitle>
               </CardHeader>
@@ -131,7 +131,7 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className={`border-0 shadow-lg bg-gradient-to-br ${lucroTotal >= 0 ? 'from-emerald-50 to-emerald-100/50' : 'from-red-50 to-red-100/50'} hover:shadow-xl transition-shadow flex flex-col h-full`}>
+            <Card className={`border-0 shadow-lg bg-gradient-to-br ${lucroTotal >= 0 ? 'from-emerald-50 to-emerald-100/50' : 'from-red-50 to-red-100/50'} hover:shadow-xl transition-shadow flex flex-col h-full min-h-40`}>
               <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-medium text-slate-600 uppercase">Lucro</CardTitle>
               </CardHeader>
@@ -142,7 +142,7 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100/50 hover:shadow-xl transition-shadow flex flex-col h-full">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100/50 hover:shadow-xl transition-shadow flex flex-col h-full min-h-40">
               <CardHeader className="pb-2 sm:pb-3 flex-shrink-0">
                 <CardTitle className="text-xs sm:text-sm font-medium text-slate-600 uppercase">Ticket Médio</CardTitle>
               </CardHeader>
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
       <DashboardCharts obras={obras || []} />
 
       {/* Quick Links */}
-      <div className="grid gap-3 sm:gap-4 justify-center [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))] max-w-5xl mx-auto ">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         { userPermissions?.clientes?.view && (
         <Link href="/clientes" className="group h-full">
           <Card className="border-0 shadow-lg hover:shadow-xl transition-all h-full hover:scale-105 transform">
