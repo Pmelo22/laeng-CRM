@@ -207,12 +207,12 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
           <p className="text-xs text-center text-gray-400">
             Desenvolvido por{" "}
             <a 
-              href="https://www.linkedin.com/in/pmelo22" 
+              href="https://www.linkedin.com/company/theralabs/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-[#F5C800] hover:text-yellow-400 transition-colors"
             >
-              Patrick Albuquerque
+              Thera
             </a>
           </p>
         </div>
@@ -347,12 +347,12 @@ function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { i
           <p className="text-xs text-center text-gray-400">
             Desenvolvido por{" "}
             <a 
-              href="https://www.linkedin.com/in/pmelo22" 
+              href="https://www.linkedin.com/company/theralabs/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-[#F5C800] hover:text-yellow-400 transition-colors"
             >
-              Patrick Albuquerque
+              Thera
             </a>
           </p>
         </div>

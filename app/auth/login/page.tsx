@@ -123,12 +123,12 @@ export default function LoginPage() {
           <p className="text-xs text-muted-foreground">
             Desenvolvido por{" "}
             <a 
-              href="https://www.linkedin.com/in/pmelo22" 
+              href="https://www.linkedin.com/company/theralabs/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="font-semibold text-[#F5C800] hover:text-yellow-400 transition-colors underline"
             >
-              Patrick Albuquerque
+              Thera
             </a>
           </p>
         </div>
