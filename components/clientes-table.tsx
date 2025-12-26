@@ -51,7 +51,7 @@ export function ClientesTable({ clientes, searchTerm = "" , userPermissions}: Cl
   }, [clientes, searchTerm])
 
   // Hooks centralizados
-  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedClientes, handleItemsPerPageChange, getPageNumbers } = usePagination(filteredClientes, 20)
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedClientes, handleItemsPerPageChange, getPageNumbers } = usePagination(filteredClientes, 100)
 
   if (clientes.length === 0) {
     return <div className="text-center py-8 text-muted-foreground">Nenhum cliente cadastrado ainda.</div>
