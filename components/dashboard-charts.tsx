@@ -38,8 +38,8 @@ export function DashboardCharts({ obras }: DashboardChartsProps) {
   }, [] as { name: string; value: number }[]);
 
   const faturamentoPorStatusOrdenado = [
-    faturamentoPorStatus.find(f => f.name === 'EM ANDAMENTO') || { name: 'EM ANDAMENTO', value: 0 },
     faturamentoPorStatus.find(f => f.name === 'FINALIZADO') || { name: 'FINALIZADO', value: 0 },
+    faturamentoPorStatus.find(f => f.name === 'EM ANDAMENTO') || { name: 'EM ANDAMENTO', value: 0 },
     faturamentoPorStatus.find(f => f.name === 'PENDENTE') || { name: 'PENDENTE', value: 0 },
   ];
 

@@ -42,7 +42,7 @@ export function FinanceiraTable({ obras , userPermissions}: FinanceiraTableProps
   // Hooks centralizados
   const { toggleRow, isExpanded } = useExpandableRows()
   const { handleSort, getSortIcon, sortedData: sortedObras } = useSortTable<ObraFinanceiroAggregated>(obras)
-  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(sortedObras, 20)
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(sortedObras, 100)
 
   // Sincronizar input com medicaoEditando
   useEffect(() => {

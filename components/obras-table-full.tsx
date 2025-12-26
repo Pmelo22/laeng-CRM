@@ -63,7 +63,7 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
 
 
   // Hooks centralizados
-  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(obras, 20)
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedObras, handleItemsPerPageChange, getPageNumbers } = usePagination(obras, 100)
   const { expandedRows, toggleRow: toggleRowExpansion } = useExpandableRows()
   const { expandedRows: expandedEmpreiteiro, toggleRow: toggleEmpreiteiroExpansion } = useExpandableRows()
 
