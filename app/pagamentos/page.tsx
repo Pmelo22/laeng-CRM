@@ -2,10 +2,11 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import PagamentosPageContent from "./pagamentos-page-content"
 import { getUserContext } from "../auth/context/userContext";
+import { Pagamentos } from "@/lib/types";
 
 export const dynamic = 'force-dynamic';
 
-export default async function ObrasPage() {
+export default async function PagamentosPage() {
   const supabase = await createClient()
 
   const { userPermissions } = await getUserContext();
@@ -18,5 +19,29 @@ export default async function ObrasPage() {
     redirect("/auth/login")
   }
 
-  return <PagamentosPageContent userPermissions={userPermissions} />
+  // 1. Query with Multiple Joins
+  const { data: pagamentosData } = await supabase
+    .from("transactions")
+    .select(`
+      *,
+      categories:category_id (
+        name
+      ),
+      accounts:account_id (
+        name
+      ),
+      clientes:cliente_id (
+        nome
+      )
+    `)
+    .order("date", { ascending: false })
+
+  const pagamentos: Pagamentos[] = (pagamentosData || []).map((transaction: any) => ({
+    ...transaction,
+    category_name: transaction.categories?.name || 'Sem Categoria',
+    account_name: transaction.accounts?.name || 'Conta desconhecida',
+    cliente_nome: transaction.clientes?.nome || null 
+  }));
+
+  return <PagamentosPageContent pagamentos={pagamentos} userPermissions={userPermissions} />
 }

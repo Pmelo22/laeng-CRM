@@ -89,6 +89,27 @@ export interface Obra extends ObraFinanceiro, ObraCustos, ObraMedicoes {
   updated_at: string;
 }
 
+export interface Pagamentos {
+  id: string;
+  description?: string;
+  amount: number;
+  type: 'receita' | 'despesa',
+  date: string,
+  category_id: string,
+  account_id: string,
+  cliente_id?: string,
+  user_id: string,
+  method: 'cartao_credito' | 'cartao_debito' | 'boleto' | 'pix' | 'dinheiro' | 'transferencia',
+  installments_current: number,
+  installments_total: number,
+  created_at: string,
+  updated_at?: string, 
+  category_name?: string;
+  account_name?: string; 
+  cliente_nome?: string; 
+  status: 'pago' | 'não pago'
+}
+
 export interface ObraComCliente extends Obra {
   cliente_nome: string;
   cliente_endereco: string;
