@@ -5,6 +5,7 @@ import {
   Users, 
   Building2, 
   DollarSign, 
+  CreditCard,
   LogOut,
   Menu,
   X,
@@ -48,6 +49,11 @@ const menuItems = [
     title: "Logs",
     icon: ScrollText,
     href: "/logs",
+  },
+  {
+    title: "Pagamentos",
+    icon: CreditCard,
+    href: "/pagamentos"
   },
   {
     title: "Admin",
