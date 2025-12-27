@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import PagamentosPageContent from "./pagamentos-page-content"
 import { getUserContext } from "../auth/context/userContext";
 import { Pagamentos } from "@/lib/types";
+import { calculateFinancialMetrics } from "@/lib/financial";
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,6 @@ export default async function PagamentosPage() {
     redirect("/auth/login")
   }
 
-  // 1. Query with Multiple Joins
   const { data: pagamentosData } = await supabase
     .from("transactions")
     .select(`
@@ -43,5 +43,7 @@ export default async function PagamentosPage() {
     cliente_nome: transaction.clientes?.nome || null 
   }));
 
-  return <PagamentosPageContent pagamentos={pagamentos} userPermissions={userPermissions} />
+  const metrics = calculateFinancialMetrics(pagamentos)
+
+  return <PagamentosPageContent metrics={metrics} pagamentos={pagamentos} userPermissions={userPermissions} />
 }
