@@ -5,12 +5,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark } from "lucide-react"
+import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil } from "lucide-react"
 import { formatCurrency } from "@/lib/financial"
 import type { Pagamentos } from "@/lib/types"
 import { PagamentoQuickEditModal } from "./pagamento-quick-edit-modal"
 import { format } from "date-fns"
 import { usePagination } from "@/lib/table-utils"
+import { PagamentoEditModal } from "./pagamento-edit-modal"
 
 
 interface PagamentosTableFullProps {
@@ -95,6 +96,14 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
     })
   }
 
+  const [isEditModalFullOpen, setIsEditModalFullOpen] = useState(false)
+  const [selectedPagamentoFull, setSelectedPagamentoFull] = useState<Pagamentos | null>(null)
+
+  const handleFullEdit = (pagamento: Pagamentos) => {
+    setSelectedPagamentoFull(pagamento)
+    setIsEditModalFullOpen(true)
+  }
+
   const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedData, handleItemsPerPageChange, getPageNumbers } = usePagination(data, 100)
 
   if (data.length === 0) {
@@ -125,6 +134,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                 <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[110px]">STATUS</TableHead>
                 <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[110px]">DATA</TableHead>
                 <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">VALOR</TableHead>
+                <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -257,6 +267,20 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                         {row.type === 'despesa' ? '-' : '+'} {formatCurrency(row.amount || 0)}
                     </div>
                   </TableCell>
+                
+                  {/* AÇÕES */}
+                  <TableCell className="py-3 text-right pr-4">
+                      {canEdit && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleFullEdit(row)}
+                          className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
+                          title="Editar Detalhes Completos"
+                        >
+                          <Pencil className="h-4 w-4 text-[#1E1E1E]" />
+                        </Button>
+                      )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -359,6 +383,17 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
             options={editConfig.options}
         />
       )}
+
+      <PagamentoEditModal 
+        isOpen={isEditModalFullOpen}
+        onClose={() => {
+            setIsEditModalFullOpen(false)
+            setSelectedPagamentoFull(null)
+        }}
+        pagamento={selectedPagamentoFull || undefined}
+        categories={categories}
+        accounts={accounts}
+      />
     </div>
   )
 }

@@ -34,7 +34,7 @@ export default async function PagamentosPage() {
         nome
       )
     `)
-    .order("date", { ascending: false })
+    .order("updated_at", { ascending: false })
 
   const {data: categoriasData} = await supabase.from("categories").select("id , name")
   const {data: accountsData} = await supabase.from("accounts").select("id, name")
