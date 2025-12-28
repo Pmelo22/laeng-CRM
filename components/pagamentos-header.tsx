@@ -1,0 +1,216 @@
+// src/components/pagamentos/pagamento-header.tsx
+"use client"
+
+import { Input } from "@/components/ui/input"
+import { Search, Filter, Wallet, TrendingUp, TrendingDown, LayoutDashboard, CheckCircle2, Clock, Banknote, Calendar, CreditCard, RotateCcw, Layers } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { formatCurrency } from "@/lib/financial"
+import type { FinancialMetrics } from "@/lib/types"
+import type { PaymentFiltersState } from "@/lib/payment-logic"
+
+const MONTHS = [
+  { value: "0", label: "Janeiro" }, { value: "1", label: "Fevereiro" },
+  { value: "2", label: "Março" }, { value: "3", label: "Abril" },
+  { value: "4", label: "Maio" }, { value: "5", label: "Junho" },
+  { value: "6", label: "Julho" }, { value: "7", label: "Agosto" },
+  { value: "8", label: "Setembro" }, { value: "9", label: "Outubro" },
+  { value: "10", label: "Novembro" }, { value: "11", label: "Dezembro" },
+]
+
+export type ViewMode = 'table' | 'report'
+
+interface PagamentoHeaderProps {
+  metrics: FinancialMetrics
+  searchTerm: string
+  setSearchTerm: (term: string) => void
+  viewMode: ViewMode
+  setViewMode: (mode: ViewMode) => void
+  filters: PaymentFiltersState
+  updateFilter: (key: keyof PaymentFiltersState, value: string) => void
+  clearFilters: () => void
+  availableYears: number[]
+  categories: { label: string; value: string }[]
+  accounts: { label: string; value: string }[]
+}
+
+export function PagamentoHeader({
+  metrics,
+  searchTerm,
+  setSearchTerm,
+  viewMode,
+  setViewMode,
+  filters,
+  updateFilter,
+  clearFilters,
+  availableYears,
+  categories,
+  accounts
+}: PagamentoHeaderProps) {
+
+  const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
+
+  return (
+    <div className="bg-[#1E1E1E] border-b-2 sm:border-b-4 border-[#F5C800] shadow-lg sticky top-0 z-30">
+      <div className="px-3 sm:px-6 lg:px-8 py-4">
+        
+        {/* Topo: Título e Saldo Principal */}
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight uppercase flex items-center gap-3">
+            <Wallet className="h-6 w-6 text-[#F5C800]" />
+            Gestão de Pagamentos
+          </h1>
+
+          <div className="flex flex-col items-start sm:items-end">
+             <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Saldo Realizado (Filtrado)</span>
+             <span className={`text-2xl sm:text-3xl font-bold ${metrics.saldoRealizado >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+               {formatCurrency(metrics.saldoRealizado)}
+             </span>
+          </div>
+        </div>
+
+        {/* Cards de Métricas */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
+          {/* Receitas */}
+          <div className="flex items-center bg-gray-800/50 rounded-lg p-1 border border-gray-700">
+             <Badge variant="outline" className="border-0 bg-transparent text-green-500 hover:bg-transparent font-bold">
+                <TrendingUp className="h-3 w-3 mr-1.5" /> Receitas
+             </Badge>
+             <div className="h-4 w-[1px] bg-gray-600 mx-1"></div>
+             <Badge className="bg-green-600/20 text-green-400 hover:bg-green-600/30 border-0 mr-1">
+                <CheckCircle2 className="h-3 w-3 mr-1" /> {formatCurrency(metrics.recPaga)}
+             </Badge>
+             <Badge className="bg-green-900/20 text-green-600 hover:bg-green-900/30 border-dashed border-green-800 border">
+                <Clock className="h-3 w-3 mr-1" /> {formatCurrency(metrics.recPendente)}
+             </Badge>
+          </div>
+
+          <span className="text-[#F5C800] hidden md:inline">•</span>
+
+          {/* Despesas */}
+          <div className="flex items-center bg-gray-800/50 rounded-lg p-1 border border-gray-700">
+             <Badge variant="outline" className="border-0 bg-transparent text-red-500 hover:bg-transparent font-bold">
+                <TrendingDown className="h-3 w-3 mr-1.5" /> Despesas
+             </Badge>
+             <div className="h-4 w-[1px] bg-gray-600 mx-1"></div>
+             <Badge className="bg-red-600/20 text-red-400 hover:bg-red-600/30 border-0 mr-1">
+                <CheckCircle2 className="h-3 w-3 mr-1" /> {formatCurrency(metrics.despPaga)}
+             </Badge>
+             <Badge className="bg-red-900/20 text-red-600 hover:bg-red-900/30 border-dashed border-red-800 border">
+                <Clock className="h-3 w-3 mr-1" /> {formatCurrency(metrics.despPendente)}
+             </Badge>
+          </div>
+          
+           <span className="text-gray-500 text-xs font-medium whitespace-nowrap ml-auto sm:ml-2">
+              {metrics.totalCount} lançamentos
+           </span>
+        </div>
+
+        {/* Área de Controles e Filtros */}
+        <div className="bg-gray-800/30 rounded-lg p-3 border border-gray-700 space-y-3">
+          
+          {/* Linha 1: Busca e Toggle View */}
+          <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 relative group">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#F5C800]" />
+                <Input
+                    placeholder="Buscar por descrição, cliente, categoria..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 h-10 bg-white border-0 text-gray-900 placeholder:text-gray-500 rounded-md shadow-sm"
+                />
+              </div>
+              
+              <div className="flex gap-2 w-full sm:w-auto">
+                  <Select value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
+                      <SelectTrigger className="w-full sm:w-[140px] h-10 bg-[#F5C800] text-[#1E1E1E] border-0 font-bold">
+                        <LayoutDashboard className="h-4 w-4 mr-2" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="table">Tabela</SelectItem>
+                        <SelectItem value="report">Relatórios</SelectItem>
+                      </SelectContent>
+                  </Select>
+                  
+                  {activeFiltersCount > 0 && (
+                      <Button variant="destructive" onClick={clearFilters} size="icon" className="h-10 w-10 shrink-0" title="Limpar Filtros">
+                          <RotateCcw className="h-4 w-4" />
+                      </Button>
+                  )}
+              </div>
+          </div>
+
+          {/* Linha 2: Grid de Selects */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+              
+              <FilterSelect value={filters.type} onChange={(v: string) => updateFilter('type', v)} placeholder="Tipo" icon={Filter}>
+                  <SelectItem value="all">Todos Tipos</SelectItem>
+                  <SelectItem value="receita">Receitas</SelectItem>
+                  <SelectItem value="despesa">Despesas</SelectItem>
+              </FilterSelect>
+
+              <FilterSelect value={filters.status} onChange={(v: string) => updateFilter('status', v)} placeholder="Status" icon={Banknote}>
+                  <SelectItem value="all">Todos Status</SelectItem>
+                  <SelectItem value="pago">Pago</SelectItem>
+                  <SelectItem value="not_pago">Pendente</SelectItem>
+              </FilterSelect>
+
+              <FilterSelect value={filters.month} onChange={(v: string) => updateFilter('month', v)} placeholder="Mês" icon={Calendar}>
+                  <SelectItem value="all">Todo Ano</SelectItem>
+                  {MONTHS.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+              </FilterSelect>
+
+              <FilterSelect value={filters.year} onChange={(v: string) => updateFilter('year', v)} placeholder="Ano" icon={Calendar}>
+                  <SelectItem value="all">Histórico</SelectItem>
+                  {availableYears.map(year => <SelectItem key={year} value={String(year)}>{year}</SelectItem>)}
+              </FilterSelect>
+
+               <FilterSelect value={filters.category} onChange={(v: string) => updateFilter('category', v)} placeholder="Categoria" icon={Layers}>
+                  <SelectItem value="all">Todas Cats.</SelectItem>
+                  {categories.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+              </FilterSelect>
+
+              <FilterSelect value={filters.account} onChange={(v: string) => updateFilter('account', v)} placeholder="Banco" icon={Wallet}>
+                  <SelectItem value="all">Todos Bancos</SelectItem>
+                  {accounts.map(a => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}
+              </FilterSelect>
+
+              <FilterSelect value={filters.method} onChange={(v: string) => updateFilter('method', v)} placeholder="Método" icon={CreditCard}>
+                  <SelectItem value="all">Todos Mét.</SelectItem>
+                  <SelectItem value="cartao_credito">Crédito</SelectItem>
+                  <SelectItem value="cartao_debito">Débito</SelectItem>
+                  <SelectItem value="boleto">Boleto</SelectItem>
+                  <SelectItem value="pix">PIX</SelectItem>
+                  <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                  <SelectItem value="transferencia">Transferência</SelectItem>
+              </FilterSelect>
+
+              <FilterSelect value={filters.installments} onChange={(v: string) => updateFilter('installments', v)} placeholder="Parcelas" icon={Layers}>
+                  <SelectItem value="all">Todas Parc.</SelectItem>
+                  <SelectItem value="single">Única (À vista)</SelectItem>
+                  <SelectItem value="multi">Parcelado (+1)</SelectItem>
+              </FilterSelect>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Pequeno helper local para reduzir repetição dos Selects
+function FilterSelect({ value, onChange, placeholder, icon: Icon, children }: any) {
+    return (
+        <Select value={value} onValueChange={onChange}>
+            <SelectTrigger className="bg-gray-700/50 border-gray-600 text-gray-200 h-9 text-xs">
+                <Icon className="h-3 w-3 mr-2 text-[#F5C800]" />
+                <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+                {children}
+            </SelectContent>
+        </Select>
+    )
+}
