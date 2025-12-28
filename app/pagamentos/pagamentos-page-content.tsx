@@ -7,14 +7,9 @@ import { Search, Filter, Wallet, TrendingUp, TrendingDown, LayoutDashboard, Tabl
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency } from "@/lib/financial"
-import type { Pagamentos, FinancialMetrics } from "@/lib/types"
+import type { Pagamentos, FinancialMetrics, Categories, Account } from "@/lib/types"
+import { PagamentosTableFull } from "@/components/pagamento-table-full"
 
-const PagamentosTableFull = ({ data }: { data: Pagamentos[] }) => (
-  <div className="p-4 text-center border-2 border-dashed border-gray-200 rounded-lg min-h-[300px] flex flex-col items-center justify-center text-gray-500">
-    <TableIcon className="h-10 w-10 mb-2 opacity-20" />
-    <p>Mockup: Tabela de Pagamentos ({data.length} registros)</p>
-  </div>
-)
 
 const PagamentosReportFull = ({ data }: { data: Pagamentos[] }) => (
   <div className="p-4 text-center border-2 border-dashed border-gray-200 rounded-lg min-h-[300px] flex flex-col items-center justify-center text-gray-500 bg-gray-50/50">
@@ -25,13 +20,15 @@ const PagamentosReportFull = ({ data }: { data: Pagamentos[] }) => (
 
 interface PagamentoPageContentProps {
   pagamentos: Pagamentos[]
+  categories: { label: string; value: string }[]
+  accounts: { label: string; value: string }[]
   metrics: FinancialMetrics
   userPermissions: Record<string, any>
 }
 
 type ViewMode = 'table' | 'report'
 
-export default function PagamentoPageContent({ pagamentos, metrics, userPermissions }: PagamentoPageContentProps) {
+export default function PagamentoPageContent({ pagamentos, metrics, categories, accounts, userPermissions }: PagamentoPageContentProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -195,17 +192,10 @@ export default function PagamentoPageContent({ pagamentos, metrics, userPermissi
 
       <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
         <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden min-h-[500px]">
-          <CardHeader className="bg-white border-b px-6 py-4 flex flex-row items-center justify-between">
-             <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                {viewMode === 'table' ? 'Lançamentos' : 'Visão Geral'}
-                <Badge variant="secondary" className="text-xs font-normal bg-gray-100 text-gray-500">
-                   {filteredPagamentos.length} items filtrados
-                </Badge>
-             </CardTitle>
-          </CardHeader>
+         
           <CardContent className="p-0">
             {viewMode === 'table' ? (
-              <PagamentosTableFull data={filteredPagamentos} />
+              <PagamentosTableFull data={filteredPagamentos} userPermissions={userPermissions} categories={categories} accounts={accounts} />
             ) : (
               <PagamentosReportFull data={filteredPagamentos} />
             )}

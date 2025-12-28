@@ -216,6 +216,7 @@ export interface PermissoesUsuario {
 
 export interface Pagamentos {
   id: string;
+  codigo: number;
   description?: string;
   amount?: number;
   type?: 'receita' | 'despesa',
@@ -233,6 +234,19 @@ export interface Pagamentos {
   account_name?: string; 
   cliente_nome?: string; 
   status?: 'pago' | 'not_pago'
+}
+
+export interface Account {
+  id?: string,
+  name?: string,
+  created_at?: string
+}
+
+export interface Categories {
+  id?: string,
+  name?: string,
+  type?: 'receita' | 'despesa',
+  created_at?: string
 }
 
 export interface FinancialMetrics {
