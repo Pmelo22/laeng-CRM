@@ -10,6 +10,7 @@ import { formatCurrency } from "@/lib/financial"
 import type { Pagamentos } from "@/lib/types"
 import { PagamentoQuickEditModal } from "./pagamento-quick-edit-modal"
 import { format } from "date-fns"
+import { usePagination } from "@/lib/table-utils"
 
 
 interface PagamentosTableFullProps {
@@ -54,8 +55,7 @@ const getTypeBadge = (type: string) => {
 }
 
 export function PagamentosTableFull({ data, userPermissions, categories, accounts}: PagamentosTableFullProps) {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(20)
+
   
   const [editConfig, setEditConfig] = useState<{
     isOpen: boolean
@@ -72,11 +72,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
     title: "",
     type: "text",
   })
-
-  const totalPages = Math.ceil(data.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedData = data.slice(startIndex, endIndex)
 
   const canEdit = userPermissions?.pagamentos?.edit ?? true
 
@@ -100,6 +95,8 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
     })
   }
 
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedData, handleItemsPerPageChange, getPageNumbers } = usePagination(data, 100)
+
   if (data.length === 0) {
     return (
         <div className="flex flex-col items-center justify-center p-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
@@ -108,6 +105,8 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
         </div>
     )
   }
+
+  
 
   return (
     <div className="space-y-4">
@@ -273,38 +272,63 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
           </span>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-gray-500 uppercase">Linhas:</span>
-            <Select value={String(itemsPerPage)} onValueChange={(v) => { setItemsPerPage(Number(v)); setCurrentPage(1); }}>
-              <SelectTrigger className="w-[60px] h-8 text-xs border-gray-200 focus:ring-[#F5C800] bg-white">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+          {/* Seletor de itens por página */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-muted-foreground whitespace-nowrap">
+              Pagamentos por página:
+            </span>
+            <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPageChange}>
+              <SelectTrigger className="w-[80px] h-9 border-[#F5C800]/30 focus:ring-[#F5C800] bg-background font-semibold">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
+              <SelectContent className="min-w-[80px]">
+                <SelectItem value="20" className="cursor-pointer font-semibold">20</SelectItem>
+                <SelectItem value="50" className="cursor-pointer font-semibold">50</SelectItem>
+                <SelectItem value="100" className="cursor-pointer font-semibold">100</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
+
+          {/* Navegação de páginas */}
           <div className="flex items-center gap-1">
             <Button
               variant="outline"
-              size="icon"
+              size="sm"
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 border-gray-200 hover:bg-[#F5C800] hover:text-white hover:border-[#F5C800]"
+              className="border-[#F5C800]/30 hover:bg-[#F5C800]/10 disabled:opacity-50 font-semibold"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-xs font-bold w-8 text-center">{currentPage}</span>
+
+            {getPageNumbers().map((page, index) => (
+              page === '...' ? (
+                <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground font-semibold">...</span>
+              ) : (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(page as number)}
+                  className={
+                    currentPage === page
+                      ? "bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold"
+                      : "border-[#F5C800]/30 hover:bg-[#F5C800]/10 font-semibold"
+                  }
+                >
+                  {page}
+                </Button>
+              )
+            ))}
+
             <Button
               variant="outline"
-              size="icon"
+              size="sm"
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="h-8 w-8 border-gray-200 hover:bg-[#F5C800] hover:text-white hover:border-[#F5C800]"
+              className="border-[#F5C800]/30 hover:bg-[#F5C800]/10 disabled:opacity-50 font-semibold"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
