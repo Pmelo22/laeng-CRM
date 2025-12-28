@@ -1,4 +1,3 @@
-// src/components/pagamentos/pagamento-header.tsx
 "use client"
 
 import { Input } from "@/components/ui/input"
@@ -55,7 +54,7 @@ export function PagamentoHeader({
     <div className="bg-[#1E1E1E] border-b-2 sm:border-b-4 border-[#F5C800] shadow-lg sticky top-0 z-30">
       <div className="px-3 sm:px-6 lg:px-8 py-4">
         
-        {/* Topo: Título e Saldo Principal */}
+        {/* Cabeçalho e Métricas (Sem alterações) */}
         <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight uppercase flex items-center gap-3">
             <Wallet className="h-6 w-6 text-[#F5C800]" />
@@ -70,9 +69,7 @@ export function PagamentoHeader({
           </div>
         </div>
 
-        {/* Cards de Métricas */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
-          {/* Receitas */}
           <div className="flex items-center bg-gray-800/50 rounded-lg p-1 border border-gray-700">
              <Badge variant="outline" className="border-0 bg-transparent text-green-500 hover:bg-transparent font-bold">
                 <TrendingUp className="h-3 w-3 mr-1.5" /> Receitas
@@ -88,7 +85,6 @@ export function PagamentoHeader({
 
           <span className="text-[#F5C800] hidden md:inline">•</span>
 
-          {/* Despesas */}
           <div className="flex items-center bg-gray-800/50 rounded-lg p-1 border border-gray-700">
              <Badge variant="outline" className="border-0 bg-transparent text-red-500 hover:bg-transparent font-bold">
                 <TrendingDown className="h-3 w-3 mr-1.5" /> Despesas
@@ -101,27 +97,28 @@ export function PagamentoHeader({
                 <Clock className="h-3 w-3 mr-1" /> {formatCurrency(metrics.despPendente)}
              </Badge>
           </div>
-          
            <span className="text-gray-500 text-xs font-medium whitespace-nowrap ml-auto sm:ml-2">
               {metrics.totalCount} lançamentos
            </span>
         </div>
 
-        {/* Área de Controles e Filtros */}
+        {/* --- ÁREA DE CONTROLES --- */}
         <div className="bg-gray-800/30 rounded-lg p-3 border border-gray-700 space-y-3">
           
-          {/* Linha 1: Busca e Toggle View */}
+          {/* LINHA 1: Busca e Botões de Ação */}
           <div className="flex flex-col sm:flex-row gap-3">
+              {/* Busca ocupa todo o espaço disponível */}
               <div className="flex-1 relative group">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#F5C800]" />
                 <Input
                     placeholder="Buscar por descrição, cliente, categoria..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-10 bg-white border-0 text-gray-900 placeholder:text-gray-500 rounded-md shadow-sm"
+                    className="pl-10 h-10 bg-white border-0 text-gray-900 placeholder:text-gray-500 rounded-md shadow-sm w-full"
                 />
               </div>
               
+              {/* Botões ficam à direita */}
               <div className="flex gap-2 w-full sm:w-auto">
                   <Select value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
                       <SelectTrigger className="w-full sm:w-[140px] h-10 bg-[#F5C800] text-[#1E1E1E] border-0 font-bold">
@@ -142,55 +139,55 @@ export function PagamentoHeader({
               </div>
           </div>
 
-          {/* Linha 2: Grid de Selects */}
+          {/* LINHA 2: Grid de Filtros (Abaixo da busca) */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
               
               <FilterSelect value={filters.type} onChange={(v: string) => updateFilter('type', v)} placeholder="Tipo" icon={Filter}>
-                  <SelectItem value="all">Todos Tipos</SelectItem>
+                  <SelectItem value="all">Tipos</SelectItem>
                   <SelectItem value="receita">Receitas</SelectItem>
                   <SelectItem value="despesa">Despesas</SelectItem>
               </FilterSelect>
 
               <FilterSelect value={filters.status} onChange={(v: string) => updateFilter('status', v)} placeholder="Status" icon={Banknote}>
-                  <SelectItem value="all">Todos Status</SelectItem>
+                  <SelectItem value="all">Status</SelectItem>
                   <SelectItem value="pago">Pago</SelectItem>
                   <SelectItem value="not_pago">Pendente</SelectItem>
               </FilterSelect>
 
               <FilterSelect value={filters.month} onChange={(v: string) => updateFilter('month', v)} placeholder="Mês" icon={Calendar}>
-                  <SelectItem value="all">Todo Ano</SelectItem>
+                  <SelectItem value="all">Mês</SelectItem>
                   {MONTHS.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
               </FilterSelect>
 
               <FilterSelect value={filters.year} onChange={(v: string) => updateFilter('year', v)} placeholder="Ano" icon={Calendar}>
-                  <SelectItem value="all">Histórico</SelectItem>
+                  <SelectItem value="all">Ano</SelectItem>
                   {availableYears.map(year => <SelectItem key={year} value={String(year)}>{year}</SelectItem>)}
               </FilterSelect>
 
                <FilterSelect value={filters.category} onChange={(v: string) => updateFilter('category', v)} placeholder="Categoria" icon={Layers}>
-                  <SelectItem value="all">Todas Cats.</SelectItem>
+                  <SelectItem value="all">Categorias</SelectItem>
                   {categories.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
               </FilterSelect>
 
               <FilterSelect value={filters.account} onChange={(v: string) => updateFilter('account', v)} placeholder="Banco" icon={Wallet}>
-                  <SelectItem value="all">Todos Bancos</SelectItem>
+                  <SelectItem value="all">Bancos</SelectItem>
                   {accounts.map(a => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}
               </FilterSelect>
 
               <FilterSelect value={filters.method} onChange={(v: string) => updateFilter('method', v)} placeholder="Método" icon={CreditCard}>
-                  <SelectItem value="all">Todos Mét.</SelectItem>
+                  <SelectItem value="all">Métodos</SelectItem>
                   <SelectItem value="cartao_credito">Crédito</SelectItem>
                   <SelectItem value="cartao_debito">Débito</SelectItem>
                   <SelectItem value="boleto">Boleto</SelectItem>
                   <SelectItem value="pix">PIX</SelectItem>
                   <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                  <SelectItem value="transferencia">Transferência</SelectItem>
+                  <SelectItem value="transferencia">Transferf.</SelectItem>
               </FilterSelect>
 
-              <FilterSelect value={filters.installments} onChange={(v: string) => updateFilter('installments', v)} placeholder="Parcelas" icon={Layers}>
-                  <SelectItem value="all">Todas Parc.</SelectItem>
-                  <SelectItem value="single">Única (À vista)</SelectItem>
-                  <SelectItem value="multi">Parcelado (+1)</SelectItem>
+              <FilterSelect value={filters.installments} onChange={(v: string) => updateFilter('installments', v)} placeholder="Parc." icon={Layers}>
+                  <SelectItem value="all">Parcelas</SelectItem>
+                  <SelectItem value="single">À vista</SelectItem>
+                  <SelectItem value="multi">Parcelado</SelectItem>
               </FilterSelect>
 
           </div>
@@ -200,13 +197,16 @@ export function PagamentoHeader({
   )
 }
 
-// Pequeno helper local para reduzir repetição dos Selects
 function FilterSelect({ value, onChange, placeholder, icon: Icon, children }: any) {
     return (
         <Select value={value} onValueChange={onChange}>
-            <SelectTrigger className="bg-gray-700/50 border-gray-600 text-gray-200 h-9 text-xs">
-                <Icon className="h-3 w-3 mr-2 text-[#F5C800]" />
-                <SelectValue placeholder={placeholder} />
+            <SelectTrigger className="bg-gray-700/50 border-gray-600 text-gray-200 h-10 text-xs w-full px-2">
+                 <div className="flex items-center truncate">
+                    <Icon className="h-3 w-3 mr-2 text-[#F5C800] shrink-0" />
+                    <span className="truncate block text-left">
+                        <SelectValue placeholder={placeholder} />
+                    </span>
+                </div>
             </SelectTrigger>
             <SelectContent>
                 {children}
