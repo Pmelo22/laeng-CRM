@@ -46,21 +46,13 @@ export default async function PagamentosPage() {
     cliente_nome: transaction.clientes?.nome || null 
   }));
 
-  const categories: Categories[] = categoriasData || []
-
   const categoryOptions = categoriasData?.map((cat) => ({label: cat.name, value: cat.id })) || []
 
   const accountOptions = accountsData?.map((cat) => ({label: cat.name, value: cat.id })) || []
 
   console.log(categoryOptions)
 
-  const accounts: Account[] = accountsData || []
-
-  const metrics = calculateFinancialMetrics(pagamentos)
-
-  console.log(pagamentos)
-  console.log(categories)
-  console.log(accounts)
+  const metrics = calculateFinancialMetrics(pagamentos) 
 
   return <PagamentosPageContent metrics={metrics} pagamentos={pagamentos} categories={categoryOptions} accounts={accountOptions} userPermissions={userPermissions} />
 }

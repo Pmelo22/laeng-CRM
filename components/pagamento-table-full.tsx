@@ -27,7 +27,7 @@ const getMethodLabel = (method: string) => {
     cartao_debito: "Débito",
     boleto: "Boleto",
     pix: "PIX",
-    dinheiro: "Dinheiro",
+    dinheiro: "Dinheiro", 
     transferencia: "Transf.",
   }
   return map[method] || method

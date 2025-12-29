@@ -88,9 +88,6 @@ export function PagamentoQuickEditModal({
 
   const renderInput = () => {
 
-    //Debug
-    console.log(type)
-
     switch (type) {
       case "money":
         return (
