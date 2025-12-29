@@ -245,6 +245,7 @@ export interface PaymentFiltersState {
   installments: string
   month: string
   year: string
+  week: string
 }
 
 export interface Account {

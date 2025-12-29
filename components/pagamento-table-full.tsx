@@ -94,6 +94,8 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
       type,
       options,
     })
+
+  console.log(row.date)
   }
 
   const [isEditModalFullOpen, setIsEditModalFullOpen] = useState(false)
@@ -254,10 +256,14 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                         className={`text-xs font-medium text-gray-600 flex items-center justify-center gap-1.5 whitespace-nowrap ${canEdit ? 'cursor-pointer hover:text-[#F5C800]' : ''}`}
                     >
                         <CalendarDays className="h-3 w-3 text-gray-400" />
-                        {row.date ? format(new Date(row.date), "dd/MM/yy") : "-"}
+                  
+                        {row.date ? (() => {
+                            const [ano, mes, dia] = row.date.split('T')[0].split('-');
+                    
+                            return `${mes}/${dia}/${ano}`;
+                        })() : "-"}
                     </div>
                   </TableCell>
-
                   {/* VALOR */}
                   <TableCell className="text-right pr-6 p-2">
                     <div

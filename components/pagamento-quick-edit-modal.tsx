@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { formatMoneyInput, parseMoneyInput } from "@/lib/utils" // Assumindo que existam no seu projeto
+import { formatMoneyInput, parseMoneyInput } from "@/lib/utils" 
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -43,6 +43,7 @@ export function PagamentoQuickEditModal({
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSave = async () => {
+
     setIsLoading(true)
     try {
       const supabase = createClient()
@@ -58,6 +59,11 @@ export function PagamentoQuickEditModal({
       } else {
         updates[fieldName] = value
       }
+      
+
+      console.log("1. Valor bruto no estado (value):", value)
+      console.log("2. Tipo do dado:", typeof value)
+      console.log("3. Objeto final enviado ao Supabase (updates):", updates)
 
       const { error } = await supabase
         .from("transactions") 

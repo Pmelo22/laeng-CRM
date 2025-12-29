@@ -7,7 +7,7 @@ import { calculateFinancialMetrics } from "@/lib/financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { PagamentosTableFull } from "@/components/pagamento-table-full"
 import { PagamentoHeader, ViewMode } from "@/components/pagamento-header"
-import { filterPayments, getAvailableYears, INITIAL_FILTERS } from "@/lib/payment-filter-logic"
+import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/lib/payment-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
 
 // Componente Placeholder para Relatório
@@ -38,6 +38,8 @@ export default function PagamentoPageContent({
   const [filters, setFilters] = useState<PaymentFiltersState>(INITIAL_FILTERS)
 
   const availableYears = useMemo(() => getAvailableYears(pagamentos), [pagamentos])
+  const availableMonth = useMemo(() => getAvailableMonth(pagamentos), [pagamentos])
+  const availableWeeks = useMemo(() => getAvailableWeek(pagamentos), [pagamentos])
 
   const filteredPagamentos = useMemo(() => {
     return filterPayments(pagamentos, filters, searchTerm)
@@ -70,6 +72,8 @@ export default function PagamentoPageContent({
         updateFilter={updateFilter}
         clearFilters={clearFilters}
         availableYears={availableYears}
+        availableMonth={availableMonth}
+        availableWeeks={availableWeeks}
         categories={categories}
         accounts={accounts}
       />

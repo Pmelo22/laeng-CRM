@@ -29,6 +29,8 @@ interface PagamentoHeaderProps {
   updateFilter: (key: keyof PaymentFiltersState, value: string) => void
   clearFilters: () => void
   availableYears: number[]
+  availableMonth: number[]
+  availableWeeks: number[]
   categories: { label: string; value: string }[]
   accounts: { label: string; value: string }[]
 }
@@ -43,6 +45,8 @@ export function PagamentoHeader({
   updateFilter,
   clearFilters,
   availableYears,
+  availableMonth,
+  availableWeeks,
   categories,
   accounts
 }: PagamentoHeaderProps) {
@@ -139,7 +143,7 @@ export function PagamentoHeader({
           </div>
 
           {/* LINHA 2: Grid de Filtros (Abaixo da busca) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-2">
               
               <FilterSelect value={filters.type} onChange={(v: string) => updateFilter('type', v)} placeholder="Tipo" icon={Filter}>
                   <SelectItem value="all">Tipos</SelectItem>
@@ -153,9 +157,14 @@ export function PagamentoHeader({
                   <SelectItem value="not_pago">Pendente</SelectItem>
               </FilterSelect>
 
+              <FilterSelect value={filters.week} onChange={(v: string) => updateFilter('week', v)} placeholder="Semana" icon={Calendar}>
+                  <SelectItem value="all">Semanas</SelectItem>
+                  {availableWeeks.map(week => <SelectItem key={week} value={String(week)}>{week}ª Semana</SelectItem>)}
+              </FilterSelect>
+
               <FilterSelect value={filters.month} onChange={(v: string) => updateFilter('month', v)} placeholder="Mês" icon={Calendar}>
-                  <SelectItem value="all">Mês</SelectItem>
-                  {MONTHS.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                  <SelectItem value="all">  Meses</SelectItem>
+                  {availableMonth.map(monthIndex => (<SelectItem key={monthIndex} value={String(monthIndex)}>{MONTHS[monthIndex]?.label || monthIndex} </SelectItem> ))}
               </FilterSelect>
 
               <FilterSelect value={filters.year} onChange={(v: string) => updateFilter('year', v)} placeholder="Ano" icon={Calendar}>

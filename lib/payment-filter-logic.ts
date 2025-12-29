@@ -1,4 +1,4 @@
-import { getMonth, getYear, parseISO } from "date-fns"
+import { getMonth, getWeekOfMonth, getYear, parseISO } from "date-fns"
 import type { Pagamentos, PaymentFiltersState } from "@/lib/types"
 
 export const INITIAL_FILTERS: PaymentFiltersState = {
@@ -9,7 +9,8 @@ export const INITIAL_FILTERS: PaymentFiltersState = {
   method: "all",
   installments: "all",
   month: "all",
-  year: "all"
+  year: "all",
+  week: "all"
 }
 
 // Extrai os anos únicos disponíveis nos pagamentos para o dropdown
@@ -18,6 +19,20 @@ export function getAvailableYears(pagamentos: Pagamentos[]): number[] {
     pagamentos.map(p => p.date ? getYear(parseISO(p.date)) : new Date().getFullYear())
   )
   return Array.from(years).sort((a, b) => b - a)
+}
+
+export function getAvailableMonth(pagamentos: Pagamentos[]): number[] {
+  const month = new Set(
+    pagamentos.map(p => p.date ? getMonth(parseISO(p.date)) : new Date().getMonth())
+  )
+  return Array.from(month).sort((a, b) => a - b)
+}
+
+export function getAvailableWeek(pagamentos: Pagamentos[]): number[] {
+  const week = new Set(
+    pagamentos.map(p => p.date ? getWeekOfMonth(parseISO(p.date)) : 1)
+  )
+  return Array.from(week).sort((a, b) => a - b)
 }
 
 // Main Function
@@ -77,8 +92,9 @@ function matchesInstallments(pg: Pagamentos, filterValue: string): boolean {
 function matchesDate(pg: Pagamentos, filters: PaymentFiltersState): boolean {
   const hasYearFilter = filters.year !== 'all'
   const hasMonthFilter = filters.month !== 'all'
+  const hasWeekFilter = filters.week !== 'all'
 
-  if (!hasYearFilter && !hasMonthFilter) return true
+  if (!hasYearFilter && !hasMonthFilter && !hasWeekFilter) return true
 
   if (!pg.date) return false
 
@@ -86,6 +102,8 @@ function matchesDate(pg: Pagamentos, filters: PaymentFiltersState): boolean {
 
   if (hasYearFilter && getYear(dateObj) !== parseInt(filters.year)) return false
   if (hasMonthFilter && getMonth(dateObj) !== parseInt(filters.month)) return false
+  
+  if (hasWeekFilter && getWeekOfMonth(dateObj) !== parseInt(filters.week)) return false
 
   return true
 }

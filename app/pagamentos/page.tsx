@@ -50,7 +50,7 @@ export default async function PagamentosPage() {
 
   const accountOptions = accountsData?.map((cat) => ({label: cat.name, value: cat.id })) || []
 
-  console.log(categoryOptions)
+  console.log(pagamentos)
 
   const metrics = calculateFinancialMetrics(pagamentos) 
 
