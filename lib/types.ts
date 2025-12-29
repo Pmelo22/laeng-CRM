@@ -236,6 +236,17 @@ export interface Pagamentos {
   status?: 'pago' | 'not_pago'
 }
 
+export interface PaymentFiltersState {
+  type: string
+  status: string
+  category: string
+  account: string
+  method: string
+  installments: string
+  month: string
+  year: string
+}
+
 export interface Account {
   id?: string,
   name?: string,
@@ -258,4 +269,3 @@ export interface FinancialMetrics {
   saldoRealizado: number;
   saldoPrevisto: number;
 }
-

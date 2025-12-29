@@ -21,12 +21,9 @@ export const calculateFinancialMetrics = (transactions: Pagamentos[]): Financial
   const metrics = transactions.reduce((acc, p) => {
     const valor = Number(p.amount) || 0; 
     
-    const statusNormalized = p.status?.toLowerCase() || '';
-    const typeNormalized = p.type?.toLowerCase() || '';
-
-    const isPago = statusNormalized === 'pago';
-    const isReceita = typeNormalized === 'receita';
-    const isDespesa = typeNormalized === 'despesa';
+    const isPago = p.status === 'pago';
+    const isReceita = p.type === 'receita';
+    const isDespesa = p.type === 'despesa';
 
     if (isReceita) {
       if (isPago) acc.recPaga += valor;

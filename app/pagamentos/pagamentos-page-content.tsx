@@ -7,7 +7,8 @@ import { calculateFinancialMetrics } from "@/lib/financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { PagamentosTableFull } from "@/components/pagamento-table-full"
 import { PagamentoHeader, ViewMode } from "@/components/pagamentos-header"
-import { filterPayments, getAvailableYears, INITIAL_FILTERS, type PaymentFiltersState } from "@/lib/payment-logic"
+import { filterPayments, getAvailableYears, INITIAL_FILTERS } from "@/lib/payment-logic"
+import { PaymentFiltersState } from "@/lib/types"
 
 // Componente Placeholder para Relatório
 const PagamentosReportFull = ({ data }: { data: Pagamentos[] }) => (
