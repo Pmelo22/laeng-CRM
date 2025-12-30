@@ -154,6 +154,18 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                                     {row.category_name || "Geral"}
                                 </span>
                             </div>
+                        </div>
+                    </TableCell>
+                  
+                  {/* SUBCATEGORIA */}
+                  <TableCell> 
+                        <div className="flex items-center justify-between gap-1.5 relative group/cat">
+                            <div className="flex items-center gap-1.5">
+                                <Tag className="h-3 w-3 text-gray-400" />
+                                <span className="text-sm font-medium text-gray-600 truncate max-w-[120px]" title={row.subcategory_name}>
+                                    {row.subcategory_name || "Geral"}
+                                </span>
+                            </div>
                             
                             {/* Edição*/}
                             {canEdit && (
@@ -163,7 +175,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                                         "subcategories_id",
                                         "Classificação", 
                                         "category_tree", 
-                                        subcategories, 
+                                        subcategories as any, 
                                         undefined 
                                     )}
                                     className="opacity-0 group-hover/cat:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-[#F5C800]"
@@ -172,16 +184,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                                     <ListTree className="h-4 w-4" />
                                 </button>
                             )}
-                        </div>
-                    </TableCell>
-                  
-                  {/* SUBCATEGORIA */}
-                    <TableCell> 
-                        <div className="flex items-center gap-1.5">
-                            <Tags className="h-3 w-3 text-gray-400" />
-                            <span className="text-sm font-medium text-gray-600 truncate max-w-[140px]" title={row.subcategory_name}>
-                                {row.subcategory_name || "Geral"}
-                            </span>
                         </div>
                     </TableCell>
                   

@@ -14,7 +14,7 @@ interface PagamentosEditModalProps {
   onClose: () => void
   pagamento?: Pagamentos
   categories: { label: string; value: string }[]
-  subcategories: { label: string; value: string }[]
+  subcategories: { id: string; name: string ; categories_id: string}[]
   accounts: { label: string; value: string }[]
 }
 

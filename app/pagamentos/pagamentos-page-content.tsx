@@ -22,7 +22,7 @@ interface PagamentosPageContentProps {
   pagamentos: Pagamentos[]
   categories: { label: string; value: string }[]
   accounts: { label: string; value: string }[]
-  subcategories: { label: string; value: string }[]
+  subcategories: { id: string; name: string ; categories_id: string}[]
   metrics: FinancialMetrics 
   userPermissions: Record<string, any>
 }

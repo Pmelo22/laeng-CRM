@@ -66,7 +66,5 @@ export default async function PagamentosPage() {
 
   const metrics = calculateFinancialMetrics(pagamentos) 
 
-  //Antes, subcategory estava mapeando um objeto com label: value:. Agora eu tenho um objeto id: name: categories_id
-
   return <PagamentosPageContent metrics={metrics} pagamentos={pagamentos} categories={categoryOptions} subcategories={subcategoriasData || []} accounts={accountOptions} userPermissions={userPermissions} />
 }
