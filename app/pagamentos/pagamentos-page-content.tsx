@@ -22,6 +22,7 @@ interface PagamentoPageContentProps {
   pagamentos: Pagamentos[]
   categories: { label: string; value: string }[]
   accounts: { label: string; value: string }[]
+  subcategories: { label: string; value: string }[]
   metrics: FinancialMetrics 
   userPermissions: Record<string, any>
 }
@@ -29,6 +30,7 @@ interface PagamentoPageContentProps {
 export default function PagamentoPageContent({ 
   pagamentos, 
   categories, 
+  subcategories,
   accounts, 
   userPermissions 
 }: PagamentoPageContentProps) {
@@ -75,6 +77,7 @@ export default function PagamentoPageContent({
         availableMonth={availableMonth}
         availableWeeks={availableWeeks}
         categories={categories}
+        subcategories={subcategories}
         accounts={accounts}
       />
 
@@ -86,6 +89,7 @@ export default function PagamentoPageContent({
                 data={filteredPagamentos} 
                 userPermissions={userPermissions} 
                 categories={categories} 
+                subcategories={subcategories}
                 accounts={accounts} 
               />
             ) : (

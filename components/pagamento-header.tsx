@@ -32,6 +32,7 @@ interface PagamentoHeaderProps {
   availableMonth: number[]
   availableWeeks: number[]
   categories: { label: string; value: string }[]
+  subcategories: { label: string; value: string }[]
   accounts: { label: string; value: string }[]
 }
 
@@ -48,6 +49,7 @@ export function PagamentoHeader({
   availableMonth,
   availableWeeks,
   categories,
+  subcategories,
   accounts
 }: PagamentoHeaderProps) {
 

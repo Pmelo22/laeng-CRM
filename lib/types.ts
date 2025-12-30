@@ -231,6 +231,7 @@ export interface Pagamentos {
   created_at?: string,
   updated_at?: string, 
   category_name?: string;
+  subcategory_name?: string;
   account_name?: string; 
   cliente_nome?: string; 
   status?: 'pago' | 'not_pago'

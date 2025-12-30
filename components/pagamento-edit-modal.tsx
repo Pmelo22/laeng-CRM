@@ -17,6 +17,7 @@ interface PagamentoEditModalProps {
   onClose: () => void
   pagamento?: Pagamentos
   categories: { label: string; value: string }[]
+  subcategories: { label: string; value: string }[]
   accounts: { label: string; value: string }[]
 }
 
@@ -25,6 +26,7 @@ export function PagamentoEditModal({
   onClose, 
   pagamento, 
   categories, 
+  subcategories,
   accounts 
 }: PagamentoEditModalProps) {
 

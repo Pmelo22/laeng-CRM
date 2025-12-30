@@ -5,19 +5,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil } from "lucide-react"
+import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil, Tags } from "lucide-react"
 import { formatCurrency } from "@/lib/financial"
 import type { Pagamentos } from "@/lib/types"
 import { PagamentoQuickEditModal } from "./pagamento-quick-edit-modal"
-import { format } from "date-fns"
 import { usePagination } from "@/lib/table-utils"
 import { PagamentoEditModal } from "./pagamento-edit-modal"
-
 
 interface PagamentosTableFullProps {
   data: Pagamentos[]
   categories: { label: string; value: string }[]
   accounts: { label: string; value: string }[]
+  subcategories: { label: string; value: string }[]
   userPermissions?: Record<string, any>
 }
 
@@ -55,8 +54,7 @@ const getTypeBadge = (type: string) => {
     return <Badge className="bg-rose-500 hover:bg-rose-600 h-6">Despesa</Badge>
 }
 
-export function PagamentosTableFull({ data, userPermissions, categories, accounts}: PagamentosTableFullProps) {
-
+export function PagamentosTableFull({ data, userPermissions, categories, accounts, subcategories}: PagamentosTableFullProps) {
   
   const [editConfig, setEditConfig] = useState<{
     isOpen: boolean
@@ -94,8 +92,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
       type,
       options,
     })
-
-  console.log(row.date)
   }
 
   const [isEditModalFullOpen, setIsEditModalFullOpen] = useState(false)
@@ -106,7 +102,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
     setIsEditModalFullOpen(true)
   }
 
-  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData: paginatedData, handleItemsPerPageChange, getPageNumbers } = usePagination(data, 100)
+  const { currentPage, setCurrentPage, itemsPerPage, totalPages, startIndex, endIndex, paginatedData, handleItemsPerPageChange, getPageNumbers } = usePagination(data, 100)
 
   if (data.length === 0) {
     return (
@@ -117,8 +113,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
     )
   }
 
-  
-
   return (
     <div className="space-y-4">
       <div className="rounded-xl border-2 border-[#F5C800]/20 overflow-hidden shadow-sm bg-white">
@@ -128,6 +122,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
               <TableRow className="hover:bg-[#1E1E1E] border-b border-gray-700">
                 <TableHead className="text-[#F5C800] font-bold py-3 pl-4 w-[70px]">CÓD.</TableHead>
                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">CATEGORIA</TableHead>
+                <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">SUBCATEGORIA</TableHead>
                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">BANCO</TableHead>
                 <TableHead className="text-[#F5C800] font-bold py-3 min-w-[200px]">DESCRIÇÃO</TableHead>
                 <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[100px]">TIPO</TableHead>
@@ -143,14 +138,12 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
               {paginatedData.map((row) => (
                 <TableRow key={row.id} className="hover:bg-[#F5C800]/5 border-b border-gray-100 transition-colors h-[60px]">
                   
-                  {/* CÓDIGO */}
                     <TableCell className="py-3 pl-4">
                     <Badge className="font-mono bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold text-xs px-2 py-1">
                          #{String(row.codigo || 0).padStart(3, '0')}
                     </Badge>
                     </TableCell>
     
-                  {/* CATEGORIA */}
                     <TableCell> 
                     <div className="flex items-center gap-1.5">
                         <Tag className="h-3 w-3 text-gray-400" />
@@ -165,8 +158,22 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                         </div>
                     </div>
                 </TableCell>
-                
-                {/* BANCOS */}
+
+                    <TableCell> 
+                    <div className="flex items-center gap-1.5">
+                        <Tags className="h-3 w-3 text-gray-400" />
+                        <div 
+                            onClick={() => handleEdit( row, "subcategories_id", "SubCategoria", "select", subcategories
+                            )}
+                            className={`flex flex-col justify-center max-w-[250px] ${canEdit ? 'cursor-pointer group' : ''}`}
+                        >
+                        <span className="text-sm font-medium text-gray-600 truncate max-w-[140px]" title={row.subcategory_name}>
+                            {row.subcategory_name || "Geral"}
+                        </span>
+                        </div>
+                    </div>
+                </TableCell>
+
                     <TableCell> 
                     <div className="flex items-center gap-1.5">
                         <Landmark className="h-3 w-3 text-gray-400" />
@@ -182,8 +189,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                 </TableCell>
 
-            
-                  {/* DESCRIÇÃO E CLIENTE */}
                   <TableCell>
                     <div 
                         onClick={() => handleEdit(row, "description", "Descrição", "text")}
@@ -196,7 +201,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
 
-                  {/* TIPO */}
                   <TableCell className="text-center p-2">
                     <div 
                         onClick={() => handleEdit(row, "type", "Tipo", "select", [
@@ -209,7 +213,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
 
-                  {/* MÉTODO */}
                   <TableCell className="text-center p-2">
                      <div 
                         onClick={() => handleEdit(row, "method", "Forma de Pagamento", "select", [
@@ -226,7 +229,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
 
-                  {/* PARCELAS */}
                   <TableCell className="text-center p-2">
                     <div
                         onClick={() => handleEdit(row, "installments_current", "Parcelas", "installments", undefined, "installments_total")}
@@ -236,7 +238,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
 
-                  {/* STATUS */}
                   <TableCell className="text-center p-2">
                     <div 
                         onClick={() => handleEdit(row, "status", "Status", "select", [
@@ -249,7 +250,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
 
-                  {/* DATA */}
                   <TableCell className="text-center p-2">
                     <div
                         onClick={() => handleEdit(row, "date", "Data", "date")}
@@ -264,7 +264,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                         })() : "-"}
                     </div>
                   </TableCell>
-                  {/* VALOR */}
+                  
                   <TableCell className="text-right pr-6 p-2">
                     <div
                         onClick={() => handleEdit(row, "amount", "Valor", "money")}
@@ -274,7 +274,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
                 
-                  {/* AÇÕES */}
                   <TableCell className="py-3 text-right pr-4">
                       {canEdit && (
                         <Button
@@ -294,7 +293,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
         </div>
       </div>
 
-      {/* Controles de Paginação */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-2 py-4">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground font-semibold">
@@ -303,7 +301,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
-          {/* Seletor de itens por página */}
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold text-muted-foreground whitespace-nowrap">
               Pagamentos por página:
@@ -320,8 +317,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
             </Select>
           </div>
 
-
-          {/* Navegação de páginas */}
           <div className="flex items-center gap-1">
             <Button
               variant="outline"
@@ -366,7 +361,6 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
         </div>
       </div>
 
-      {/* Modal de Edição */}
       {editConfig.isOpen && editConfig.row && (
         <PagamentoQuickEditModal
             isOpen={editConfig.isOpen}
@@ -398,6 +392,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
         }}
         pagamento={selectedPagamentoFull || undefined}
         categories={categories}
+        subcategories={subcategories}
         accounts={accounts}
       />
     </div>
