@@ -1,7 +1,7 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
-import { Search, Filter, Wallet, TrendingUp, TrendingDown, LayoutDashboard, CheckCircle2, Clock, Banknote, Calendar, CreditCard, RotateCcw, Layers } from "lucide-react"
+import { Search, Filter, Wallet, TrendingUp, TrendingDown, LayoutDashboard, CheckCircle2, Clock, Banknote, Calendar, CreditCard, RotateCcw, Layers, Plus } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -34,6 +34,7 @@ interface PagamentosHeaderProps {
   categories: { label: string; value: string }[]
   subcategories: { id: string; name: string ; categories_id: string}[]
   accounts: { label: string; value: string }[]
+  onNewPayment: () => void
 }
 
 export function PagamentosHeader({
@@ -49,7 +50,7 @@ export function PagamentosHeader({
   availableMonth,
   availableWeeks,
   categories,
-  subcategories,
+  onNewPayment,
   accounts
 }: PagamentosHeaderProps) {
 
@@ -125,8 +126,15 @@ export function PagamentosHeader({
               
               {/* Botões ficam à direita */}
               <div className="flex gap-2 w-full sm:w-auto">
+
+                  <Button 
+                  onClick={onNewPayment}
+                  className="h-9 bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
+                  <Plus className="h-4 w-4 mr-2" />Novo
+                  </Button>
+      
                   <Select value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
-                      <SelectTrigger className="w-full sm:w-[140px] h-10 bg-[#F5C800] text-[#1E1E1E] border-0 font-bold">
+                      <SelectTrigger className="w-full sm:w-[140px] h-10 bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] border-0 font-bold">
                         <LayoutDashboard className="h-4 w-4 mr-2" />
                         <SelectValue />
                       </SelectTrigger>

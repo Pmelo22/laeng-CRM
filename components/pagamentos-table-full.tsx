@@ -18,6 +18,7 @@ interface PagamentosTableFullProps {
   accounts: { label: string; value: string }[]
   subcategories: { id: string; name: string ; categories_id: string}[]
   userPermissions?: Record<string, any>
+  onEdit: (payment: Pagamentos) => void
 }
 
 const getMethodLabel = (method: string) => {

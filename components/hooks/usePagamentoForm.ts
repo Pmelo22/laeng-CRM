@@ -30,7 +30,7 @@ const INITIAL_STATE: FormData = {
   method: "pix",
   status: "not_pago",
   category_id: "",
-  subcategories_id: "", // Inicializa vazio
+  subcategories_id: "", 
   account_id: "",
   installments_current: 1,
   installments_total: 1,
@@ -39,7 +39,7 @@ const INITIAL_STATE: FormData = {
 export function usePagamentoForm(
   isOpen: boolean, 
   onClose: () => void, 
-  pagamento?: Pagamentos
+  pagamento?: Pagamentos | null 
 ) {
   const { toast } = useToast()
   const router = useRouter()
@@ -64,7 +64,7 @@ export function usePagamentoForm(
         installments_current: pagamento.installments_current || 1,
         installments_total: pagamento.installments_total || 1,
       })
-    } else if (!isOpen) {
+    } else {
       setFormData(INITIAL_STATE)
     }
   }, [isOpen, pagamento])
@@ -87,41 +87,60 @@ export function usePagamentoForm(
     setFormData(prev => ({ ...prev, amount: parseMoneyInput(value) }))
   }
 
-  // 3. Função de Salvar
+  // 3. Função de Salvar (Create ou Update)
   const savePagamento = async () => {
-    if (!pagamento) return
-
     setIsLoading(true)
     try {
-      // Prepara objeto para envio (null se string vazia)
+
       const payload = {
-          ...formData,
-          category_id: formData.category_id || null,
+          description: formData.description,
+          amount: formData.amount,
+          date: formData.date,
+          type: formData.type,
+          method: formData.method,
+          status: formData.status,
           subcategories_id: formData.subcategories_id || null,
           account_id: formData.account_id || null,
+          installments_current: formData.installments_current,
+          installments_total: formData.installments_total,
           updated_at: new Date().toISOString()
       }
 
-      const { error } = await supabase
-        .from("transactions") 
-        .update(payload)
-        .eq("id", pagamento.id)
+      let error;
+
+      if (pagamento?.id) {
+        // --- UPDATE ---
+        const result = await supabase
+          .from("transactions") 
+          .update(payload)
+          .eq("id", pagamento.id)
+        error = result.error
+      } else {
+        // --- INSERT ---
+        const result = await supabase
+          .from("transactions")
+          .insert({
+            ...payload,
+            created_at: new Date().toISOString() 
+          })
+        error = result.error
+      }
 
       if (error) throw error
 
       toast({
-        title: "✅ Pagamento atualizado!",
+        title: pagamento ? "✅ Pagamento atualizado!" : "✅ Pagamento criado!",
         description: "Os dados foram salvos com sucesso.",
         duration: 3000,
       })
 
       onClose()
       router.refresh()
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
       toast({
-        title: "❌ Erro ao atualizar",
-        description: "Ocorreu um erro ao salvar os dados.",
+        title: "❌ Erro ao salvar",
+        description: error.message || "Ocorreu um erro ao salvar os dados.",
         variant: "destructive",
         duration: 3000,
       })
