@@ -59,7 +59,7 @@ export function PagamentosHeader({
     <div className="bg-[#1E1E1E] border-b-2 sm:border-b-4 border-[#F5C800] shadow-lg sticky top-0 z-30">
       <div className="px-3 sm:px-6 lg:px-8 py-4">
         
-        {/* Cabeçalho e Métricas (Sem alterações) */}
+        {/* Cabeçalho e Métricas*/}
         <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight uppercase flex items-center gap-3">
             <Wallet className="h-6 w-6 text-[#F5C800]" />

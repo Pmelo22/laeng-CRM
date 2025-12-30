@@ -1,16 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
-import { createClient } from "@/lib/supabase/client"
+import { formatMoneyInput } from "@/lib/utils" 
 import type { Pagamentos } from "@/lib/types"
-import { useRouter } from "next/navigation"
-import { formatMoneyInput, parseMoneyInput } from "@/lib/utils" 
+import { usePagamentoForm } from "./hooks/usePagamentoForm"
 
 interface PagamentosEditModalProps {
   isOpen: boolean
@@ -30,88 +27,13 @@ export function PagamentosEditModal({
   accounts 
 }: PagamentosEditModalProps) {
 
-  const { toast } = useToast()
-  const router = useRouter()
-  const supabase = createClient()
-  const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    description: "",
-    amount: 0,
-    date: "",
-    type: "despesa",
-    method: "pix",
-    status: "not_pago",
-    category_id: "",
-    account_id: "",
-    installments_current: 1,
-    installments_total: 1,
-  })
-
-  useEffect(() => {
-    if (isOpen && pagamento) {
-      setFormData({
-        description: pagamento.description || "",
-        amount: Number(pagamento.amount) || 0,
-        date: pagamento.date ? new Date(pagamento.date).toISOString().split('T')[0] : "",
-        type: pagamento.type || "despesa",
-        method: pagamento.method || "pix",
-        status: pagamento.status || "not_pago",
-        category_id: pagamento.category_id || "",
-        account_id: pagamento.account_id || "",
-        installments_current: pagamento.installments_current || 1,
-        installments_total: pagamento.installments_total || 1,
-      })
-    }
-  }, [isOpen, pagamento])
-
-  const handleSave = async () => {
-    if (!pagamento) return
-
-    setIsLoading(true)
-    try {
-      const { error } = await supabase
-        .from("transactions") 
-        .update({
-          description: formData.description,
-          amount: formData.amount,
-          date: formData.date,
-          type: formData.type,
-          method: formData.method,
-          status: formData.status,
-          category_id: formData.category_id || null,
-          account_id: formData.account_id || null,
-          installments_current: formData.installments_current,
-          installments_total: formData.installments_total,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", pagamento.id)
-
-      if (error) throw error
-
-      toast({
-        title: "✅ Pagamento atualizado!",
-        description: "Os dados foram salvos com sucesso.",
-        duration: 3000,
-      })
-
-      onClose()
-      router.refresh()
-    } catch (error) {
-      console.error(error)
-      toast({
-        title: "❌ Erro ao atualizar",
-        description: "Ocorreu um erro ao salvar os dados.",
-        variant: "destructive",
-        duration: 3000,
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleMoneyChange = (value: string) => {
-    setFormData(prev => ({ ...prev, amount: parseMoneyInput(value) }))
-  }
+  const { 
+    formData, 
+    isLoading, 
+    updateField, 
+    updateMoney, 
+    savePagamento 
+  } = usePagamentoForm(isOpen, onClose, pagamento)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -135,7 +57,7 @@ export function PagamentosEditModal({
               <Label>Descrição</Label>
               <Input 
                 value={formData.description} 
-                onChange={e => setFormData({...formData, description: e.target.value})}
+                onChange={e => updateField('description', e.target.value)}
                 className="border-2 focus:border-[#F5C800]"
               />
             </div>
@@ -144,7 +66,7 @@ export function PagamentosEditModal({
               <Label>Valor (R$)</Label>
               <Input 
                 value={formatMoneyInput(formData.amount)} 
-                onChange={e => handleMoneyChange(e.target.value)}
+                onChange={e => updateMoney(e.target.value)}
                 className="border-2 focus:border-[#F5C800] font-mono text-lg font-bold"
               />
             </div>
@@ -154,7 +76,7 @@ export function PagamentosEditModal({
               <Input 
                 type="date"
                 value={formData.date} 
-                onChange={e => setFormData({...formData, date: e.target.value})}
+                onChange={e => updateField('date', e.target.value)}
                 className="border-2 focus:border-[#F5C800]"
               />
             </div>
@@ -169,7 +91,7 @@ export function PagamentosEditModal({
                 <Label>Categoria</Label>
                 <Select 
                   value={formData.category_id} 
-                  onValueChange={v => setFormData({...formData, category_id: v})}
+                  onValueChange={v => updateField('category_id', v)}
                 >
                   <SelectTrigger className="border-2 focus:ring-[#F5C800]">
                     <SelectValue placeholder="Selecione..." />
@@ -186,7 +108,7 @@ export function PagamentosEditModal({
                 <Label>Conta / Banco</Label>
                 <Select 
                   value={formData.account_id} 
-                  onValueChange={v => setFormData({...formData, account_id: v})}
+                  onValueChange={v => updateField('account_id', v)}
                 >
                   <SelectTrigger className="border-2 focus:ring-[#F5C800]">
                     <SelectValue placeholder="Selecione..." />
@@ -203,7 +125,7 @@ export function PagamentosEditModal({
                 <Label>Tipo</Label>
                 <Select 
                   value={formData.type} 
-                  onValueChange={v => setFormData({...formData, type: v})}
+                  onValueChange={v => updateField('type', v)}
                 >
                   <SelectTrigger className="border-2 focus:ring-[#F5C800]">
                     <SelectValue />
@@ -219,7 +141,7 @@ export function PagamentosEditModal({
                 <Label>Status</Label>
                 <Select 
                   value={formData.status} 
-                  onValueChange={v => setFormData({...formData, status: v})}
+                  onValueChange={v => updateField('status', v)}
                 >
                   <SelectTrigger className="border-2 focus:ring-[#F5C800]">
                     <SelectValue />
@@ -241,7 +163,7 @@ export function PagamentosEditModal({
                 <Label>Método</Label>
                 <Select 
                   value={formData.method} 
-                  onValueChange={v => setFormData({...formData, method: v})}
+                  onValueChange={v => updateField('method', v)}
                 >
                   <SelectTrigger className="border-2 focus:ring-[#F5C800]">
                     <SelectValue />
@@ -263,7 +185,7 @@ export function PagamentosEditModal({
                   type="number"
                   min={1}
                   value={formData.installments_current} 
-                  onChange={e => setFormData({...formData, installments_current: Number(e.target.value)})}
+                  onChange={e => updateField('installments_current', Number(e.target.value))}
                   className="border-2 focus:border-[#F5C800]"
                 />
               </div>
@@ -274,7 +196,7 @@ export function PagamentosEditModal({
                   type="number"
                   min={1}
                   value={formData.installments_total} 
-                  onChange={e => setFormData({...formData, installments_total: Number(e.target.value)})}
+                  onChange={e => updateField('installments_total', Number(e.target.value))}
                   className="border-2 focus:border-[#F5C800]"
                 />
               </div>
@@ -286,7 +208,7 @@ export function PagamentosEditModal({
               Cancelar
             </Button>
             <Button 
-              onClick={handleSave} 
+              onClick={savePagamento} 
               disabled={isLoading}
               className="bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold"
             >
