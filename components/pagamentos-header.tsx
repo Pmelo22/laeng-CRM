@@ -5,7 +5,7 @@ import { Search, Filter, Wallet, TrendingUp, TrendingDown, LayoutDashboard, Chec
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { formatCurrency } from "@/lib/financial"
+import { formatCurrency } from "@/lib/pagamentos-financial"
 import type { FinancialMetrics, PaymentFiltersState } from "@/lib/types"
 
 const MONTHS = [
@@ -19,7 +19,7 @@ const MONTHS = [
 
 export type ViewMode = 'table' | 'report'
 
-interface PagamentoHeaderProps {
+interface PagamentosHeaderProps {
   metrics: FinancialMetrics
   searchTerm: string
   setSearchTerm: (term: string) => void
@@ -36,7 +36,7 @@ interface PagamentoHeaderProps {
   accounts: { label: string; value: string }[]
 }
 
-export function PagamentoHeader({
+export function PagamentosHeader({
   metrics,
   searchTerm,
   setSearchTerm,
@@ -51,7 +51,7 @@ export function PagamentoHeader({
   categories,
   subcategories,
   accounts
-}: PagamentoHeaderProps) {
+}: PagamentosHeaderProps) {
 
   const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
 

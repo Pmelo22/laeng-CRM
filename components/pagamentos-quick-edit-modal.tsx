@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Label } from "@/components/ui/label"
 
-interface PagamentoQuickEditModalProps {
+interface PagamentosQuickEditModalProps {
   isOpen: boolean
   onClose: () => void
   title: string
@@ -24,7 +24,7 @@ interface PagamentoQuickEditModalProps {
   options?: { label: string; value: string }[] 
 }
 
-export function PagamentoQuickEditModal({
+export function PagamentosQuickEditModal({
   isOpen,
   onClose,
   title,
@@ -35,7 +35,7 @@ export function PagamentoQuickEditModal({
   tableId,
   type,
   options,
-}: PagamentoQuickEditModalProps) {
+}: PagamentosQuickEditModalProps) {
   const { toast } = useToast()
   const router = useRouter()
   const [value, setValue] = useState(currentValue)
@@ -59,11 +59,6 @@ export function PagamentoQuickEditModal({
       } else {
         updates[fieldName] = value
       }
-      
-
-      console.log("1. Valor bruto no estado (value):", value)
-      console.log("2. Tipo do dado:", typeof value)
-      console.log("3. Objeto final enviado ao Supabase (updates):", updates)
 
       const { error } = await supabase
         .from("transactions") 

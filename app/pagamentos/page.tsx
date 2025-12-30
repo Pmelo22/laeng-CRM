@@ -1,13 +1,15 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import PagamentosPageContent from "./pagamentos-page-content"
 import { getUserContext } from "../auth/context/userContext";
-import { Account, Categories, Pagamentos } from "@/lib/types";
-import { calculateFinancialMetrics } from "@/lib/financial";
+import { Pagamentos } from "@/lib/types";
+import { calculateFinancialMetrics } from "@/lib/pagamentos-financial";
+import PagamentosPageContent from "./pagamentos-page-content"
 
 export const dynamic = 'force-dynamic';
 
 export default async function PagamentosPage() {
+
+  // Fetch
   const supabase = await createClient()
 
   const { userPermissions } = await getUserContext();
@@ -19,6 +21,8 @@ export default async function PagamentosPage() {
   if (error || !user) {
     redirect("/auth/login")
   }
+
+  //Query
 
   const { data: pagamentosData } = await supabase
     .from("transactions")
@@ -43,6 +47,9 @@ export default async function PagamentosPage() {
   const {data: categoriasData} = await supabase.from("categories").select("id , name")
   const {data: subcategoriasData} = await supabase.from("subcategories").select("id, name")
   const {data: accountsData} = await supabase.from("accounts").select("id, name") 
+  
+
+  // Maps
 
   const pagamentos: Pagamentos[] = (pagamentosData || []).map((transaction: any) => ({
     ...transaction,

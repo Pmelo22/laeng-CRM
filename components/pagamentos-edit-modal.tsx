@@ -12,7 +12,7 @@ import type { Pagamentos } from "@/lib/types"
 import { useRouter } from "next/navigation"
 import { formatMoneyInput, parseMoneyInput } from "@/lib/utils" 
 
-interface PagamentoEditModalProps {
+interface PagamentosEditModalProps {
   isOpen: boolean
   onClose: () => void
   pagamento?: Pagamentos
@@ -21,14 +21,14 @@ interface PagamentoEditModalProps {
   accounts: { label: string; value: string }[]
 }
 
-export function PagamentoEditModal({ 
+export function PagamentosEditModal({ 
   isOpen, 
   onClose, 
   pagamento, 
   categories, 
   subcategories,
   accounts 
-}: PagamentoEditModalProps) {
+}: PagamentosEditModalProps) {
 
   const { toast } = useToast()
   const router = useRouter()

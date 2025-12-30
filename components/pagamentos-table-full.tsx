@@ -4,13 +4,13 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil, Tags } from "lucide-react"
-import { formatCurrency } from "@/lib/financial"
-import type { Pagamentos } from "@/lib/types"
-import { PagamentoQuickEditModal } from "./pagamento-quick-edit-modal"
+import {  AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil, Tags } from "lucide-react"
+import { formatCurrency } from "@/lib/pagamentos-financial"
+import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
-import { PagamentoEditModal } from "./pagamento-edit-modal"
+import { PagamentosEditModal } from "./pagamentos-edit-modal"
+import { PagamentosPagination } from "./pagamentos-pagination"
+import type { Pagamentos } from "@/lib/types"
 
 interface PagamentosTableFullProps {
   data: Pagamentos[]
@@ -137,29 +137,32 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
             <TableBody>
               {paginatedData.map((row) => (
                 <TableRow key={row.id} className="hover:bg-[#F5C800]/5 border-b border-gray-100 transition-colors h-[60px]">
-                  
-                    <TableCell className="py-3 pl-4">
+
+                  {/* CÓDIGO */}
+                  <TableCell className="py-3 pl-4">
                     <Badge className="font-mono bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold text-xs px-2 py-1">
                          #{String(row.codigo || 0).padStart(3, '0')}
                     </Badge>
-                    </TableCell>
-    
-                    <TableCell> 
-                    <div className="flex items-center gap-1.5">
-                        <Tag className="h-3 w-3 text-gray-400" />
-                        <div 
-                            onClick={() => handleEdit( row, "category_id", "Categoria", "select", categories 
-                            )}
-                            className={`flex flex-col justify-center max-w-[250px] ${canEdit ? 'cursor-pointer group' : ''}`}
-                        >
-                        <span className="text-sm font-medium text-gray-600 truncate max-w-[140px]" title={row.category_name}>
-                            {row.category_name || "Geral"}
-                        </span>
-                        </div>
-                    </div>
-                </TableCell>
+                  </TableCell>
 
-                    <TableCell> 
+                  {/* CATEGORIA */}
+                  <TableCell> 
+                      <div className="flex items-center gap-1.5">
+                          <Tag className="h-3 w-3 text-gray-400" />
+                          <div 
+                              onClick={() => handleEdit( row, "category_id", "Categoria", "select", categories 
+                              )}
+                              className={`flex flex-col justify-center max-w-[250px] ${canEdit ? 'cursor-pointer group' : ''}`}
+                          >
+                          <span className="text-sm font-medium text-gray-600 truncate max-w-[140px]" title={row.category_name}>
+                              {row.category_name || "Geral"}
+                          </span>
+                          </div>
+                      </div>
+                  </TableCell>
+                  
+                  {/* SUBCATEGORIA */}
+                  <TableCell> 
                     <div className="flex items-center gap-1.5">
                         <Tags className="h-3 w-3 text-gray-400" />
                         <div 
@@ -172,9 +175,10 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                         </span>
                         </div>
                     </div>
-                </TableCell>
-
-                    <TableCell> 
+                  </TableCell>
+                  
+                  {/* BANCOS*/}
+                  <TableCell> 
                     <div className="flex items-center gap-1.5">
                         <Landmark className="h-3 w-3 text-gray-400" />
                         <div 
@@ -187,8 +191,9 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                         </span>
                         </div>
                     </div>
-                </TableCell>
+                  </TableCell>
 
+                  {/* DESCRIÇÃO */}
                   <TableCell>
                     <div 
                         onClick={() => handleEdit(row, "description", "Descrição", "text")}
@@ -201,6 +206,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
 
+                  {/* TIPO */}
                   <TableCell className="text-center p-2">
                     <div 
                         onClick={() => handleEdit(row, "type", "Tipo", "select", [
@@ -213,6 +219,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
 
+                  {/* CATEGORIA */}
                   <TableCell className="text-center p-2">
                      <div 
                         onClick={() => handleEdit(row, "method", "Forma de Pagamento", "select", [
@@ -228,7 +235,8 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                         {getMethodLabel(row.method || '-')}
                     </div>
                   </TableCell>
-
+                  
+                  {/* PARCELAS */}
                   <TableCell className="text-center p-2">
                     <div
                         onClick={() => handleEdit(row, "installments_current", "Parcelas", "installments", undefined, "installments_total")}
@@ -238,6 +246,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
 
+                  {/* STATUS */}
                   <TableCell className="text-center p-2">
                     <div 
                         onClick={() => handleEdit(row, "status", "Status", "select", [
@@ -250,6 +259,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
 
+                  {/* DATA */}
                   <TableCell className="text-center p-2">
                     <div
                         onClick={() => handleEdit(row, "date", "Data", "date")}
@@ -265,6 +275,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
                   
+                  {/* DESPESA */}
                   <TableCell className="text-right pr-6 p-2">
                     <div
                         onClick={() => handleEdit(row, "amount", "Valor", "money")}
@@ -274,6 +285,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                     </div>
                   </TableCell>
                 
+                  {/* BOTÃO DE EDITAR */}
                   <TableCell className="py-3 text-right pr-4">
                       {canEdit && (
                         <Button
@@ -293,76 +305,18 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-2 py-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground font-semibold">
-            Mostrando {startIndex + 1} - {Math.min(endIndex, data.length)} de {data.length} pagamentos
-          </span>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold text-muted-foreground whitespace-nowrap">
-              Pagamentos por página:
-            </span>
-            <Select value={String(itemsPerPage)} onValueChange={handleItemsPerPageChange}>
-              <SelectTrigger className="w-[80px] h-9 border-[#F5C800]/30 focus:ring-[#F5C800] bg-background font-semibold">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="min-w-[80px]">
-                <SelectItem value="20" className="cursor-pointer font-semibold">20</SelectItem>
-                <SelectItem value="50" className="cursor-pointer font-semibold">50</SelectItem>
-                <SelectItem value="100" className="cursor-pointer font-semibold">100</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="border-[#F5C800]/30 hover:bg-[#F5C800]/10 disabled:opacity-50 font-semibold"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-
-            {getPageNumbers().map((page, index) => (
-              page === '...' ? (
-                <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground font-semibold">...</span>
-              ) : (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(page as number)}
-                  className={
-                    currentPage === page
-                      ? "bg-[#F5C800] text-[#1E1E1E] hover:bg-[#F5C800]/90 font-bold"
-                      : "border-[#F5C800]/30 hover:bg-[#F5C800]/10 font-semibold"
-                  }
-                >
-                  {page}
-                </Button>
-              )
-            ))}
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className="border-[#F5C800]/30 hover:bg-[#F5C800]/10 disabled:opacity-50 font-semibold"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <PagamentosPagination startIndex={startIndex} endIndex={endIndex}
+          totalItems={data.length}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          getPageNumbers={getPageNumbers}
+       />
 
       {editConfig.isOpen && editConfig.row && (
-        <PagamentoQuickEditModal
+        <PagamentosQuickEditModal
             isOpen={editConfig.isOpen}
             onClose={() => setEditConfig(prev => ({ ...prev, isOpen: false }))}
             title={editConfig.title}
@@ -384,7 +338,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
         />
       )}
 
-      <PagamentoEditModal 
+      <PagamentosEditModal 
         isOpen={isEditModalFullOpen}
         onClose={() => {
             setIsEditModalFullOpen(false)

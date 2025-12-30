@@ -3,11 +3,11 @@
 import { useState, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { BarChart3 } from "lucide-react"
-import { calculateFinancialMetrics } from "@/lib/financial"
+import { calculateFinancialMetrics } from "@/lib/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
-import { PagamentosTableFull } from "@/components/pagamento-table-full"
-import { PagamentoHeader, ViewMode } from "@/components/pagamento-header"
-import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/lib/payment-filter-logic"
+import { PagamentosTableFull } from "@/components/pagamentos-table-full"
+import { PagamentosHeader, ViewMode } from "@/components/pagamentos-header"
+import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/lib/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
 
 // Componente Placeholder para Relatório
@@ -18,7 +18,7 @@ const PagamentosReportFull = ({ data }: { data: Pagamentos[] }) => (
   </div>
 )
 
-interface PagamentoPageContentProps {
+interface PagamentosPageContentProps {
   pagamentos: Pagamentos[]
   categories: { label: string; value: string }[]
   accounts: { label: string; value: string }[]
@@ -27,13 +27,13 @@ interface PagamentoPageContentProps {
   userPermissions: Record<string, any>
 }
 
-export default function PagamentoPageContent({ 
+export default function PagamentosPageContent({ 
   pagamentos, 
   categories, 
   subcategories,
   accounts, 
   userPermissions 
-}: PagamentoPageContentProps) {
+}: PagamentosPageContentProps) {
   
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<ViewMode>("table")
@@ -64,7 +64,7 @@ export default function PagamentoPageContent({
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       
-      <PagamentoHeader
+      <PagamentosHeader
         metrics={currentMetrics}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
