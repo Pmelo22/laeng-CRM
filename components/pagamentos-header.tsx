@@ -17,7 +17,7 @@ const MONTHS = [
   { value: "10", label: "Novembro" }, { value: "11", label: "Dezembro" },
 ]
 
-export type ViewMode = 'table' | 'report'
+export type ViewMode = 'dashboard' | 'table'
 
 interface PagamentosHeaderProps {
   metrics: FinancialMetrics
@@ -129,18 +129,18 @@ export function PagamentosHeader({
 
                   <Button 
                   onClick={onNewPayment}
-                  className="h-9 bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
+                  className="h-9 bg-[#F5C800] sm:w-[100px] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
                   <Plus className="h-4 w-4 mr-2" />Novo
                   </Button>
       
                   <Select value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
-                      <SelectTrigger className="w-full sm:w-[140px] h-10 bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] border-0 font-bold">
-                        <LayoutDashboard className="h-4 w-4 mr-2" />
+                      <SelectTrigger className="w-full sm:w-[180px] h-10 bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] border-0 font-bold">
+                        <LayoutDashboard className="h-4 w-5 mr-2" />
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="table">Tabela</SelectItem>
-                        <SelectItem value="report">Relatórios</SelectItem>
+                        <SelectItem value="dashboard">Dashboard</SelectItem>
+                         <SelectItem value="table">Tabela</SelectItem>
                       </SelectContent>
                   </Select>
                   

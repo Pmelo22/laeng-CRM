@@ -13,7 +13,7 @@ import { PaymentFiltersState } from "@/lib/types"
 import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLogic"
 import { toast } from "@/hooks/use-toast"
 import { PagamentosDeleteDialog } from "@/components/pagamentos-delete-dialog"
-import { PagamentosReportFull } from "@/components/pagamentos-report-full"
+import { PagamentosDashboard } from "@/components/pagamentos-dashboard"
 
 interface PagamentosPageContentProps {
   pagamentos: Pagamentos[]
@@ -40,7 +40,7 @@ export default function PagamentosPageContent({
   
   // Estados de Filtro e View 
   const [searchTerm, setSearchTerm] = useState("")
-  const [viewMode, setViewMode] = useState<ViewMode>("table")
+  const [viewMode, setViewMode] = useState<ViewMode>("dashboard")
   const [filters, setFilters] = useState<PaymentFiltersState>(INITIAL_FILTERS)
 
   // Estados do Modal ---
@@ -162,10 +162,9 @@ export default function PagamentosPageContent({
         accounts={accounts}
         onNewPayment={handleNewPayment} 
       />
-
+            
       <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
               {/* Lógica de Renderização Condicional */}
-              
               {viewMode === 'table' ? (
                 <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden min-h-[500px]">
                   <CardContent className="p-0">
@@ -182,7 +181,7 @@ export default function PagamentosPageContent({
                 </Card>
               ) : (
                 <div className="pb-10">
-                  <PagamentosReportFull data={filteredPagamentos} />
+                  <PagamentosDashboard data={filteredPagamentos} />
                 </div>
               )}
             </div>
