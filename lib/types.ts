@@ -218,9 +218,9 @@ export interface Pagamentos {
   id: string;
   codigo: number;
   description?: string;
-  amount?: number;
+  amount: number;
   type?: 'receita' | 'despesa',
-  date?: string,
+  date: string,
   category_id?: string,
   account_id?: string,
   cliente_id?: string,

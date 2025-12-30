@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {  AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil, Tags, ListTree } from "lucide-react"
+import {  AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil, Tags, ListTree, Trash2 } from "lucide-react"
 import { formatCurrency } from "@/lib/pagamentos-financial"
 import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
@@ -19,6 +19,7 @@ interface PagamentosTableFullProps {
   subcategories: { id: string; name: string ; categories_id: string}[]
   userPermissions?: Record<string, any>
   onEdit: (payment: Pagamentos) => void
+  onDelete: (payment: Pagamentos) => void
 }
 
 const getMethodLabel = (method: string) => {
@@ -55,7 +56,7 @@ const getTypeBadge = (type: string) => {
     return <Badge className="bg-rose-500 hover:bg-rose-600 h-6">Despesa</Badge>
 }
 
-export function PagamentosTableFull({ data, userPermissions, categories, accounts, subcategories}: PagamentosTableFullProps) {
+export function PagamentosTableFull({ data, userPermissions, categories, accounts, subcategories, onDelete}: PagamentosTableFullProps) {
   
   const [editConfig, setEditConfig] = useState<{
     isOpen: boolean
@@ -308,6 +309,16 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
                           <Pencil className="h-4 w-4 text-[#1E1E1E]" />
                         </Button>
                       )}
+                      
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onDelete(row)}
+                        className="border-2 border-red-300 hover:border-red-500 hover:bg-red-50 h-9 w-9 p-0 transition-colors"
+                        title="Excluir Usuário"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-600" />
+                      </Button>
                   </TableCell>
                 </TableRow>
               ))}
