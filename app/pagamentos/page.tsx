@@ -29,6 +29,7 @@ export default async function PagamentosPage() {
     .select(`
       *,
       subcategories:subcategories_id (
+        id,
         name,
         categories:categories_id (
           id,
@@ -45,14 +46,14 @@ export default async function PagamentosPage() {
     .order("updated_at", { ascending: false })
 
   const {data: categoriasData} = await supabase.from("categories").select("id , name")
-  const {data: subcategoriasData} = await supabase.from("subcategories").select("id, name")
+  const {data: subcategoriasData} = await supabase.from("subcategories").select("id, name, categories_id")
   const {data: accountsData} = await supabase.from("accounts").select("id, name") 
   
-
   // Maps
 
   const pagamentos: Pagamentos[] = (pagamentosData || []).map((transaction: any) => ({
     ...transaction,
+    category_id: transaction.subcategories?.categories?.id,
     category_name: transaction.subcategories?.categories?.name || 'Sem Categoria',
     subcategory_name: transaction.subcategories?.name || 'Sem Subcategoria',
     account_name: transaction.accounts?.name || 'Conta desconhecida',
@@ -61,13 +62,11 @@ export default async function PagamentosPage() {
 
   const categoryOptions = categoriasData?.map((cat) => ({label: cat.name, value: cat.id })) || []
 
-  const subcategoriaOptions = subcategoriasData?.map((cat) => ({label: cat.name, value: cat.id })) || []
-
   const accountOptions = accountsData?.map((cat) => ({label: cat.name, value: cat.id })) || []
-
-  console.log(pagamentos)
 
   const metrics = calculateFinancialMetrics(pagamentos) 
 
-  return <PagamentosPageContent metrics={metrics} pagamentos={pagamentos} categories={categoryOptions} subcategories={subcategoriaOptions} accounts={accountOptions} userPermissions={userPermissions} />
+  //Antes, subcategory estava mapeando um objeto com label: value:. Agora eu tenho um objeto id: name: categories_id
+
+  return <PagamentosPageContent metrics={metrics} pagamentos={pagamentos} categories={categoryOptions} subcategories={subcategoriasData || []} accounts={accountOptions} userPermissions={userPermissions} />
 }

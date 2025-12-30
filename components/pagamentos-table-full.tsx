@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {  AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil, Tags } from "lucide-react"
+import {  AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil, Tags, ListTree } from "lucide-react"
 import { formatCurrency } from "@/lib/pagamentos-financial"
 import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
@@ -16,7 +16,7 @@ interface PagamentosTableFullProps {
   data: Pagamentos[]
   categories: { label: string; value: string }[]
   accounts: { label: string; value: string }[]
-  subcategories: { label: string; value: string }[]
+  subcategories: { id: string; name: string ; categories_id: string}[]
   userPermissions?: Record<string, any>
 }
 
@@ -62,7 +62,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
     field: string
     fieldSecondary?: string
     title: string
-    type: "text" | "money" | "date" | "select" | "installments"
+    type: "text" | "money" | "date" | "select" | "installments" | "category_tree"
     options?: { label: string; value: string }[]
   }>({
     isOpen: false,
@@ -78,7 +78,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
     row: Pagamentos,
     field: string,
     title: string,
-    type: "text" | "money" | "date" | "select" | "installments",
+    type: "text" | "money" | "date" | "select" | "installments" | "category_tree",
     options?: { label: string; value: string }[],
     fieldSecondary?: string
   ) => {
@@ -147,35 +147,43 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
 
                   {/* CATEGORIA */}
                   <TableCell> 
-                      <div className="flex items-center gap-1.5">
-                          <Tag className="h-3 w-3 text-gray-400" />
-                          <div 
-                              onClick={() => handleEdit( row, "category_id", "Categoria", "select", categories 
-                              )}
-                              className={`flex flex-col justify-center max-w-[250px] ${canEdit ? 'cursor-pointer group' : ''}`}
-                          >
-                          <span className="text-sm font-medium text-gray-600 truncate max-w-[140px]" title={row.category_name}>
-                              {row.category_name || "Geral"}
-                          </span>
-                          </div>
-                      </div>
-                  </TableCell>
+                        <div className="flex items-center justify-between gap-1.5 relative group/cat">
+                            <div className="flex items-center gap-1.5">
+                                <Tag className="h-3 w-3 text-gray-400" />
+                                <span className="text-sm font-medium text-gray-600 truncate max-w-[120px]" title={row.category_name}>
+                                    {row.category_name || "Geral"}
+                                </span>
+                            </div>
+                            
+                            {/* Edição*/}
+                            {canEdit && (
+                                <button
+                                    onClick={() => handleEdit(
+                                        row, 
+                                        "subcategories_id",
+                                        "Classificação", 
+                                        "category_tree", 
+                                        subcategories, 
+                                        undefined 
+                                    )}
+                                    className="opacity-0 group-hover/cat:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-[#F5C800]"
+                                    title="Editar Classificação"
+                                >
+                                    <ListTree className="h-4 w-4" />
+                                </button>
+                            )}
+                        </div>
+                    </TableCell>
                   
                   {/* SUBCATEGORIA */}
-                  <TableCell> 
-                    <div className="flex items-center gap-1.5">
-                        <Tags className="h-3 w-3 text-gray-400" />
-                        <div 
-                            onClick={() => handleEdit( row, "subcategories_id", "SubCategoria", "select", subcategories
-                            )}
-                            className={`flex flex-col justify-center max-w-[250px] ${canEdit ? 'cursor-pointer group' : ''}`}
-                        >
-                        <span className="text-sm font-medium text-gray-600 truncate max-w-[140px]" title={row.subcategory_name}>
-                            {row.subcategory_name || "Geral"}
-                        </span>
+                    <TableCell> 
+                        <div className="flex items-center gap-1.5">
+                            <Tags className="h-3 w-3 text-gray-400" />
+                            <span className="text-sm font-medium text-gray-600 truncate max-w-[140px]" title={row.subcategory_name}>
+                                {row.subcategory_name || "Geral"}
+                            </span>
                         </div>
-                    </div>
-                  </TableCell>
+                    </TableCell>
                   
                   {/* BANCOS*/}
                   <TableCell> 
@@ -316,18 +324,20 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
        />
 
       {editConfig.isOpen && editConfig.row && (
-        <PagamentosQuickEditModal
+      <PagamentosQuickEditModal
             isOpen={editConfig.isOpen}
             onClose={() => setEditConfig(prev => ({ ...prev, isOpen: false }))}
             title={editConfig.title}
             currentValue={
-              editConfig.type === 'installments' 
-                ? editConfig.row.installments_current 
+              editConfig.type === 'category_tree'
+                ? editConfig.row.subcategories_id
                 : (editConfig.row as any)[editConfig.field]
             }
             currentValueSecondary={
                editConfig.type === 'installments' 
                 ? editConfig.row.installments_total
+                : editConfig.type === 'category_tree'
+                ? editConfig.row.category_id
                 : undefined
             }
             fieldName={editConfig.field}
@@ -335,6 +345,7 @@ export function PagamentosTableFull({ data, userPermissions, categories, account
             tableId={editConfig.row.id}
             type={editConfig.type}
             options={editConfig.options}
+            extraOptions={categories} 
         />
       )}
 
