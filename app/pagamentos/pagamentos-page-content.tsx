@@ -13,14 +13,7 @@ import { PaymentFiltersState } from "@/lib/types"
 import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLogic"
 import { toast } from "@/hooks/use-toast"
 import { PagamentosDeleteDialog } from "@/components/pagamentos-delete-dialog"
-
-// Componente Placeholder para Relatório
-const PagamentosReportFull = ({ data }: { data: Pagamentos[] }) => (
-  <div className="p-4 text-center border-2 border-dashed border-gray-200 rounded-lg min-h-[300px] flex flex-col items-center justify-center text-gray-500 bg-gray-50/50">
-    <BarChart3 className="h-10 w-10 mb-2 opacity-20" />
-    <p>Relatórios Gerenciais ({data.length} registros filtrados)</p>
-  </div>
-)
+import { PagamentosReportFull } from "@/components/pagamentos-report-full"
 
 interface PagamentosPageContentProps {
   pagamentos: Pagamentos[]
@@ -171,24 +164,28 @@ export default function PagamentosPageContent({
       />
 
       <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
-        <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden min-h-[500px]">
-          <CardContent className="p-0">
-            {viewMode === 'table' ? (
-              <PagamentosTableFull 
-                data={filteredPagamentos} 
-                userPermissions={userPermissions} 
-                categories={categories} 
-                subcategories={subcategories}
-                accounts={accounts} 
-                onEdit={handleEditPayment} 
-                onDelete={handleOpenDeleteDialog}
-              />
-            ) : (
-              <PagamentosReportFull data={filteredPagamentos} />
-            )}
-          </CardContent>
-        </Card>
-      </div>
+              {/* Lógica de Renderização Condicional */}
+              
+              {viewMode === 'table' ? (
+                <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden min-h-[500px]">
+                  <CardContent className="p-0">
+                    <PagamentosTableFull 
+                        data={filteredPagamentos} 
+                        userPermissions={userPermissions} 
+                        categories={categories} 
+                        subcategories={subcategories}
+                        accounts={accounts} 
+                        onEdit={handleEditPayment} 
+                        onDelete={handleOpenDeleteDialog}
+                      />
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="pb-10">
+                  <PagamentosReportFull data={filteredPagamentos} />
+                </div>
+              )}
+            </div>
 
       <PagamentosDeleteDialog 
         isOpen={deleteState.isOpen}
