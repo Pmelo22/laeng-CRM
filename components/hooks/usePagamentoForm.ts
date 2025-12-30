@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -5,7 +7,6 @@ import { createClient } from "@/lib/supabase/client"
 import { parseMoneyInput } from "@/lib/utils"
 import type { Pagamentos } from "@/lib/types"
 
-// Tipagem do estado do formulário
 interface FormData {
   description: string
   amount: number
@@ -14,6 +15,7 @@ interface FormData {
   method: string
   status: string
   category_id: string
+  subcategories_id: string
   account_id: string
   installments_current: number
   installments_total: number
@@ -28,6 +30,7 @@ const INITIAL_STATE: FormData = {
   method: "pix",
   status: "not_pago",
   category_id: "",
+  subcategories_id: "", // Inicializa vazio
   account_id: "",
   installments_current: 1,
   installments_total: 1,
@@ -56,19 +59,28 @@ export function usePagamentoForm(
         method: pagamento.method || "pix",
         status: pagamento.status || "not_pago",
         category_id: pagamento.category_id || "",
+        subcategories_id: pagamento.subcategories_id || "", 
         account_id: pagamento.account_id || "",
         installments_current: pagamento.installments_current || 1,
         installments_total: pagamento.installments_total || 1,
       })
     } else if (!isOpen) {
-      // Opcional: Limpar formulário ao fechar
       setFormData(INITIAL_STATE)
     }
   }, [isOpen, pagamento])
 
   // 2. Helpers para atualizar estado
   const updateField = (field: keyof FormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData(prev => {
+        const newData = { ...prev, [field]: value }
+
+        // Lógica de dependência: Se mudar a Categoria, reseta a Subcategoria
+        if (field === 'category_id' && value !== prev.category_id) {
+            newData.subcategories_id = ""
+        }
+
+        return newData
+    })
   }
 
   const updateMoney = (value: string) => {
@@ -81,14 +93,18 @@ export function usePagamentoForm(
 
     setIsLoading(true)
     try {
-      const { error } = await supabase
-        .from("transactions") 
-        .update({
-          ...formData, 
+      // Prepara objeto para envio (null se string vazia)
+      const payload = {
+          ...formData,
           category_id: formData.category_id || null,
+          subcategories_id: formData.subcategories_id || null,
           account_id: formData.account_id || null,
           updated_at: new Date().toISOString()
-        })
+      }
+
+      const { error } = await supabase
+        .from("transactions") 
+        .update(payload)
         .eq("id", pagamento.id)
 
       if (error) throw error

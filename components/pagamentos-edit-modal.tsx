@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { formatMoneyInput } from "@/lib/utils" 
 import type { Pagamentos } from "@/lib/types"
 import { usePagamentoForm } from "./hooks/usePagamentoForm"
+import { AlertCircle } from "lucide-react"
 
 interface PagamentosEditModalProps {
   isOpen: boolean
@@ -34,6 +35,11 @@ export function PagamentosEditModal({
     updateMoney, 
     savePagamento 
   } = usePagamentoForm(isOpen, onClose, pagamento)
+
+  // Filtra as subcategorias com base na categoria selecionada no form
+  const filteredSubcategories = subcategories.filter(
+    sub => sub.categories_id === formData.category_id
+  )
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -87,6 +93,7 @@ export function PagamentosEditModal({
             <h3 className="text-sm font-bold text-[#1E1E1E] uppercase mb-3 border-b pb-1">Classificação</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               
+              {/* 1. Seleção de Categoria */}
               <div className="space-y-1">
                 <Label>Categoria</Label>
                 <Select 
@@ -102,6 +109,38 @@ export function PagamentosEditModal({
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* 2. Seleção de Subcategoria (Dependente) */}
+              <div className="space-y-1">
+                <Label className={!formData.category_id ? "text-gray-400" : ""}>
+                    Subcategoria
+                </Label>
+                <Select 
+                  value={formData.subcategories_id} 
+                  onValueChange={v => updateField('subcategories_id', v)}
+                  disabled={!formData.category_id}
+                >
+                  <SelectTrigger className={`border-2 focus:ring-[#F5C800] ${!formData.category_id ? 'bg-gray-50 border-gray-100' : ''}`}>
+                    <SelectValue placeholder={
+                        !formData.category_id 
+                        ? "Selecione a categoria primeiro" 
+                        : filteredSubcategories.length === 0 
+                            ? "Sem subcategorias" 
+                            : "Selecione..."
+                    } />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredSubcategories.map(sub => (
+                      <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formData.category_id && filteredSubcategories.length === 0 && (
+                    <p className="text-[10px] text-orange-500 flex items-center gap-1 mt-1">
+                        <AlertCircle className="w-3 h-3" /> Nenhuma subcategoria cadastrada
+                    </p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -136,7 +175,12 @@ export function PagamentosEditModal({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          </div>
 
+          <div>
+            <h3 className="text-sm font-bold text-[#1E1E1E] uppercase mb-3 border-b pb-1">Detalhes</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <Label>Status</Label>
                 <Select 
@@ -152,14 +196,8 @@ export function PagamentosEditModal({
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-          </div>
-
-          {/* Detalhes do Pagamento */}
-          <div>
-            <h3 className="text-sm font-bold text-[#1E1E1E] uppercase mb-3 border-b pb-1">Detalhes</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-1">
+              
+              <div className="space-y-1 md:col-span-2">
                 <Label>Método</Label>
                 <Select 
                   value={formData.method} 
@@ -219,4 +257,4 @@ export function PagamentosEditModal({
       </DialogContent>
     </Dialog>
   )
-}
+} 
