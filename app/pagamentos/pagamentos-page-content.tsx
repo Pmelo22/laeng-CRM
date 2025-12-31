@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { BarChart3 } from "lucide-react"
 import { calculateFinancialMetrics } from "@/lib/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { PagamentosTableFull } from "@/components/pagamentos-table-full"
@@ -14,6 +13,7 @@ import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLog
 import { toast } from "@/hooks/use-toast"
 import { PagamentosDeleteDialog } from "@/components/pagamentos-delete-dialog"
 import { PagamentosDashboard } from "@/components/pagamentos-dashboard"
+import { PagamentosOptionsTable } from "@/components/pagamentos-options-table"
 
 interface PagamentosPageContentProps {
   pagamentos: Pagamentos[]
@@ -43,7 +43,7 @@ export default function PagamentosPageContent({
   const [viewMode, setViewMode] = useState<ViewMode>("dashboard")
   const [filters, setFilters] = useState<PaymentFiltersState>(INITIAL_FILTERS)
 
-  // Estados do Modal ---
+  // Estados do Modal
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedPayment, setSelectedPayment] = useState<Pagamentos | null>(null)
 
@@ -163,10 +163,16 @@ export default function PagamentosPageContent({
         onNewPayment={handleNewPayment} 
       />
             
-      <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
-              {/* Lógica de Renderização Condicional */}
-              {viewMode === 'table' ? (
-                <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden min-h-[500px]">
+    <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
+          {/* Lógica de Renderização Condicional*/}
+          {viewMode === 'dashboard' && (
+              <div className="pb-10">
+                  <PagamentosDashboard data={filteredPagamentos} />
+              </div>
+          )}
+
+          {viewMode === 'table' && (
+              <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden min-h-[500px]">
                   <CardContent className="p-0">
                     <PagamentosTableFull 
                         data={filteredPagamentos} 
@@ -178,13 +184,16 @@ export default function PagamentosPageContent({
                         onDelete={handleOpenDeleteDialog}
                       />
                   </CardContent>
-                </Card>
-              ) : (
-                <div className="pb-10">
-                  <PagamentosDashboard data={filteredPagamentos} />
-                </div>
-              )}
-            </div>
+              </Card>
+          )}
+          {viewMode === 'options' && (
+             <PagamentosOptionsTable 
+                categories={categories} 
+                subcategories={subcategories} 
+                accounts={accounts}
+             />
+          )}
+      </div>
 
       <PagamentosDeleteDialog 
         isOpen={deleteState.isOpen}
