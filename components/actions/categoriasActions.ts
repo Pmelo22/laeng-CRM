@@ -160,3 +160,65 @@ export async function deleteAccountAction(id: string) {
     return { ok: false, error: e.message }
   }
 }
+
+// === INTEGRAÇÃO COM OBRAS ===
+
+export async function getObrasForLinkAction() {
+  const supabase = await createClient()
+  try {
+    // 1. Log para confirmar que a função foi chamada
+    console.log("--- INICIANDO BUSCA DE OBRAS ---")
+
+    const { data, error } = await supabase
+      .from("obras")
+      .select(`
+        id, 
+        cliente_id,
+        empreiteiro,
+        material,
+        pintor,
+        eletricista,
+        gesseiro,
+        azulejista,
+        manutencao,
+        clientes:cliente_id (
+          nome
+        )
+      `)
+      // Remova o filtro .or() temporariamente para testar se é erro de sintaxe
+      // .or('empreiteiro.gt.0, ...') 
+
+    if (error) {
+      // 2. ISSO VAI MOSTRAR O ERRO REAL NO SEU TERMINAL VSCODE
+      console.error("❌ ERRO SUPABASE DETALHADO:", JSON.stringify(error, null, 2))
+      throw error
+    }
+
+    console.log("✅ DADOS ENCONTRADOS:", data?.length)
+
+    const formattedData = data.map((item: any) => ({
+      ...item,
+      // Garante que não quebre se cliente for null
+      cliente_nome: item.clientes?.nome || `Cliente ID: ${item.cliente_id} (Não encontrado)`
+    }))
+
+    return { ok: true, data: formattedData }
+  } catch (e: any) {
+    console.error("❌ ERRO CATCH:", e.message)
+    return { ok: false, error: e.message } // Retorna a mensagem real para o Toast
+  }
+}
+
+export async function createBulkTransactionsAction(transactions: any[]) {
+  const supabase = await createClient()
+  try {
+    const { error } = await supabase.from("transactions").insert(transactions)
+    
+    if (error) throw error
+    
+    revalidatePath("/pagamentos")
+    return { ok: true }
+  } catch (e: any) {
+    return { ok: false, error: e.message }
+  }
+}
