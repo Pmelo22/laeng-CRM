@@ -13,7 +13,7 @@ import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLog
 import { toast } from "@/hooks/use-toast"
 import { PagamentosDeleteDialog } from "@/components/pagamentos-delete-dialog"
 import { PagamentosDashboard } from "@/components/pagamentos-dashboard"
-import { PagamentosOptionsTable } from "@/components/pagamentos-options-table"
+import { PagamentosOptionsTable } from "@/components/pagamentos/pagamentos-options-table"
 
 interface PagamentosPageContentProps {
   pagamentos: Pagamentos[]
