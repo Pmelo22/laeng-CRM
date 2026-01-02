@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { OBRA_SUBCATEGORIES_MAP, ObraData } from "../types/pagamentosTypes";
-import { createBulkTransactionsAction, getObrasForLinkAction } from "../actions/categoriasActions";
 import { toast } from "@/hooks/use-toast";
+import { createBulkTransactionsAction, getObrasForLinkAction } from "../actions/obraslinkActions";
 
 export function useObras(isOpen: boolean, onSuccess: () => void){
 

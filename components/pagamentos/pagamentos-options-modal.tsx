@@ -8,14 +8,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/hooks/use-toast"
-import { 
-  deleteCategoryAction, deleteSubcategoryAction,deleteAccountAction,
-  getObrasForLinkAction, createBulkTransactionsAction
-} from "@/components/pagamentos/actions/categoriasActions"
 
 import { Account, Category, ObraData, OBRA_SUBCATEGORIES_MAP, modalsState, editingData } from "./types/pagamentosTypes"
 import { useAccountForm, useCategoryForm, useSubCategoryForm } from "./hooks/useModals"
 import { useObras } from "./hooks/useObras"
+import { deleteCategoryAction } from "./actions/categoriasActions"
+import { deleteSubcategoryAction } from "./actions/subcategoriasActions"
+import { deleteAccountAction } from "./actions/accountsActions"
 
 interface PagamentosModalsProps {
   categories: Category[]
