@@ -60,3 +60,30 @@ export async function saveTransactionAction(data: TransactionPayload, id?: strin
     return { success: false, message: error.message || "Erro desconhecido" }
   }
 }
+
+export async function updateTransactionAction(tableId: string, updates: Record<string, any>) {
+
+  const supabase = await createClient();
+
+  try {
+    const { error } = await supabase
+      .from("transactions")
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", tableId)
+
+    if (error) throw error
+
+    // Opcional: Revalidar o cache se você souber a rota exata, 
+    // mas o router.refresh() no cliente também funciona.
+    // revalidatePath("/financeiro") 
+    
+    return { success: true }
+  } catch (error) {
+    console.error("Erro na Server Action:", error)
+    return { success: false, error: "Falha ao atualizar o registro." }
+  }
+  
+}

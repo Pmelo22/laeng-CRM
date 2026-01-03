@@ -6,11 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatMoneyInput, parseMoneyInput } from "@/lib/utils" 
-import { useToast } from "@/hooks/use-toast"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
 import { Label } from "@/components/ui/label"
 import { Check } from "lucide-react"
+import { useQuickEdit } from "./hooks/usePagamentosQuickEdit"
 
 interface PagamentosQuickEditModalProps {
   isOpen: boolean
@@ -26,91 +24,10 @@ interface PagamentosQuickEditModalProps {
   extraOptions?: { label: string; value: string }[] 
 }
 
-export function PagamentosQuickEditModal({
-  isOpen,
-  onClose,
-  title,
-  currentValue,
-  currentValueSecondary,
-  fieldName,
-  fieldNameSecondary,
-  tableId,
-  type,
-  options, 
-  extraOptions 
-}: PagamentosQuickEditModalProps) {
-  const { toast } = useToast()
-  const router = useRouter()
-  const [value, setValue] = useState(currentValue)
-  const [valueSecondary, setValueSecondary] = useState(currentValueSecondary)
-  const [isLoading, setIsLoading] = useState(false)
+export function PagamentosQuickEditModal(props: PagamentosQuickEditModalProps) {const { isOpen, onClose, title, type,options,extraOptions} = props
 
-  // Estados específicos para Category Tree
-  const [step, setStep] = useState<"category" | "subcategory">("category")
-  const [selectedCategory, setSelectedCategory] = useState<string>(currentValueSecondary || "")
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string>(currentValue || "")
-
-  // Filtrar subcategorias com base na categoria selecionada
-  const filteredSubcategories = type === 'category_tree' && options 
-    ? options.filter((sub: any) => sub.categories_id === selectedCategory)
-    : []
-
-  useEffect(() => {
-    if (isOpen && type === 'category_tree') {
-        setSelectedCategory(currentValueSecondary || "")
-        setSelectedSubcategory(currentValue || "")
-        setStep("category")
-    } else {
-        setValue(currentValue)
-        setValueSecondary(currentValueSecondary)
-    }
-  }, [isOpen, currentValue, currentValueSecondary, type])
-
-  const handleSave = async () => {
-    setIsLoading(true)
-    try {
-      const supabase = createClient()
-      const updates: any = {
-        updated_at: new Date().toISOString(),
-      }
-
-      if (type === "money") {
-        updates[fieldName] = typeof value === 'string' ? parseMoneyInput(value) : value
-      } else if (type === "installments") {
-        updates[fieldName] = Number(value)
-        if (fieldNameSecondary) updates[fieldNameSecondary] = Number(valueSecondary)
-      } else if (type === "category_tree") {
-        updates["subcategories_id"] = selectedSubcategory
-      } else {
-        updates[fieldName] = value
-      }
-      
-      const { error } = await supabase
-        .from("transactions") 
-        .update(updates)
-        .eq("id", tableId)
-
-      if (error) throw error
-
-      toast({
-        title: "✅ Atualizado!",
-        description: "Registro salvo com sucesso.",
-        duration: 3000,
-      })
-
-      onClose()
-      setTimeout(() => router.refresh(), 500)
-    } catch (error) {
-      console.error(error)
-      toast({
-        title: "Erro ao salvar",
-        description: "Não foi possível atualizar o registro.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { value, setValue, valueSecondary, setValueSecondary, isLoading,step, setStep,  selectedCategory, selectedSubcategory, setSelectedSubcategory, filteredSubcategories, handleCategorySelect, handleSave
+  } = useQuickEdit(props)
 
   const renderInput = () => {
     switch (type) {
@@ -135,7 +52,7 @@ export function PagamentosQuickEditModal({
                                 <button
                                     key={cat.value}
                                     onClick={() => {
-                                        setSelectedCategory(cat.value)
+                                        handleCategorySelect(cat.value)
                                         // Se mudou de categoria, reseta subcategoria
                                         if (cat.value !== selectedCategory) setSelectedSubcategory("")
                                         setStep("subcategory")
@@ -256,14 +173,13 @@ export function PagamentosQuickEditModal({
     }
   }
 
-  // Define actions based on type
   const renderFooter = () => {
       if (type === 'category_tree') {
           if (step === 'category') {
              return (
                 <Button 
                     className="bg-gray-100 text-gray-400 hover:bg-gray-200 w-full" 
-                    disabled={true} // Desabilitado visualmente, o clique na opção avança
+                    disabled={true} 
                 >
                     Selecione uma categoria
                 </Button>
