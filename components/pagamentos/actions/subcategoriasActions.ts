@@ -11,7 +11,7 @@ export async function createSubcategoryAction(name: string, categories_id: strin
     revalidatePath("/pagamentos")
     return { ok: true }
   } catch (e: any) {
-    return { ok: false, error: e.message }
+    return { ok: false, error: e.message}
   }
 }
 
@@ -27,7 +27,7 @@ export async function updateSubcategoryAction(id: string, name: string, categori
     revalidatePath("/pagamentos")
     return { ok: true }
   } catch (e: any) {
-    return { ok: false, error: e.message }
+    return { ok: false, error: e.message}
   }
 }
 

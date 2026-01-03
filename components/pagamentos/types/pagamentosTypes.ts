@@ -36,8 +36,8 @@ export type modalsState = {
 }
 
 export type editingData = {
-    category: {id?: string, name: string} | null
-    subcategory: {id?: string, name: string, catId: string} | null
+    category: {id: string, name: string} | null
+    subcategory: {id: string, name: string, catId: string} | null
     account: {value: string, label: string} | null
     toDelete: {type: 'cat' | 'sub' | 'account', id: string, name: string} | null
 }

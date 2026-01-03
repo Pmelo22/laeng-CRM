@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Account, Category, Subcategory } from "../types/pagamentosTypes"
-import { randomUUID } from "crypto"
 
 export function usePagamentosModals() {
   // Estados de Controle de UI (Visibilidade)
@@ -16,7 +15,7 @@ export function usePagamentosModals() {
 
   // Estados de Dados em Edição
   const [editingCategory, setEditingCategory] = useState<{id: string, name: string} | null>(null)
-  const [editingSubcategory, setEditingSubcategory] = useState<{id?: string, name: string, catId: string} | null>(null)
+  const [editingSubcategory, setEditingSubcategory] = useState<{id: string, name: string, catId: string} | null>(null)
   const [editingAccount, setEditingAccount] = useState<{value: string, label: string} | null>(null)
   const [itemToDelete, setItemToDelete] = useState<{type: 'cat' | 'sub' | 'account', id: string, name: string} | null>(null)
 
@@ -37,7 +36,7 @@ export function usePagamentosModals() {
 
   // Subcategorias
   const openNewSubcategory = (preSelectedCatId?: string) => {
-    setEditingSubcategory(preSelectedCatId ? { id: undefined, name: "", catId: preSelectedCatId } : null)
+    setEditingSubcategory(preSelectedCatId ? { id: "", name: "", catId: preSelectedCatId } : null)
     setModalsState(prev => ({ ...prev, isSubOpen: true }))
   }
   

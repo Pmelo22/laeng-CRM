@@ -39,34 +39,36 @@ export function useCategoryForm(editingData: editingData, isOpen: boolean, onSuc
 export function useSubCategoryForm(editingData: editingData, isSubOpen: boolean, onSuccess: () => void){
 
     const [name, setName] = useState("")
-    const [id, setId] = useState("")
+    const [id, setId] = useState("") // Este é o ID da Categoria (catId)
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         if (isSubOpen) {
-        setName(editingData.subcategory ? editingData.subcategory.name : "")
-        setId(editingData.subcategory ? editingData.subcategory.catId : "")
+            setName(editingData.subcategory ? editingData.subcategory.name : "")
+            setId(editingData.subcategory ? editingData.subcategory.catId : "")
         }
     }, [isSubOpen, editingData.subcategory])
 
   const handleSave = async () => {
     if (!name.trim() || !id) return
     setIsLoading(true)
-    
-    const result = editingData.subcategory 
-        ? await updateSubcategoryAction(editingData.subcategory.id, name, id) 
+    const isEditing = editingData.subcategory && editingData.subcategory.id !== "";
+
+    const result = isEditing
+        ? await updateSubcategoryAction(editingData.subcategory!.id, name, id) 
         : await createSubcategoryAction(name, id)
+        
     setIsLoading(false)
 
     if (result.ok) {
-        toast({ title: "Sucesso", description: "Categoria salva com sucesso." })
+        toast({ title: "Sucesso", description: "Subcategoria salva com sucesso." })
         onSuccess()
-        } else {
+    } else {
         toast({ title: "Erro", description: result.error, variant: "destructive" })
-        }
     }
+  }
 
-    return {name, setName, id, setId, isLoading, handleSave}
+  return {name, setName, id, setId, isLoading, handleSave}
 }
 
 export function useAccountForm(editingData: editingData, isOpen: boolean, onSuccess: () => void){

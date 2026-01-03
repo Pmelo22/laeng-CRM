@@ -163,7 +163,7 @@ export function PagamentosOptionsTable({ categories, subcategories, accounts = [
                     </div>
 
                 <div className="p-3 border-t bg-gray-50">
-                    <Button onClick={() => openNewSubcategory()} variant="outline" className="border-dashed border-gray-400">
+                    <Button onClick={() => openNewSubcategory(cat.value)} variant="outline" className="border-dashed border-gray-400">
                         <Plus className="h-4 w-4 mr-2" /> Adicionar Subcategoria
                     </Button>
                 </div>
