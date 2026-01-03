@@ -8,7 +8,7 @@ import {  AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landma
 import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
 import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
-import { PagamentosEditModal } from "./pagamentos-edit-modal"
+import { PagamentosEditModal } from "./pagamentos/pagamentos-edit-modal"
 import { PagamentosPagination } from "./pagamentos-pagination"
 import type { Pagamentos } from "@/lib/types"
 
