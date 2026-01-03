@@ -99,7 +99,7 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
   let items =
     userRole === "admin"
       ? menuItems
-      : menuItems.filter((i) => i.title !== "Admin");
+      : menuItems.filter((i) => i.title !== "Admin" && i.title !== "Pagamentos");
 
   if (!userPermissions?.dashboard?.view) {
     items = items.filter((i) => i.title !== "Dashboard")

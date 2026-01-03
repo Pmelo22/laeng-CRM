@@ -1,6 +1,7 @@
 import { getUserContext } from "../auth/context/userContext";
 import DashboardLayoutClient from "../dashboard/layout-client";
 import { resolveRedirect } from "../auth/routes/resolveRedirect";
+import { redirect } from "next/navigation";
 
 
 export default async function PagamentosLayout({
@@ -10,7 +11,9 @@ export default async function PagamentosLayout({
 }) {
   const { user, userRole, userPermissions } = await getUserContext();
 
-  //resolveRedirect(userPermissions, (p) => p?.pagamentos?.view); Adicionar permissões depois
+  if (userRole !== "admin") {
+    redirect("/dashboard");
+  }
 
   return (
     <DashboardLayoutClient
