@@ -50,7 +50,7 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
         <Card className="bg-white border-l-4 border-l-purple-500 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-gray-500">Saldo Geral</CardTitle>
-            <Wallet className="h-4 w-4 text-purple-500" />
+            <Wallet className="h-4 w-4 text-purple-500  " />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-900">{formatCurrency(metrics.saldoRealizado)}</div>
@@ -81,7 +81,7 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
         
         {/* COLUNA ESQUERDA: Balanços e Métricas */}
         <div className="lg:col-span-1 space-y-6">
@@ -92,8 +92,8 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
               <CardTitle className="text-lg text-slate-700">Balanço do Período</CardTitle>
               <CardDescription className="capitalize">{periodLabel}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6 pt-4">
-              <div className="space-y-2">
+            <CardContent>
+              <div className="space-y-2 h-[149px]">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Entradas</span>
                   <span className="font-semibold text-gray-700">{formatCurrency(metrics.recPaga)}</span>
@@ -125,7 +125,7 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
             </CardContent>
           </Card>
 
-          {/* Card 2: Balanço por Categorias (NOVO) */}
+          {/* Card 2: Balanço por Categorias */}
           <Card className="shadow-md border-0 flex flex-col max-h-[500px]">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg text-slate-700">Balanço por Categoria</CardTitle>
@@ -219,7 +219,7 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
                 <CardTitle className="text-lg text-slate-700">Distribuição (Pagos)</CardTitle>
                 <CardDescription>Visão detalhada de valores efetivados</CardDescription>
               </div>
-              <div className="w-[200px]">
+              <div className="w-[200px] h-[150px]">
                 <Select value={chartMetric} onValueChange={setChartMetric}>
                   <SelectTrigger className="h-8">
                     <SelectValue placeholder="Agrupar por" />
