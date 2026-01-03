@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {  AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil, Tags, ListTree, Trash2 } from "lucide-react"
 import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
-import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
+import { PagamentosQuickEditModal } from "./pagamentos/pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
 import { PagamentosEditModal } from "./pagamentos/pagamentos-edit-modal"
-import { PagamentosPagination } from "./pagamentos-pagination"
+import { PagamentosPagination } from "./pagamentos/pagamentos-pagination"
 import type { Pagamentos } from "@/lib/types"
 
 interface PagamentosTableFullProps {
