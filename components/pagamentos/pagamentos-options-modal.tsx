@@ -68,6 +68,7 @@ export function PagamentosModals({
     } else { toast({ title: "Erro ao excluir", description: result.error, variant: "destructive" }) }
   }
 
+
   return (
     <>
       {/* 1. LINK MODAL */}
@@ -131,7 +132,7 @@ export function PagamentosModals({
       <Dialog open={modalsState.isCatOpen} onOpenChange={(v) => !v && closeAll()}>
         <DialogContent className="sm:max-w-[500px] flex flex-col p-0 bg-white gap-0">
             <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gray-50/50">
-                <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">{editingData.category ? "Editar Categoria" : "Nova Categoria"}
+                <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">{editingData.subcategory?.catId && editingData.subcategory.name ? "Editar Categoria" : "Nova Categoria"}
                     </DialogTitle>
             </DialogHeader>
             <div className="px-6 py-6 space-y-4"><Label>Nome</Label><Input value={catForm.name} 
@@ -145,12 +146,12 @@ export function PagamentosModals({
       <Dialog open={modalsState.isSubOpen} onOpenChange={(v) => !v && closeAll()}>
         <DialogContent className="sm:max-w-[500px] flex flex-col p-0 bg-white gap-0">
             <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gray-50/50">
-                <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">{editingData.subcategory ? "Editar Subcategoria" : "Nova Subcategoria"}
+                <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">{editingData.subcategory?.id ? "Editar Subcategoria" : "Nova Subcategoria"}
                     </DialogTitle>
             </DialogHeader>
             <div className="px-6 py-6 space-y-4">
                 <div><Label>Nome</Label><Input value={subCatForm.name} onChange={(e) => subCatForm.setName(e.target.value)} className="mt-2" /></div>
-                <div><Label>Categoria</Label><Select value={subCatForm.id} onValueChange={subCatForm.setName}><SelectTrigger className="mt-2"><SelectValue placeholder="Selecione..." /></SelectTrigger><SelectContent>{categories.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent></Select></div>
+                <div><Label>Categoria</Label><Select value={subCatForm.id} onValueChange={subCatForm.setId}><SelectTrigger className="mt-2"><SelectValue placeholder="Selecione..." /></SelectTrigger><SelectContent>{categories.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent></Select></div>
             </div>
             <div className="flex justify-end px-6 py-4 border-t bg-gray-50 gap-2"><Button variant="ghost" onClick={closeAll}>Cancelar</Button><Button onClick={subCatForm.handleSave} className="bg-[#F5C800] text-[#1E1E1E]">Salvar</Button></div>
         </DialogContent>

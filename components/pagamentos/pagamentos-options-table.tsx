@@ -7,6 +7,7 @@ import { Layers, Plus, Pencil, Trash2, FolderTree, ArrowRight, Landmark, Wallet,
 import { Account, Category, Subcategory } from "./types/pagamentosTypes"
 import { PagamentosModals } from "./pagamentos-options-modal"
 import { usePagamentosModals } from "./hooks/usePagamentosTableModals"
+import { ca } from "date-fns/locale"
 
 interface PagamentosOptionsTableProps {
   categories: Category[]
@@ -160,11 +161,13 @@ export function PagamentosOptionsTable({ categories, subcategories, accounts = [
                             </div>
                         )}
                     </div>
-                    <div className="p-3 border-t bg-gray-50">
-                        <Button variant="ghost" size="sm" className="w-full text-xs text-gray-500 hover:text-[#1E1E1E] hover:bg-[#F5C800]/10" onClick={() => openNewSubcategory(cat.value)}>
-                            <Plus className="h-3 w-3 mr-1" /> Adicionar Subcategoria
-                        </Button>
-                    </div>
+
+                <div className="p-3 border-t bg-gray-50">
+                    <Button onClick={() => openNewSubcategory()} variant="outline" className="border-dashed border-gray-400">
+                        <Plus className="h-4 w-4 mr-2" /> Adicionar Subcategoria
+                    </Button>
+                </div>
+                    
                 </CardContent>
                 </Card>
             )
