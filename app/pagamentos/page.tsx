@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { getUserContext } from "../auth/context/userContext";
 import { Pagamentos } from "@/lib/types";
-import { calculateFinancialMetrics } from "@/lib/pagamentos-financial";
+import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial";
 import PagamentosPageContent from "./pagamentos-page-content"
 
 export const dynamic = 'force-dynamic';

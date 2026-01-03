@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/hooks/use-toast"
 
 import { Account, Category, ObraData, OBRA_SUBCATEGORIES_MAP, modalsState, editingData } from "./types/pagamentosTypes"
-import { useAccountForm, useCategoryForm, useSubCategoryForm } from "./hooks/useModals"
+import { useAccountForm, useCategoryForm, useSubCategoryForm } from "./hooks/usePagementosOptionsModals"
 import { useObras } from "./hooks/useObras"
 import { deleteCategoryAction } from "./actions/categoriasActions"
 import { deleteSubcategoryAction } from "./actions/subcategoriasActions"

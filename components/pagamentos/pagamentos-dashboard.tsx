@@ -9,20 +9,16 @@ import {
 } from "recharts"
 import { format, parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { ArrowDownCircle, ArrowUpCircle, Wallet, AlertCircle } from "lucide-react"
-import { Pagamentos } from "@/lib/types"
+import { ArrowUpCircle, Wallet, AlertCircle } from "lucide-react"
+import { FinancialMetrics, Pagamentos } from "@/lib/types"
+import {formatCurrency, calculateFinancialMetrics, calculateCategoryBalances, calculateDailyFlow, calculateProgress} from "@/components/pagamentos/libs/pagamentos-financial"
+import { usePagamentosCharts } from "./hooks/usePagamentosDashboardCharts"
 
 // --- Tipos e Utilitários ---
 interface PagamentosDashboardProps {
   data: Pagamentos[]
+  metrics: FinancialMetrics
   periodLabel?: string 
-}
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value)
 }
 
 const COLORS = {
@@ -34,114 +30,17 @@ const COLORS = {
   chartPalette: ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d", "#ff7300", "#387908"]
 }
 
-export function PagamentosDashboard({ data, periodLabel = "Geral" }: PagamentosDashboardProps) {
-  const [chartMetric, setChartMetric] = useState<string>("category")
+export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: PagamentosDashboardProps) {
 
-  // 1. Cálculos Gerais (KPIs)
-  const metrics = useMemo(() => {
-    let entradas = 0
-    let saidas = 0
-    let aReceber = 0
-    let aPagar = 0
+  const { chartMetric, setChartMetric, donutReceitas, donutDespesas } = usePagamentosCharts(data)
 
-    data.forEach(p => {
-      const val = Number(p.amount) || 0
-      if (p.type === "receita") {
-        entradas += val
-        if (p.status === "not_pago") aReceber += val
-      } else {
-        saidas += val
-        if (p.status === "not_pago") aPagar += val
-      }
-    })
-
-    return { entradas, saidas, saldo: entradas - saidas, aReceber, aPagar }
-  }, [data])
-
-  // 2. Cálculo de Balanço por Categoria (NOVO)
   const categoryBalances = useMemo(() => {
-    const groups: Record<string, { entradas: number; saidas: number }> = {}
+      return calculateCategoryBalances(data)
+    }, [data])
 
-    data.forEach(p => {
-      // Usamos category_name ou fallback
-      const cat = p.category_name || "Sem Categoria"
-      if (!groups[cat]) groups[cat] = { entradas: 0, saidas: 0 }
-
-      const val = Number(p.amount) || 0
-      if (p.type === "receita") groups[cat].entradas += val
-      else groups[cat].saidas += val
-    })
-
-    // Converte para array e ordena por volume total (entradas + saídas) para mostrar os mais relevantes primeiro
-    return Object.entries(groups)
-      .map(([name, vals]) => ({ 
-        name, 
-        ...vals, 
-        saldo: vals.entradas - vals.saidas,
-        volume: vals.entradas + vals.saidas
-      }))
-      .sort((a, b) => b.volume - a.volume)
-  }, [data])
-
-  // 3. Gráfico de Barras (Fluxo Diário)
   const dailyData = useMemo(() => {
-    const grouped: Record<string, { date: string; receita: number; despesa: number }> = {}
-
-    data.forEach(p => {
-      if (!p.date) return
-      const dateKey = p.date.split("T")[0] 
-      
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = { date: dateKey, receita: 0, despesa: 0 }
-      }
-
-      const val = Number(p.amount) || 0
-      if (p.type === "receita") grouped[dateKey].receita += val
-      else grouped[dateKey].despesa += val
-    })
-
-    return Object.values(grouped)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  }, [data])
-
-  // 4. Dados Dinâmicos para os Gráficos de Rosca
-  const { donutReceitas, donutDespesas } = useMemo(() => {
-    const receitasMap: Record<string, number> = {}
-    const despesasMap: Record<string, number> = {}
-
-    data.forEach(p => {
-      if (p.status !== "pago") return
-
-      let key = "Outros"
-      switch (chartMetric) {
-        case "category": key = p.category_name || "Sem Categoria"; break
-        case "subcategory": key = p.subcategory_name || "Sem Subcategoria"; break
-        case "account": key = p.account_name || "Sem Conta"; break
-        case "method": key = p.method || "Outros"; break
-        default: key = "Geral"
-      }
-
-      const val = Number(p.amount) || 0
-      if (p.type === "receita") receitasMap[key] = (receitasMap[key] || 0) + val
-      else despesasMap[key] = (despesasMap[key] || 0) + val
-    })
-
-    const processData = (map: Record<string, number>) => 
-      Object.entries(map)
-        .map(([name, value]) => ({ name, value }))
-        .sort((a, b) => b.value - a.value)
-
-    return {
-      donutReceitas: processData(receitasMap),
-      donutDespesas: processData(despesasMap)
-    }
-  }, [data, chartMetric])
-
-  // Helper para calcular porcentagem da barra de progresso (evita divisão por zero)
-  const calculateProgress = (val: number, total: number) => {
-    if (total === 0) return val > 0 ? 100 : 0
-    return Math.min((val / total) * 100, 100)
-  }
+      return calculateDailyFlow(data)
+    }, [data])
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -154,7 +53,7 @@ export function PagamentosDashboard({ data, periodLabel = "Geral" }: PagamentosD
             <Wallet className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(metrics.saldo)}</div>
+            <div className="text-2xl font-bold text-gray-900">{formatCurrency(metrics.saldoRealizado)}</div>
             <p className="text-xs text-gray-400 mt-1">Total consolidado</p>
           </CardContent>
         </Card>
@@ -165,7 +64,7 @@ export function PagamentosDashboard({ data, periodLabel = "Geral" }: PagamentosD
             <AlertCircle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{formatCurrency(metrics.aPagar)}</div>
+            <div className="text-2xl font-bold text-red-600">{formatCurrency(metrics.despPendente)}</div>
             <p className="text-xs text-gray-400 mt-1">Pendentes</p>
           </CardContent>
         </Card>
@@ -176,7 +75,7 @@ export function PagamentosDashboard({ data, periodLabel = "Geral" }: PagamentosD
             <ArrowUpCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{formatCurrency(metrics.aReceber)}</div>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(metrics.recPendente)}</div>
             <p className="text-xs text-gray-400 mt-1">Previstos</p>
           </CardContent>
         </Card>
@@ -197,7 +96,7 @@ export function PagamentosDashboard({ data, periodLabel = "Geral" }: PagamentosD
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Entradas</span>
-                  <span className="font-semibold text-gray-700">{formatCurrency(metrics.entradas)}</span>
+                  <span className="font-semibold text-gray-700">{formatCurrency(metrics.recPaga)}</span>
                 </div>
                 <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
                   <div className="h-full bg-green-500 rounded-full" style={{ width: '100%' }} />
@@ -207,21 +106,20 @@ export function PagamentosDashboard({ data, periodLabel = "Geral" }: PagamentosD
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Saídas</span>
-                  <span className="font-semibold text-gray-700">{formatCurrency(metrics.saidas)}</span>
+                  <span className="font-semibold text-gray-700">{formatCurrency(metrics.despPaga)}</span>
                 </div>
                 <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                  {/* Barra de Saída proporcional à Entrada */}
                   <div 
                     className="h-full bg-red-500 rounded-full" 
-                    style={{ width: `${calculateProgress(metrics.saidas, metrics.entradas)}%` }} 
+                    style={{ width: `${calculateProgress(metrics.despPaga, metrics.recPaga)}%` }} 
                   />
                 </div>
               </div>
 
               <div className="pt-4 border-t flex justify-between items-center">
                 <span className="font-medium text-gray-900">Resultado</span>
-                <span className={`text-lg font-bold ${metrics.saldo >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {formatCurrency(metrics.saldo)}
+                <span className={`text-lg font-bold ${metrics.saldoRealizado >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatCurrency(metrics.saldoRealizado)}
                 </span>
               </div>
             </CardContent>

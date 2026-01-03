@@ -5,7 +5,7 @@
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
   import { Badge } from "@/components/ui/badge"
   import { Button } from "@/components/ui/button"
-  import { formatCurrency } from "@/lib/pagamentos-financial"
+  import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
   import type { FinancialMetrics, PaymentFiltersState } from "@/lib/types"
 
   const MONTHS = [

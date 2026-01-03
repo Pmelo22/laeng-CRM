@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Layers, Plus, Pencil, Trash2, FolderTree, ArrowRight, Landmark, Wallet, Link2 } from "lucide-react"
 import { Account, Category, Subcategory } from "./types/pagamentosTypes"
 import { PagamentosModals } from "./pagamentos-options-modal"
-import { usePagamentosModals } from "./hooks/usePagamentosModals"
+import { usePagamentosModals } from "./hooks/usePagamentosTableModals"
 
 interface PagamentosOptionsTableProps {
   categories: Category[]

@@ -2,17 +2,17 @@
 
 import { useState, useMemo, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { calculateFinancialMetrics } from "@/lib/pagamentos-financial"
+import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { PagamentosTableFull } from "@/components/pagamentos-table-full"
 import { PagamentosHeader, ViewMode } from "@/components/pagamentos-header" 
 import { PagamentosEditModal } from "@/components/pagamentos-edit-modal" 
-import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/lib/pagamentos-filter-logic"
+import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/components/pagamentos/libs/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
 import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLogic"
 import { toast } from "@/hooks/use-toast"
 import { PagamentosDeleteDialog } from "@/components/pagamentos-delete-dialog"
-import { PagamentosDashboard } from "@/components/pagamentos-dashboard"
+import { PagamentosDashboard } from "@/components/pagamentos/pagamentos-dashboard"
 import { PagamentosOptionsTable } from "@/components/pagamentos/pagamentos-options-table"
 
 interface PagamentosPageContentProps {
@@ -167,7 +167,7 @@ export default function PagamentosPageContent({
           {/* Lógica de Renderização Condicional*/}
           {viewMode === 'dashboard' && (
               <div className="pb-10">
-                  <PagamentosDashboard data={filteredPagamentos} />
+                  <PagamentosDashboard data={filteredPagamentos} metrics={currentMetrics}/>
               </div>
           )}
 

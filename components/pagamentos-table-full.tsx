@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {  AlertCircle, CheckCircle2, CircleDollarSign, CalendarDays, Tag, Landmark, Pencil, Tags, ListTree, Trash2 } from "lucide-react"
-import { formatCurrency } from "@/lib/pagamentos-financial"
+import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
 import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
 import { PagamentosEditModal } from "./pagamentos-edit-modal"

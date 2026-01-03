@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Loader2 } from "lucide-react"
 import type { Pagamentos } from "@/lib/types"
-import { formatCurrency } from "@/lib/pagamentos-financial"
+import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
 
 interface PagamentosDeleteDialogProps {
   pagamento: Pagamentos | null
