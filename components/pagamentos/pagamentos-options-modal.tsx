@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Loader2, CheckCircle2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -52,6 +52,31 @@ export function PagamentosModals({
   //Obras
   const obras = useObras(modalsState.isLinkOpen, closeAll)
 
+  const [searchObra, setSearchObra] = useState("")
+
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+
+  const filteredObras = searchObra.length >= 3 
+    ? obras.list.filter(obra => 
+        obra.cliente_nome.toLowerCase().includes(searchObra.toLowerCase())
+      )
+    : []
+
+  const handleSelectFromSearch = (id: string) => {
+    obras.handleSelectObra(id) 
+    setSearchObra("") 
+    }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setSearchObra("")
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
   //Delete
   const handleConfirmDelete = async () => {
     const item = editingData.toDelete
@@ -71,23 +96,58 @@ export function PagamentosModals({
 
   return (
     <>
-      {/* 1. LINK MODAL */}
-      <Dialog open={modalsState.isLinkOpen} onOpenChange={(v) => !v && closeAll()}>
-        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0 bg-white">
+    {/* 1. LINK MODAL */}
+      <Dialog open={modalsState.isLinkOpen} onOpenChange={(v) => { if(!v) closeAll(); setSearchObra(""); }}>
+        <DialogContent className="max-w-3xl max-h-[120vh] flex flex-col p-0 bg-white">
             <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gray-50/50">
                 <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">Importar Custos da Obra</DialogTitle>
             </DialogHeader>
             <div className="overflow-y-auto px-6 py-6 space-y-6 scrollbar-thin flex-1">
-                <div className="space-y-2">
+                
+               
+                <div className="space-y-2" ref={searchContainerRef}>
                     <Label className="text-base font-semibold">Qual cliente deseja importar?</Label>
+                    
+                    <div className="relative">
+                        <Input 
+                            placeholder="Digite o nome do cliente..." 
+                            value={searchObra}
+                            onChange={(e) => setSearchObra(e.target.value)}
+                            className="mb-2 border-gray-300 focus:ring-[#F5C800]"
+                        />
+                    
+                        {searchObra.length >= 3 && (
+                            <div className="absolute top-full left-0 w-full z-50 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto mt-1">
+                                {filteredObras.length === 0 ? (
+                                    <div className="p-3 text-sm text-gray-500 text-center">
+                                        Nenhum cliente encontrado.
+                                    </div>
+                                ) : (
+                                    filteredObras.map(obra => (
+                                        <div 
+                                            key={obra.id}
+                                            onClick={() => handleSelectFromSearch(String(obra.id))}
+                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-[#1E1E1E] border-b border-gray-50 last:border-0 transition-colors"
+                                        >
+                                            {obra.cliente_nome}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </div>
+
                     <Select value={obras.selectedId} onValueChange={obras.handleSelectObra}>
-                        <SelectTrigger className="border-gray-300 focus:ring-[#F5C800] text-lg py-6">
+                        <SelectTrigger className="border-gray-300 focus:ring-[#F5C800] text-lg py-6 bg-gray-50">
                             <SelectValue placeholder="Selecione o Cliente / Obra..." />
                         </SelectTrigger>
+                        
                         <SelectContent>
-                            {obras.list.length === 0 ? <SelectItem value="0" disabled>Nenhuma obra encontrada</SelectItem> : 
-                                obras.list.map(obra => <SelectItem key={obra.id} value={String(obra.id)}>{obra.cliente_nome} (Cód: {String(obra.id).padStart(3,'0')})</SelectItem>)
-                            }
+                             {obras.list.map(obra => (
+                                    <SelectItem key={obra.id} value={String(obra.id)}>
+                                        {obra.cliente_nome}
+                                    </SelectItem>
+                             ))}
                         </SelectContent>
                     </Select>
                 </div>
