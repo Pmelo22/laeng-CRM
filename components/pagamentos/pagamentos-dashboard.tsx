@@ -11,7 +11,7 @@ import { format, parseISO } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { ArrowUpCircle, Wallet, AlertCircle } from "lucide-react"
 import { FinancialMetrics, Pagamentos } from "@/lib/types"
-import {formatCurrency, calculateFinancialMetrics, calculateCategoryBalances, calculateDailyFlow, calculateProgress} from "@/components/pagamentos/libs/pagamentos-financial"
+import {formatCurrency, calculateCategoryBalances, calculateDailyFlow, calculateProgress} from "@/components/pagamentos/libs/pagamentos-financial"
 import { usePagamentosCharts } from "./hooks/usePagamentosDashboardCharts"
 
 // --- Tipos e Utilitários ---
@@ -20,6 +20,7 @@ interface PagamentosDashboardProps {
   metrics: FinancialMetrics
   periodLabel?: string 
 }
+
 
 const COLORS = {
   receita: "#22c55e", 
@@ -32,7 +33,7 @@ const COLORS = {
 
 export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: PagamentosDashboardProps) {
 
-  const { chartMetric, setChartMetric, donutReceitas, donutDespesas } = usePagamentosCharts(data)
+  const { chartMetric, setChartMetric, donutReceitas, donutDespesas, donutDespesasPendente, donutDespesasTotal, donutReceitasPendente, donutReceitasTotal} = usePagamentosCharts(data)
 
   const categoryBalances = useMemo(() => {
       return calculateCategoryBalances(data)
@@ -53,7 +54,7 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
             <Wallet className="h-4 w-4 text-purple-500  " />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{formatCurrency(metrics.saldoRealizado)}</div>
+            <div className="text-2xl font-bold text-gray-900">{formatCurrency(metrics.recPaga + metrics.recPendente - metrics.despPaga - metrics.despPendente)}</div>
             <p className="text-xs text-gray-400 mt-1">Total consolidado</p>
           </CardContent>
         </Card>
@@ -99,7 +100,8 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
                   <span className="font-semibold text-gray-700">{formatCurrency(metrics.recPaga)}</span>
                 </div>
                 <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-green-500 rounded-full" style={{ width: '100%' }} />
+                  <div className="h-full bg-green-500 rounded-full" 
+                  style={{ width: `${calculateProgress(metrics.recPaga, metrics.recPendente)}%` }} />
                 </div>
               </div>
 
@@ -126,10 +128,10 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
           </Card>
 
           {/* Card 2: Balanço por Categorias */}
-          <Card className="shadow-md border-0 flex flex-col max-h-[500px]">
+          <Card className="shadow-md border-0 flex flex-col max-h-[1086px]">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg text-slate-700">Balanço por Categoria</CardTitle>
-              <CardDescription>Entradas e saídas agrupadas</CardDescription>
+              <CardDescription>Entradas e saídas (Pagas) agrupadas</CardDescription>
             </CardHeader>
             <CardContent className="overflow-y-auto pr-2 custom-scrollbar space-y-6 pt-2">
               {categoryBalances.length === 0 && (
@@ -214,9 +216,9 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
 
           {/* Gráficos de Distribuição (Rosca) */}
           <Card className="shadow-md border-0">
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-row  justify-between">
               <div className="space-y-1">
-                <CardTitle className="text-lg text-slate-700">Distribuição (Pagos)</CardTitle>
+                <CardTitle className="text-lg text-slate-700">Distribuição</CardTitle>
                 <CardDescription>Visão detalhada de valores efetivados</CardDescription>
               </div>
               <div className="w-[200px] h-[150px]">
@@ -235,9 +237,9 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Gráfico 1: Receitas */}
+                {/* Gráfico 1: Receitas Pagas */}
                 <div className="flex flex-col items-center">
-                  <h4 className="text-sm font-semibold text-green-600 mb-2">Receitas</h4>
+                  <h4 className="text-sm font-semibold text-green-600 mb-2">Receitas Pagas</h4>
                   <div className="h-[250px] w-full">
                     {donutReceitas.length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
@@ -267,9 +269,9 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
                   </div>
                 </div>
 
-                {/* Gráfico 2: Despesas */}
+                {/* Gráfico 2: Despesas Pagas */}
                 <div className="flex flex-col items-center border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-4">
-                  <h4 className="text-sm font-semibold text-red-600 mb-2">Despesas</h4>
+                  <h4 className="text-sm font-semibold text-red-600 mb-2">Despesas Pagas</h4>
                   <div className="h-[250px] w-full">
                     {donutDespesas.length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
@@ -294,6 +296,130 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics}: Pag
                     ) : (
                       <div className="h-full flex items-center justify-center text-gray-400 text-xs">
                         Sem despesas pagas
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Gráfico 3: Receitas Pendentes */}
+                <div className="flex flex-col items-center">
+                  <h4 className="text-sm font-semibold text-green-600 mb-2">Receitas Pendentes</h4>
+                  <div className="h-[250px] w-full">
+                    {donutReceitasPendente.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={donutReceitasPendente}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={50}
+                            outerRadius={75}
+                            paddingAngle={2}
+                            dataKey="value"
+                          >
+                            {donutReceitasPendente.map((entry, index) => (
+                              <Cell key={`cell-r-${index}`} fill={COLORS.chartPalette[index % COLORS.chartPalette.length]} stroke="none" />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                          <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px' }}/>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-gray-400 text-xs">
+                        Sem receitas pendentes
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Gráfico 4: Receitas Pendentes */}
+                <div className="flex flex-col items-center border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-4">
+                  <h4 className="text-sm font-semibold text-red-600 mb-2">Despesas Pendentes</h4>
+                  <div className="h-[250px] w-full">
+                    {donutDespesasPendente.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={donutDespesasPendente}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={50}
+                            outerRadius={75}
+                            paddingAngle={2}
+                            dataKey="value"
+                          >
+                            {donutDespesasPendente.map((entry, index) => (
+                              <Cell key={`cell-d-${index}`} fill={COLORS.chartPalette[index % COLORS.chartPalette.length]} stroke="none" />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                          <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px' }} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-gray-400 text-xs">
+                        Sem despesas pendentes
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Gráfico 5: Receitas Totais */}
+                <div className="flex flex-col items-center">
+                  <h4 className="text-sm font-semibold text-green-600 mb-2">Receitas Totais</h4>
+                  <div className="h-[250px] w-full">
+                    {donutReceitasTotal.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={donutReceitasTotal}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={50}
+                            outerRadius={75}
+                            paddingAngle={2}
+                            dataKey="value"
+                          >
+                            {donutReceitasTotal.map((entry, index) => (
+                              <Cell key={`cell-r-${index}`} fill={COLORS.chartPalette[index % COLORS.chartPalette.length]} stroke="none" />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                          <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px' }}/>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-gray-400 text-xs">
+                        Sem receitas totais
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Gráfico 4: Receitas Totais */}
+                <div className="flex flex-col items-center border-t md:border-t-0 md:border-l pt-4 md:pt-0 md:pl-4">
+                  <h4 className="text-sm font-semibold text-red-600 mb-2">Despesas Totais</h4>
+                  <div className="h-[250px] w-full">
+                    {donutDespesasTotal.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={donutDespesasTotal}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={50}
+                            outerRadius={75}
+                            paddingAngle={2}
+                            dataKey="value"
+                          >
+                            {donutDespesasTotal.map((entry, index) => (
+                              <Cell key={`cell-d-${index}`} fill={COLORS.chartPalette[index % COLORS.chartPalette.length]} stroke="none" />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                          <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px' }} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-gray-400 text-xs">
+                        Sem despesas totais 
                       </div>
                     )}
                   </div>

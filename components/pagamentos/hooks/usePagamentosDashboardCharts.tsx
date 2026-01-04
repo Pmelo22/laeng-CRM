@@ -1,18 +1,38 @@
 import { useState, useMemo } from "react"
 import { Pagamentos } from "@/lib/types"
 
+const getMethodLabel = (method: string) => {
+  const map: Record<string, string> = {
+    cartao_credito: "Crédito",
+    cartao_debito: "Débito",
+    boleto: "Boleto",
+    pix: "PIX",
+    dinheiro: "Dinheiro", 
+    transferencia: "Transf.",
+  }
+  return map[method] || method
+}
+
 export function usePagamentosCharts(data: Pagamentos[]) {
   const [chartMetric, setChartMetric] = useState<string>("category")
 
-  const { donutReceitas, donutDespesas } = useMemo(() => {
-    const receitasMap: Record<string, number> = {}
-    const despesasMap: Record<string, number> = {}
+  const { 
+    donutReceitas, donutDespesas,            
+    donutReceitasPendente, donutDespesasPendente, 
+    donutReceitasTotal, donutDespesasTotal     
+  } = useMemo(() => {
+    const recPago: Record<string, number> = {}
+    const despPago: Record<string, number> = {}
+    
+    const recPendente: Record<string, number> = {}
+    const despPendente: Record<string, number> = {}
+
+    const recTotal: Record<string, number> = {}
+    const despTotal: Record<string, number> = {}
 
     data.forEach((p) => {
-      // Filtra apenas o que foi efetivamente pago
-      if (p.status !== "pago") return
-
       let key = "Outros"
+      
       switch (chartMetric) {
         case "category":
           key = p.category_name || "Sem Categoria"
@@ -24,17 +44,28 @@ export function usePagamentosCharts(data: Pagamentos[]) {
           key = p.account_name || "Sem Conta"
           break
         case "method":
-          key = p.method || "Outros"
+          key = getMethodLabel(p.method || 'Sem Método')
           break
         default:
           key = "Geral"
       }
 
       const val = Number(p.amount) || 0
-      if (p.type === "receita") {
-        receitasMap[key] = (receitasMap[key] || 0) + val
+      const isReceita = p.type === "receita"
+      const isPago = p.status === "pago"
+
+      if (isReceita) {
+        recTotal[key] = (recTotal[key] || 0) + val
       } else {
-        despesasMap[key] = (despesasMap[key] || 0) + val
+        despTotal[key] = (despTotal[key] || 0) + val
+      }
+
+      if (isPago) {
+        if (isReceita) recPago[key] = (recPago[key] || 0) + val
+        else despPago[key] = (despPago[key] || 0) + val
+      } else {
+        if (isReceita) recPendente[key] = (recPendente[key] || 0) + val
+        else despPendente[key] = (despPendente[key] || 0) + val
       }
     })
 
@@ -44,8 +75,12 @@ export function usePagamentosCharts(data: Pagamentos[]) {
         .sort((a, b) => b.value - a.value)
 
     return {
-      donutReceitas: processData(receitasMap),
-      donutDespesas: processData(despesasMap),
+      donutReceitas: processData(recPago),
+      donutDespesas: processData(despPago),
+      donutReceitasPendente: processData(recPendente),
+      donutDespesasPendente: processData(despPendente),
+      donutReceitasTotal: processData(recTotal),
+      donutDespesasTotal: processData(despTotal),
     }
   }, [data, chartMetric])
 
@@ -54,5 +89,9 @@ export function usePagamentosCharts(data: Pagamentos[]) {
     setChartMetric,
     donutReceitas,
     donutDespesas,
+    donutReceitasPendente,
+    donutDespesasPendente,
+    donutReceitasTotal,
+    donutDespesasTotal
   }
 }
