@@ -191,14 +191,22 @@
                  </FilterSelect>
               </div>
 
-              <FilterSelect value={filters.month} onChange={(v: string) => updateFilter('month', v)} placeholder="Mês" icon={Calendar}>
-                  <SelectItem value="all">Todos Meses</SelectItem>
-                  {availableMonth.map(monthIndex => (
-                    <SelectItem key={monthIndex} value={String(monthIndex)}>
-                      {MONTHS[monthIndex]?.label || monthIndex} 
-                    </SelectItem> 
-                  ))}
-              </FilterSelect>
+              <FilterSelect 
+                value={filters.month} 
+                onChange={(v: string) => {
+                    updateFilter('month', v);
+                    updateFilter('week', 'all');
+                }} 
+                placeholder="Mês" 
+                icon={Calendar}
+            >
+                <SelectItem value="all">Todos Meses</SelectItem>
+                {availableMonth.map(monthIndex => (
+                  <SelectItem key={monthIndex} value={String(monthIndex)}>
+                    {MONTHS[monthIndex]?.label || monthIndex} 
+                  </SelectItem> 
+                ))}
+            </FilterSelect>
 
                 <FilterSelect value={filters.year} onChange={(v: string) => updateFilter('year', v)} placeholder="Ano" icon={Calendar}>
                   <SelectItem value="all">Todos Anos</SelectItem>

@@ -13,7 +13,7 @@ export const INITIAL_FILTERS: PaymentFiltersState = {
   installments: "all",
   month: String(getMonth(today)), 
   year: String(getYear(today)),
-  week: "all"
+  week: String(getWeek(today)),
 }
 
 // Filtragem inteligente para semanas 
