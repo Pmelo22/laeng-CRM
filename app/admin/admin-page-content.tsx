@@ -129,7 +129,7 @@ export default function AdminPageContent({ usuarios: initialUsuarios }: AdminPag
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <div className="bg-[#1E1E1E] border-b-4 border-[#F5C800] px-6 py-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-white flex items-center gap-3 uppercase">
               <Shield className="h-8 w-8 text-[#F5C800]" />

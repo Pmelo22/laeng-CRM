@@ -170,9 +170,8 @@ export default function PagamentosPageContent({
                   <PagamentosDashboard data={filteredPagamentos} metrics={currentMetrics}/>
               </div>
           )}
-
           {viewMode === 'table' && (
-              <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg overflow-hidden min-h-[500px]">
+              <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg min-h-[500px]">
                   <CardContent className="p-0">
                     <PagamentosTableFull 
                         data={filteredPagamentos} 

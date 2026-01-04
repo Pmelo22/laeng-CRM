@@ -57,7 +57,7 @@
     const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
 
     return (
-      <div className="bg-[#1E1E1E] border-b-2 sm:border-b-4 border-[#F5C800] shadow-lg sticky top-0 z-30">
+      <div className="bg-[#1E1E1E] border-b-2 sm:border-b-4 border-[#F5C800] shadow-lg">
         <div className="px-3 sm:px-6 lg:px-8 py-4">
           
           {/* Cabeçalho e Métricas*/}

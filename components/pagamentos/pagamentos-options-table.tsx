@@ -7,7 +7,6 @@ import { Layers, Plus, Pencil, Trash2, FolderTree, ArrowRight, Landmark, Wallet,
 import { Account, Category, Subcategory } from "./types/pagamentosTypes"
 import { PagamentosModals } from "./pagamentos-options-modal"
 import { usePagamentosModals } from "./hooks/usePagamentosTableModals"
-import { ca } from "date-fns/locale"
 
 interface PagamentosOptionsTableProps {
   categories: Category[]
@@ -78,13 +77,14 @@ export function PagamentosOptionsTable({ categories, subcategories, accounts = [
                                     {acc.label}
                                 </span>
                             </div>
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                 <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-blue-600" onClick={() => openEditAccount(acc)}>
                                     <Pencil className="h-4 w-4" />
                                 </Button>
                                 <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => openDelete('account', acc.value, acc.label)}>
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
+                                
                             </div>
                         </CardContent>
                     </Card>
@@ -105,7 +105,7 @@ export function PagamentosOptionsTable({ categories, subcategories, accounts = [
             </h2>
             <p className="text-sm text-gray-500">Gerencie as categorias e subcategorias usadas nos lançamentos.</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col w-full sm:w-auto sm:flex-row gap-2">
             <Button onClick={() => openNewSubcategory()} variant="outline" className="border-dashed border-gray-400">
                 <Plus className="h-4 w-4 mr-2" /> Nova Subcategoria
             </Button>
@@ -148,13 +148,14 @@ export function PagamentosOptionsTable({ categories, subcategories, accounts = [
                                             <ArrowRight className="h-3 w-3 text-gray-300" />
                                             <span className="text-sm font-medium text-gray-700">{sub.name}</span>
                                         </div>
-                                        <div className="flex opacity-0 group-hover:opacity-100 transition-opacity gap-1">
-                                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => openEditSubcategory(sub)}>
-                                                <Pencil className="h-3 w-3 text-blue-600" />
+                                        <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                            <Button size="icon" variant="ghost" className="h-6 w-6 text-gray-400 hover:text-blue-600" onClick={() => openEditSubcategory(sub)}>
+                                                <Pencil className="h-3 w-3" />
                                             </Button>
-                                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => openDelete('sub', sub.id, sub.name)}>
-                                                <Trash2 className="h-3 w-3 text-red-500" />
+                                            <Button size="icon" variant="ghost" className="h-6 w-6 text-gray-400 hover:text-red-600" onClick={() => openDelete('sub', sub.id, sub.name)}>
+                                                <Trash2 className="h-3 w-3" />
                                             </Button>
+                                            
                                         </div>
                                     </div>
                                 ))}
