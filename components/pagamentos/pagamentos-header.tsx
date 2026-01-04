@@ -7,8 +7,8 @@
   import { Button } from "@/components/ui/button"
   import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
   import type { FinancialMetrics, PaymentFiltersState } from "@/lib/types"
-import { useMemo } from "react"
-import { getWeeksOptions } from "./libs/pagamentos-filter-logic"
+  import { useMemo } from "react"
+  import { getWeeksOptions } from "./libs/pagamentos-filter-logic"
 
   const MONTHS = [
     { value: "0", label: "Janeiro" }, { value: "1", label: "Fevereiro" },

@@ -1,4 +1,4 @@
-import { eachWeekOfInterval, endOfMonth, format, getMonth, getWeekOfMonth, getYear, isSameMonth, parseISO, startOfMonth } from "date-fns"
+import { eachWeekOfInterval, endOfMonth, endOfWeek, format, getMonth, getWeek, getWeekOfMonth, getYear, isSameMonth, parseISO, startOfMonth, startOfWeek } from "date-fns"
 import type { Pagamentos, PaymentFiltersState } from "@/lib/types"
 import { ptBR } from "date-fns/locale"
 
@@ -18,28 +18,29 @@ export const INITIAL_FILTERS: PaymentFiltersState = {
 
 // Filtragem inteligente para semanas 
 export function getWeeksOptions(yearStr: string, monthStr: string): { value: string, label: string }[] {
-
   if (yearStr === 'all' || monthStr === 'all') return []
 
   const year = parseInt(yearStr)
   const month = parseInt(monthStr)
-
-  const start = startOfMonth(new Date(year, month))
-  const end = endOfMonth(new Date(year, month))
+  const monthDate = new Date(year, month)
+  const startCalendar = startOfWeek(startOfMonth(monthDate), { weekStartsOn: 0 })
+  const endCalendar = endOfWeek(endOfMonth(monthDate), { weekStartsOn: 0 })
 
   const weeks = eachWeekOfInterval(
-    { start, end },
-    { weekStartsOn: 0 } 
+    { start: startCalendar, end: endCalendar },
+    { weekStartsOn: 0 }
   )
 
-  return weeks.filter(date => isSameMonth(date, start) || getWeekOfMonth(date) === 1).map((date) => {
-
-    const weekIndex = getWeekOfMonth(date) 
-    const label = format(date, "'Semana' dd/MM", { locale: ptBR })
+  return weeks.map((weekStart) => {
+    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 0 })
+    const weekIndex = getWeek(weekStart, { weekStartsOn: 0 }) 
+    
+    const startLabel = format(weekStart, 'MM/dd', { locale: ptBR })
+    const endLabel = format(weekEnd, 'MM/dd', { locale: ptBR })
     
     return {
       value: String(weekIndex),
-      label: label
+      label: `Semana ${startLabel} - ${endLabel}`
     }
   })
 }
@@ -61,7 +62,7 @@ export function getAvailableMonth(pagamentos: Pagamentos[]): number[] {
 
 export function getAvailableWeek(pagamentos: Pagamentos[]): number[] {
   const week = new Set(
-    pagamentos.map(p => p.date ? getWeekOfMonth(parseISO(p.date)) : 1)
+    pagamentos.map(p => p.date ? getWeek(parseISO(p.date), { weekStartsOn: 0 }) : 1)
   )
   return Array.from(week).sort((a, b) => a - b)
 }
@@ -126,15 +127,19 @@ function matchesDate(pg: Pagamentos, filters: PaymentFiltersState): boolean {
   const hasWeekFilter = filters.week !== 'all'
 
   if (!hasYearFilter && !hasMonthFilter && !hasWeekFilter) return true
-
   if (!pg.date) return false
 
   const dateObj = parseISO(pg.date)
+  const pgYear = getYear(dateObj)
 
-  if (hasYearFilter && getYear(dateObj) !== parseInt(filters.year)) return false
+  if (hasYearFilter && pgYear !== parseInt(filters.year)) return false
+  
+  if (hasWeekFilter) {
+    const pgWeek = getWeek(dateObj, { weekStartsOn: 0 })
+    return pgWeek === parseInt(filters.week)
+  }
+
   if (hasMonthFilter && getMonth(dateObj) !== parseInt(filters.month)) return false
   
-  if (hasWeekFilter && getWeekOfMonth(dateObj) !== parseInt(filters.week)) return false
-
   return true
 }
