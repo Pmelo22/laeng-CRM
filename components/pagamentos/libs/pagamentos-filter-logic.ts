@@ -1,5 +1,8 @@
-import { getMonth, getWeekOfMonth, getYear, parseISO } from "date-fns"
+import { eachWeekOfInterval, endOfMonth, format, getMonth, getWeekOfMonth, getYear, isSameMonth, parseISO, startOfMonth } from "date-fns"
 import type { Pagamentos, PaymentFiltersState } from "@/lib/types"
+import { ptBR } from "date-fns/locale"
+
+const today = new Date()
 
 export const INITIAL_FILTERS: PaymentFiltersState = {
   type: "all",
@@ -8,9 +11,37 @@ export const INITIAL_FILTERS: PaymentFiltersState = {
   account: "all",
   method: "all",
   installments: "all",
-  month: "all",
-  year: "all",
+  month: String(getMonth(today)), 
+  year: String(getYear(today)),
   week: "all"
+}
+
+// Filtragem inteligente para semanas 
+export function getWeeksOptions(yearStr: string, monthStr: string): { value: string, label: string }[] {
+
+  if (yearStr === 'all' || monthStr === 'all') return []
+
+  const year = parseInt(yearStr)
+  const month = parseInt(monthStr)
+
+  const start = startOfMonth(new Date(year, month))
+  const end = endOfMonth(new Date(year, month))
+
+  const weeks = eachWeekOfInterval(
+    { start, end },
+    { weekStartsOn: 0 } 
+  )
+
+  return weeks.filter(date => isSameMonth(date, start) || getWeekOfMonth(date) === 1).map((date) => {
+
+    const weekIndex = getWeekOfMonth(date) 
+    const label = format(date, "'Semana' dd/MM", { locale: ptBR })
+    
+    return {
+      value: String(weekIndex),
+      label: label
+    }
+  })
 }
 
 // Extrai os anos únicos disponíveis nos pagamentos para o dropdown

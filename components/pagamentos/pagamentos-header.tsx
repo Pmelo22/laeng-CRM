@@ -7,6 +7,8 @@
   import { Button } from "@/components/ui/button"
   import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
   import type { FinancialMetrics, PaymentFiltersState } from "@/lib/types"
+import { useMemo } from "react"
+import { getWeeksOptions } from "./libs/pagamentos-filter-logic"
 
   const MONTHS = [
     { value: "0", label: "Janeiro" }, { value: "1", label: "Fevereiro" },
@@ -48,13 +50,18 @@
     clearFilters,
     availableYears,
     availableMonth,
-    availableWeeks,
     categories,
     onNewPayment,
     accounts
   }: PagamentosHeaderProps) {
 
     const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
+
+    const isWeekEnabled = filters.year !== 'all' && filters.month !== 'all'
+
+    const weekOptions = useMemo(() => {
+      return getWeeksOptions(filters.year, filters.month)
+    }, [filters.year, filters.month])
 
     return (
       <div className="bg-[#1E1E1E] border-b-2 sm:border-b-4 border-[#F5C800] shadow-lg">
@@ -168,20 +175,35 @@
                     <SelectItem value="not_pago">Pendente</SelectItem>
                 </FilterSelect>
 
-                <FilterSelect value={filters.week} onChange={(v: string) => updateFilter('week', v)} placeholder="Semana" icon={Calendar}>
-                    <SelectItem value="all">Semanas</SelectItem>
-                    {availableWeeks.map(week => <SelectItem key={week} value={String(week)}>{week}ª Semana</SelectItem>)}
-                </FilterSelect>
+                <div className={!isWeekEnabled ? "opacity-50 pointer-events-none" : ""}>
+                 <FilterSelect 
+                    value={filters.week} 
+                    onChange={(v: string) => updateFilter('week', v)} 
+                    placeholder="Semana" 
+                    icon={Calendar}
+                 >
+                    <SelectItem value="all">Todas Semanas</SelectItem>
+                    {weekOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                 </FilterSelect>
+              </div>
 
-                <FilterSelect value={filters.month} onChange={(v: string) => updateFilter('month', v)} placeholder="Mês" icon={Calendar}>
-                    <SelectItem value="all">  Meses</SelectItem>
-                    {availableMonth.map(monthIndex => (<SelectItem key={monthIndex} value={String(monthIndex)}>{MONTHS[monthIndex]?.label || monthIndex} </SelectItem> ))}
-                </FilterSelect>
+              <FilterSelect value={filters.month} onChange={(v: string) => updateFilter('month', v)} placeholder="Mês" icon={Calendar}>
+                  <SelectItem value="all">Todos Meses</SelectItem>
+                  {availableMonth.map(monthIndex => (
+                    <SelectItem key={monthIndex} value={String(monthIndex)}>
+                      {MONTHS[monthIndex]?.label || monthIndex} 
+                    </SelectItem> 
+                  ))}
+              </FilterSelect>
 
                 <FilterSelect value={filters.year} onChange={(v: string) => updateFilter('year', v)} placeholder="Ano" icon={Calendar}>
-                    <SelectItem value="all">Ano</SelectItem>
-                    {availableYears.map(year => <SelectItem key={year} value={String(year)}>{year}</SelectItem>)}
-                </FilterSelect>
+                  <SelectItem value="all">Todos Anos</SelectItem>
+                  {availableYears.map(year => <SelectItem key={year} value={String(year)}>{year}</SelectItem>)}
+               </FilterSelect>
 
                 <FilterSelect value={filters.category} onChange={(v: string) => updateFilter('category', v)} placeholder="Categoria" icon={Layers}>
                     <SelectItem value="all">Categorias</SelectItem>
