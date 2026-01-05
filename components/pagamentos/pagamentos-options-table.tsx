@@ -18,7 +18,7 @@ export function PagamentosOptionsTable({ categories, subcategories, accounts = [
   
   const { modalsState, setModalsState, editingData, handlers } = usePagamentosModals()
 
-  const { openLinkModal, openNewCategory, openEditCategory, openNewSubcategory, openEditSubcategory,  openNewAccount, openEditAccount, openDelete } = handlers
+  const { openFinanceiroLinkModal, openLinkModal, openNewCategory, openEditCategory, openNewSubcategory, openEditSubcategory,  openNewAccount, openEditAccount, openDelete} = handlers
 
   return (
     <div className="space-y-8 pb-20">
@@ -31,11 +31,31 @@ export function PagamentosOptionsTable({ categories, subcategories, accounts = [
                     <Link2 className="h-6 w-6 text-[#F5C800]" />
                     Vincular Custos de Obra
                 </h2>
-                <p className="text-sm text-gray-600">Importe custos (material, mão de obra) registrados em Obras diretamente para o Financeiro.</p>
+                <p className="text-sm text-gray-600">Importe custos (material, pintor, etc.) registrados em Obras diretamente para Pagamentos</p>
             </div>
             <div>
                 <Button onClick={openLinkModal} className="bg-[#1E1E1E] text-white hover:bg-[#1E1E1E]/90 font-bold border border-[#F5C800] shadow-md">
                     <Plus className="h-4 w-4 mr-2 text-[#F5C800]" /> Importar da Obra
+                </Button>
+            </div>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-200" />
+
+      {/* 1. VINCULAR COM FINCANCEIRO */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#F5C800]/10 p-4 rounded-lg shadow-sm border border-[#F5C800]/30">
+            <div>
+                <h2 className="text-xl font-bold text-[#1E1E1E] flex items-center gap-2">
+                    <Link2 className="h-6 w-6 text-[#F5C800]" />
+                    Vincular Receitas do Cliente
+                </h2>
+                <p className="text-sm text-gray-600">Importe receitas (entrada, valor financiado, subsídio) registrados em Clientes diretamente para Pagamentos.</p>
+            </div>
+            <div>
+                <Button onClick={openFinanceiroLinkModal} className="bg-[#1E1E1E] text-white hover:bg-[#1E1E1E]/90 font-bold border border-[#F5C800] shadow-md">
+                    <Plus className="h-4 w-4 mr-2 text-[#F5C800]" /> Importar do Cliente
                 </Button>
             </div>
         </div>

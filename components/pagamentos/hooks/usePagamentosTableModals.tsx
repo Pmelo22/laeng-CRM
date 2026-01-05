@@ -10,7 +10,8 @@ export function usePagamentosModals() {
     isSubOpen: false,
     isAccountOpen: false,
     isDeleteOpen: false,
-    isLinkOpen: false
+    isLinkOpen: false,
+    isFinanceiroLinkOpen: false
   })
 
   // Estados de Dados em Edição
@@ -23,6 +24,8 @@ export function usePagamentosModals() {
   
   // Link
   const openLinkModal = () => setModalsState(prev => ({ ...prev, isLinkOpen: true }))
+
+  const openFinanceiroLinkModal = () => setModalsState(prev => ({ ...prev, isFinanceiroLinkOpen: true }))
 
   // Categorias
   const openNewCategory = () => {
@@ -82,6 +85,7 @@ export function usePagamentosModals() {
     // Handlers
     handlers: {
       openLinkModal,
+      openFinanceiroLinkModal,
       openNewCategory,
       openEditCategory,
       openNewSubcategory,

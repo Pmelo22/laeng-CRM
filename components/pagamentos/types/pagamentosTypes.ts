@@ -33,6 +33,7 @@ export type modalsState = {
   isAccountOpen: boolean
   isDeleteOpen: boolean
   isLinkOpen: boolean
+  isFinanceiroLinkOpen: boolean
 }
 
 export type editingData = {
@@ -51,4 +52,10 @@ export const OBRA_SUBCATEGORIES_MAP: Record<string, string> = {
   gesseiro: "977872c4-dc01-406e-a233-e260624a3999",
   azulejista: "9ae93e09-def7-4cd8-9d38-41a34fb4d287",
   eletricista: "fb9e7584-bb23-4f56-9c36-6ead6cb9fa52"
+}
+
+export const FINANCEIRO_SUBCATEGORIES_MAP: Record<string, string> = {
+  entrada: "ce001eaf-a191-4579-92d7-1a4b97862adb",
+  subsidio: "68b871d8-318c-4d83-911a-3a4a826f1870",
+  valor_financiado: "972c3d02-6f0e-4d33-973a-558e6c3b8bef"
 }
