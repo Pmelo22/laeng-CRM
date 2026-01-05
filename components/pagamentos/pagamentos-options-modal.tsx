@@ -213,7 +213,7 @@ export function PagamentosModals({
         </DialogContent>
       </Dialog>
 
-      {/* 2. FINANCEIRO LINK MODAL (RECEITAS) */}
+  {/* 2. FINANCEIRO LINK MODAL (RECEITAS) */}
       <Dialog open={modalsState.isFinanceiroLinkOpen} onOpenChange={(v) => { if(!v) closeAll(); setSearchFinanceiro(""); }}>
         <DialogContent className="max-w-3xl max-h-[120vh] flex flex-col p-0 bg-white">
             <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gray-50/50">
@@ -229,7 +229,7 @@ export function PagamentosModals({
                             placeholder="Digite o nome do cliente..." 
                             value={searchFinanceiro}
                             onChange={(e) => setSearchFinanceiro(e.target.value)}
-                            className="mb-2 border-gray-300 focus:ring-blue-500" // Cor de foco diferente para diferenciar visualmente se quiser
+                            className="mb-2 border-gray-300 focus:ring-[#F5C800]" 
                         />
                     
                         {searchFinanceiro.length >= 3 && (
@@ -254,7 +254,7 @@ export function PagamentosModals({
                     </div>
 
                     <Select value={financeiro.selectedId} onValueChange={financeiro.handleSelectObra}>
-                        <SelectTrigger className="border-gray-300 focus:ring-blue-500 text-lg py-6 bg-gray-50">
+                        <SelectTrigger className="border-gray-300 focus:ring-[#F5C800] text-lg py-6 bg-gray-50">
                             <SelectValue placeholder="Selecione o Cliente / Obra..." />
                         </SelectTrigger>
                         
@@ -276,19 +276,19 @@ export function PagamentosModals({
                             <div className="space-y-1"><Label>Conta de Entrada</Label><Select value={financeiro.linkFormData.account_id} onValueChange={v => financeiro.setLinkFormData(prev => ({...prev, account_id: v}))}><SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger><SelectContent>{accounts.map(a => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}</SelectContent></Select></div>
                             <div className="space-y-1"><Label>Data</Label><Input type="date" value={financeiro.linkFormData.date} onChange={e => financeiro.setLinkFormData(prev => ({...prev, date: e.target.value}))} /></div>
                             <div className="space-y-1"><Label>Método</Label><Select value={financeiro.linkFormData.method} onValueChange={v => financeiro.setLinkFormData(prev => ({...prev, method: v}))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pix">PIX</SelectItem><SelectItem value="boleto">Boleto</SelectItem><SelectItem value="cartao_credito">Cartão</SelectItem><SelectItem value="transferencia">Transferência</SelectItem><SelectItem value="dinheiro">Dinheiro</SelectItem></SelectContent></Select></div>
-                            <div className="space-y-1"><Label>Status</Label><Select value={financeiro.linkFormData.status} onValueChange={v => financeiro.setLinkFormData(prev => ({...prev, status: v}))}><SelectTrigger className={financeiro.linkFormData.status === 'pago' ? 'text-green-600' : 'text-orange-600'}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pago">Recebido (Pago)</SelectItem><SelectItem value="not_pago">Pendente</SelectItem></SelectContent></Select></div>
+                            <div className="space-y-1"><Label>Status</Label><Select value={financeiro.linkFormData.status} onValueChange={v => financeiro.setLinkFormData(prev => ({...prev, status: v}))}><SelectTrigger className={financeiro.linkFormData.status === 'pago' ? 'text-green-600' : 'text-orange-600'}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pago">Pago</SelectItem><SelectItem value="not_pago">Pendente</SelectItem></SelectContent></Select></div>
                             <div className="space-y-1"><Label>Parcelas</Label><Input type="number" min={1} value={financeiro.linkFormData.installments_total} onChange={e => financeiro.setLinkFormData(prev => ({...prev, installments_total: Number(e.target.value)}))} /></div>
                         </div>
                         <div className="h-[1px] bg-gray-200"></div>
-                        <div className="bg-blue-50 p-4 rounded-md border border-blue-100 space-y-2">
-                             <p className="text-xs font-bold text-blue-800 uppercase mb-2">Resumo das Receitas (Prévia)</p>
+                        <div className="bg-gray-50 p-4 rounded-md border border-gray-100 space-y-2">
+                             <p className="text-xs font-bold text-[#1E1E1E] uppercase mb-2">Resumo das Receitas (Prévia)</p>
                              {Object.keys(FINANCEIRO_SUBCATEGORIES_MAP).map(key => {
                                 const val = financeiro.selectedData?.[key as keyof ObraData] as number
                                 if(!val || val <= 0) return null;
                                 return (
-                                    <div key={key} className="flex justify-between text-sm border-b border-blue-200 pb-1 last:border-0">
-                                        <div className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-blue-500" /><span className="capitalize">{key.replace('_', ' ')}</span></div>
-                                        <span className="font-mono font-bold text-blue-900">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)}</span>
+                                    <div key={key} className="flex justify-between text-sm border-b border-gray-200 pb-1 last:border-0">
+                                        <div className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" /><span className="capitalize">{key.replace('_', ' ')}</span></div>
+                                        <span className="font-mono font-bold text-[#1E1E1E]">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)}</span>
                                     </div>
                                 )
                             })}
@@ -298,7 +298,7 @@ export function PagamentosModals({
             </div>
             <div className="flex justify-between px-6 py-4 border-t bg-gray-50 mt-auto">
                 <Button variant="ghost" onClick={closeAll}>Cancelar</Button>
-                <Button onClick={financeiro.handleSaveLinkTransactions} disabled={isLoading || !financeiro.selectedData} className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button onClick={financeiro.handleSaveLinkTransactions} disabled={isLoading || !financeiro.selectedData} className="bg-[#1E1E1E] text-white border border-[#F5C800]">
                     {isLoading ? <Loader2 className="animate-spin" /> : "Gerar Receitas"}
                 </Button>
             </div>
