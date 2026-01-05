@@ -5,6 +5,7 @@ import {
   Users, 
   Building2, 
   DollarSign, 
+  CreditCard,
   LogOut,
   Menu,
   X,
@@ -50,6 +51,11 @@ const menuItems = [
     href: "/logs",
   },
   {
+    title: "Pagamentos",
+    icon: CreditCard,
+    href: "/pagamentos"
+  },
+  {
     title: "Admin",
     icon: Shield,
     href: "/admin",
@@ -93,7 +99,7 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
   let items =
     userRole === "admin"
       ? menuItems
-      : menuItems.filter((i) => i.title !== "Admin");
+      : menuItems.filter((i) => i.title !== "Admin" && i.title !== "Pagamentos");
 
   if (!userPermissions?.dashboard?.view) {
     items = items.filter((i) => i.title !== "Dashboard")
