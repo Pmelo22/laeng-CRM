@@ -1,7 +1,7 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
-import { Search, Filter, Wallet, TrendingUp, TrendingDown, LayoutDashboard, CheckCircle2, Clock, Calendar, RotateCcw, Layers, Plus } from "lucide-react"
+import { Search, Wallet, TrendingUp, TrendingDown, LayoutDashboard, CheckCircle2, Clock, Calendar, RotateCcw, Layers, Plus } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -36,6 +36,7 @@ interface PagamentosHeaderProps {
   categories: { label: string; value: string }[]
   subcategories: { id: string; name: string; categories_id: string }[]
   onNewPayment: () => void
+  showViewToggler?: boolean
 }
 
 export function PagamentosHeader({
@@ -50,7 +51,8 @@ export function PagamentosHeader({
   availableYears,
   availableMonth,
   categories,
-  onNewPayment
+  onNewPayment,
+  showViewToggler = true
 }: PagamentosHeaderProps) {
 
   const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
@@ -132,17 +134,19 @@ export function PagamentosHeader({
                 <Plus className="h-4 w-4 mr-2" />Novo
               </Button>
 
-              <Select value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
-                <SelectTrigger className="w-full sm:w-[180px] h-10 bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] border-0 font-bold">
-                  <LayoutDashboard className="h-4 w-5 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="dashboard">Dashboard</SelectItem>
-                  <SelectItem value="table">Tabela</SelectItem>
-                  <SelectItem value="options">Opções</SelectItem>
-                </SelectContent>
-              </Select>
+              {showViewToggler && (
+                <Select value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
+                  <SelectTrigger className="w-full sm:w-[180px] h-10 bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] border-0 font-bold">
+                    <LayoutDashboard className="h-4 w-5 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dashboard">Dashboard</SelectItem>
+                    <SelectItem value="table">Tabela</SelectItem>
+                    <SelectItem value="options">Opções</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
 
               {activeFiltersCount > 0 && (
                 <Button variant="destructive" onClick={clearFilters} size="icon" className="h-10 w-10 shrink-0" title="Limpar Filtros">
@@ -154,15 +158,6 @@ export function PagamentosHeader({
 
           {/* LINHA 2: Grid de Filtros (Abaixo da busca) */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-2">
-
-            <FilterSelect value={filters.type} onChange={(v: string) => updateFilter('type', v)} placeholder="Tipo" icon={Filter}>
-              <SelectItem value="all">Tipos</SelectItem>
-              <SelectItem value="receita">Receitas</SelectItem>
-              <SelectItem value="despesa">Despesas</SelectItem>
-            </FilterSelect>
-
-
-
             <div className={!isWeekEnabled ? "opacity-50 pointer-events-none" : ""}>
               <FilterSelect
                 value={filters.week}
