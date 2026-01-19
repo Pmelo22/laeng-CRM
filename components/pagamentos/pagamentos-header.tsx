@@ -35,7 +35,6 @@ interface PagamentosHeaderProps {
   availableWeeks: number[]
   categories: { label: string; value: string }[]
   subcategories: { id: string; name: string; categories_id: string }[]
-  accounts: { label: string; value: string }[]
   onNewPayment: () => void
 }
 
@@ -74,9 +73,9 @@ export function PagamentosHeader({
           </h1>
 
           <div className="flex flex-col items-start sm:items-end">
-            <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Saldo Realizado (Filtrado)</span>
-            <span className={`text-2xl sm:text-3xl font-bold ${metrics.saldoRealizado >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-              {formatCurrency(metrics.saldoRealizado)}
+            <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Saldo Total</span>
+            <span className={`text-2xl sm:text-3xl font-bold ${metrics.saldo >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              {formatCurrency(metrics.saldo)}
             </span>
           </div>
         </div>
@@ -88,10 +87,7 @@ export function PagamentosHeader({
             </Badge>
             <div className="h-4 w-[1px] bg-gray-600 mx-1"></div>
             <Badge className="bg-green-600/20 text-green-400 hover:bg-green-600/30 border-0 mr-1">
-              <CheckCircle2 className="h-3 w-3 mr-1" /> {formatCurrency(metrics.recPaga)}
-            </Badge>
-            <Badge className="bg-green-900/20 text-green-600 hover:bg-green-900/30 border-dashed border-green-800 border">
-              <Clock className="h-3 w-3 mr-1" /> {formatCurrency(metrics.recPendente)}
+              <CheckCircle2 className="h-3 w-3 mr-1" /> {formatCurrency(metrics.receitaTotal)}
             </Badge>
           </div>
 
@@ -103,10 +99,7 @@ export function PagamentosHeader({
             </Badge>
             <div className="h-4 w-[1px] bg-gray-600 mx-1"></div>
             <Badge className="bg-red-600/20 text-red-400 hover:bg-red-600/30 border-0 mr-1">
-              <CheckCircle2 className="h-3 w-3 mr-1" /> {formatCurrency(metrics.despPaga)}
-            </Badge>
-            <Badge className="bg-red-900/20 text-red-600 hover:bg-red-900/30 border-dashed border-red-800 border">
-              <Clock className="h-3 w-3 mr-1" /> {formatCurrency(metrics.despPendente)}
+              <CheckCircle2 className="h-3 w-3 mr-1" /> {formatCurrency(metrics.despesaTotal)}
             </Badge>
           </div>
           <span className="text-gray-500 text-xs font-medium whitespace-nowrap ml-auto sm:ml-2">

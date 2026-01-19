@@ -31,7 +31,7 @@ export function useQuickEdit({
 }: UseQuickEditProps) {
   const { toast } = useToast()
   const router = useRouter()
-  
+
   const [value, setValue] = useState(currentValue)
   const [valueSecondary, setValueSecondary] = useState(currentValueSecondary)
   const [isLoading, setIsLoading] = useState(false)
@@ -56,7 +56,7 @@ export function useQuickEdit({
   }, [isOpen, currentValue, currentValueSecondary, type])
 
   // Lógica de filtragem
-  const filteredSubcategories = type === 'category_tree' && options 
+  const filteredSubcategories = type === 'category_tree' && options
     ? options.filter((sub: any) => sub.categories_id === selectedCategory)
     : []
 
@@ -74,9 +74,6 @@ export function useQuickEdit({
 
       if (type === "money") {
         updates[fieldName] = typeof value === 'string' ? parseMoneyInput(value) : value
-      } else if (type === "installments") {
-        updates[fieldName] = Number(value)
-        if (fieldNameSecondary) updates[fieldNameSecondary] = Number(valueSecondary)
       } else if (type === "category_tree") {
         updates["subcategories_id"] = selectedSubcategory
       } else {
@@ -113,7 +110,7 @@ export function useQuickEdit({
     isLoading,
     // Category Tree props
     step, setStep,
-    selectedCategory, 
+    selectedCategory,
     selectedSubcategory, setSelectedSubcategory,
     filteredSubcategories,
     handleCategorySelect,

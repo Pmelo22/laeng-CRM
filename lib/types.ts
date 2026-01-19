@@ -217,34 +217,23 @@ export interface PermissoesUsuario {
 export interface Pagamentos {
   id: string;
   codigo: number;
-  description?: string;
   amount: number;
   type?: 'receita' | 'despesa',
   date: string,
   category_id?: string,
-  account_id?: string,
   cliente_id?: string,
   user_id?: string,
-  method?: 'cartao_credito' | 'cartao_debito' | 'boleto' | 'pix' | 'dinheiro' | 'transferencia',
-  installments_current?: number,
-  installments_total?: number,
   created_at?: string,
-  updated_at?: string, 
+  updated_at?: string,
   category_name?: string;
   subcategory_name?: string;
   subcategories_id?: string;
-  account_name?: string; 
-  cliente_nome?: string; 
-  status?: 'pago' | 'not_pago'
+  cliente_nome?: string;
 }
 
 export interface PaymentFiltersState {
   type: string
-  status: string
   category: string
-  account: string
-  method: string
-  installments: string
   month: string
   year: string
   week: string
@@ -265,10 +254,7 @@ export interface Categories {
 
 export interface FinancialMetrics {
   totalCount: number;
-  recPaga: number;
-  recPendente: number;
-  despPaga: number;
-  despPendente: number;
-  saldoRealizado: number;
-  saldoPrevisto: number;
+  receitaTotal: number;
+  despesaTotal: number;
+  saldo: number;
 }

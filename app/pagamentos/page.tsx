@@ -36,19 +36,15 @@ export default async function PagamentosPage() {
           name
         )
       ),
-      accounts:account_id (
-        name
-      ),
       clientes:cliente_id (
         nome
       )
     `)
     .order("updated_at", { ascending: false })
 
-  const {data: categoriasData} = await supabase.from("categories").select("id , name")
-  const {data: subcategoriasData} = await supabase.from("subcategories").select("id, name, categories_id")
-  const {data: accountsData} = await supabase.from("accounts").select("id, name") 
-  
+  const { data: categoriasData } = await supabase.from("categories").select("id , name")
+  const { data: subcategoriasData } = await supabase.from("subcategories").select("id, name, categories_id")
+
   // Maps
 
   const pagamentos: Pagamentos[] = (pagamentosData || []).map((transaction: any) => ({
@@ -56,15 +52,12 @@ export default async function PagamentosPage() {
     category_id: transaction.subcategories?.categories?.id,
     category_name: transaction.subcategories?.categories?.name || 'Sem Categoria',
     subcategory_name: transaction.subcategories?.name || 'Sem Subcategoria',
-    account_name: transaction.accounts?.name || 'Conta desconhecida',
-    cliente_nome: transaction.clientes?.nome || null 
+    cliente_nome: transaction.clientes?.nome || null
   }));
 
-  const categoryOptions = categoriasData?.map((cat) => ({label: cat.name, value: cat.id })) || []
+  const categoryOptions = categoriasData?.map((cat) => ({ label: cat.name, value: cat.id })) || []
 
-  const accountOptions = accountsData?.map((cat) => ({label: cat.name, value: cat.id })) || []
+  const metrics = calculateFinancialMetrics(pagamentos)
 
-  const metrics = calculateFinancialMetrics(pagamentos) 
-
-  return <PagamentosPageContent metrics={metrics} pagamentos={pagamentos} categories={categoryOptions} subcategories={subcategoriasData || []} accounts={accountOptions} userPermissions={userPermissions} />
+  return <PagamentosPageContent metrics={metrics} pagamentos={pagamentos} categories={categoryOptions} subcategories={subcategoriasData || []} userPermissions={userPermissions} />
 }
