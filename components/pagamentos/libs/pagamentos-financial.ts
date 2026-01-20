@@ -10,6 +10,8 @@ export const formatCurrency = (value: number) => {
 export const calculateFinancialMetrics = (transactions: Pagamentos[]): FinancialMetrics => {
   const initialMetrics: FinancialMetrics = {
     totalCount: transactions.length,
+    despesaCount: transactions.filter((p) => p.type === "despesa").length,
+    receitaCount: transactions.filter((p) => p.type === "receita").length,
     receitaTotal: 0,
     despesaTotal: 0,
     saldo: 0,

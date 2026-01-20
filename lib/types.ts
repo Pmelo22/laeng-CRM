@@ -256,5 +256,7 @@ export interface FinancialMetrics {
   totalCount: number;
   receitaTotal: number;
   despesaTotal: number;
+  despesaCount: number;
+  receitaCount: number;
   saldo: number;
 }

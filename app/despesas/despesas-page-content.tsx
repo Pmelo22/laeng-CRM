@@ -12,6 +12,7 @@ import { PaymentFiltersState } from "@/lib/types"
 import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLogic"
 import { toast } from "@/hooks/use-toast"
 import { PagamentosDeleteDialog } from "@/components/pagamentos/pagamentos-delete-dialog"
+import { DespesasHeader } from "../../components/pagamentos/despesas-header"
 
 interface DespesasPageContentProps {
     pagamentos: Pagamentos[]
@@ -128,13 +129,10 @@ export default function DespesasPageContent({
     return (
         <div className="flex min-h-screen flex-col bg-gray-50">
 
-            <PagamentosHeader
+            <DespesasHeader
                 metrics={currentMetrics}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
-                viewMode={viewMode}
-                setViewMode={() => { }} // No-op
-                showViewToggler={false}
                 filters={filters}
                 updateFilter={updateFilter}
                 clearFilters={clearFilters}

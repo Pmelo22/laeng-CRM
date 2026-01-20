@@ -147,7 +147,7 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                                         subcategories as any,
                                                         undefined
                                                     )}
-                                                    className="opacity-0 group-hover/cat:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-[#F5C800]"
+                                                    className="opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-[#F5C800]"
                                                     title="Editar Classificação"
                                                 >
                                                     <ListTree className="h-4 w-4" />
@@ -165,13 +165,16 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                             </span>
                                         </div>
                                     </TableCell>
-
                                     {/* TIPO */}
                                     <TableCell className="text-center p-2">
                                         <div
-                                            className={`inline-flex justify-center`}
+                                        onClick={() => handleEdit(row, "type", "Tipo", "select", [
+                                            { label: "Receita", value: "receita" },
+                                            { label: "Despesa", value: "despesa" },
+                                        ])}
+                                        className={`inline-flex justify-center ${canEdit ? 'cursor-pointer hover:opacity-80' : ''}`}
                                         >
-                                            {getTypeBadge(row.type || 'despesa')}
+                                        {getTypeBadge(row.type || 'despesa')}
                                         </div>
                                     </TableCell>
 

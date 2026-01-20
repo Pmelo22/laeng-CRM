@@ -32,7 +32,7 @@ export function PagamentosPagination({
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-2 py-4">
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground font-semibold">
-          Mostrando {startIndex + 1} - {Math.min(endIndex, totalItems)} de {totalItems} pagamentos
+          Mostrando {startIndex + 1} - {Math.min(endIndex, totalItems)} de {totalItems} lançamentos
         </span>
       </div>
 
