@@ -217,12 +217,18 @@ export interface PermissoesUsuario {
 export interface Pagamentos {
   id: string;
   codigo: number;
+  description?: string;
   amount: number;
   type?: 'receita' | 'despesa',
   date: string,
+  method?: string;
+  status?: string;
   category_id?: string,
   cliente_id?: string,
   user_id?: string,
+  account_id?: string;
+  installments_current?: number;
+  installments_total?: number;
   created_at?: string,
   updated_at?: string,
   category_name?: string;
