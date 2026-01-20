@@ -12,6 +12,7 @@ import { PaymentFiltersState } from "@/lib/types"
 import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLogic"
 import { toast } from "@/hooks/use-toast"
 import { PagamentosDeleteDialog } from "@/components/pagamentos/pagamentos-delete-dialog"
+import { ReceitasHeader } from "../../components/pagamentos/receitas-header"
 
 interface ReceitaPageContentProps {
     pagamentos: Pagamentos[]
@@ -128,12 +129,10 @@ export default function ReceitaPageContent({
     return (
         <div className="flex min-h-screen flex-col bg-gray-50">
 
-            <PagamentosHeader
+            <ReceitasHeader
                 metrics={currentMetrics}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
-                viewMode={viewMode}
-                setViewMode={() => { }} // No-op
                 showViewToggler={false}
                 filters={filters}
                 updateFilter={updateFilter}

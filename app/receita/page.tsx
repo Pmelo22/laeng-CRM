@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getUserContext } from "@/app/auth/context/userContext";
 import { Pagamentos } from "@/lib/types";
 import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial";
-import ReceitaPageContent from "@/components/pagamentos/receita-page-content"
+import ReceitaPageContent from "@/app/receita/receita-page-content"
 
 export const dynamic = 'force-dynamic';
 

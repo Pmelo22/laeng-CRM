@@ -19,7 +19,7 @@ const MONTHS = [
   { value: "10", label: "Novembro" }, { value: "11", label: "Dezembro" },
 ]
 
-interface PagamentosHeaderProps {
+interface ReceitasHeaderProps {
   metrics: FinancialMetrics
   searchTerm: string
   setSearchTerm: (term: string) => void
@@ -35,7 +35,7 @@ interface PagamentosHeaderProps {
   showViewToggler?: boolean
 }
 
-export function DespesasHeader({
+export function ReceitasHeader({
   metrics,
   searchTerm,
   setSearchTerm,
@@ -47,7 +47,7 @@ export function DespesasHeader({
   categories,
   onNewPayment,
   showViewToggler = true
-}: PagamentosHeaderProps) {
+}: ReceitasHeaderProps) {
 
   const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
 
@@ -70,7 +70,6 @@ export function DespesasHeader({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
-          <span className="text-[#F5C800] hidden md:inline">•</span>
 
           <div className="flex items-center bg-gray-800/50 rounded-lg p-1 border border-gray-700">
             <Badge variant="outline" className="border-0 bg-transparent text-green-500 hover:bg-transparent font-bold">
@@ -95,7 +94,7 @@ export function DespesasHeader({
             <div className="flex-1 relative group">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#F5C800]" />
               <Input
-                placeholder="Buscar por descrição, cliente, categoria..."
+                placeholder="Buscar por cliente, categoria, subcategoria..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-10 bg-white border-0 text-gray-900 placeholder:text-gray-500 rounded-md shadow-sm w-full"
@@ -107,7 +106,7 @@ export function DespesasHeader({
 
               <Button
                 onClick={onNewPayment}
-                className="h-9 bg-[#F5C800] sm:w-[100px] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
+                className="h-10 bg-[#F5C800] sm:w-[100px] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
                 <Plus className="h-4 w-4 mr-2" />Novo
               </Button>
 

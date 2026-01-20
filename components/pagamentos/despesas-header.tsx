@@ -19,7 +19,7 @@ const MONTHS = [
   { value: "10", label: "Novembro" }, { value: "11", label: "Dezembro" },
 ]
 
-interface ReceitaHeaderProps {
+interface DespesasHeaderProps {
   metrics: FinancialMetrics
   searchTerm: string
   setSearchTerm: (term: string) => void
@@ -46,7 +46,7 @@ export function DespesasHeader({
   availableMonth,
   categories,
   onNewPayment,
-}: ReceitaHeaderProps) {
+}: DespesasHeaderProps) {
 
   const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
 
@@ -104,7 +104,7 @@ export function DespesasHeader({
 
               <Button
                 onClick={onNewPayment}
-                className="h-9 bg-[#F5C800] sm:w-[100px] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
+                className="h-10 bg-[#F5C800] sm:w-[100px] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
                 <Plus className="h-4 w-4 mr-2" />Novo
               </Button>
 
