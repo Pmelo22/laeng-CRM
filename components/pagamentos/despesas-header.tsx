@@ -69,8 +69,6 @@ export function DespesasHeader({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
-          <span className="text-[#F5C800] hidden md:inline">•</span>
-
           <div className="flex items-center bg-gray-800/50 rounded-lg p-1 border border-gray-700">
             <Badge variant="outline" className="border-0 bg-transparent text-red-500 hover:bg-transparent font-bold">
               <TrendingDown className="h-3 w-3 mr-1.5" /> Despesas
