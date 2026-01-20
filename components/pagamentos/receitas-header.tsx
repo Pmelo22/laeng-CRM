@@ -19,14 +19,10 @@ const MONTHS = [
   { value: "10", label: "Novembro" }, { value: "11", label: "Dezembro" },
 ]
 
-export type ViewMode = 'dashboard' | 'table' | 'options'
-
-interface PagamentosHeaderProps {
+interface ReceitasHeaderProps {
   metrics: FinancialMetrics
   searchTerm: string
   setSearchTerm: (term: string) => void
-  viewMode: ViewMode
-  setViewMode: (mode: ViewMode) => void
   filters: PaymentFiltersState
   updateFilter: (key: keyof PaymentFiltersState, value: string) => void
   clearFilters: () => void
@@ -39,12 +35,10 @@ interface PagamentosHeaderProps {
   showViewToggler?: boolean
 }
 
-export function PagamentosHeader({
+export function ReceitasHeader({
   metrics,
   searchTerm,
   setSearchTerm,
-  viewMode,
-  setViewMode,
   filters,
   updateFilter,
   clearFilters,
@@ -53,7 +47,7 @@ export function PagamentosHeader({
   categories,
   onNewPayment,
   showViewToggler = true
-}: PagamentosHeaderProps) {
+}: ReceitasHeaderProps) {
 
   const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
 
@@ -71,18 +65,12 @@ export function PagamentosHeader({
         <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight uppercase flex items-center gap-3">
             <Wallet className="h-6 w-6 text-[#F5C800]" />
-            Gestão de Pagamentos
+            Gestão de RECEITAS
           </h1>
-
-          <div className="flex flex-col items-start sm:items-end">
-            <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Saldo Total</span>
-            <span className={`text-2xl sm:text-3xl font-bold ${metrics.saldo >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-              {formatCurrency(metrics.saldo)}
-            </span>
-          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
+
           <div className="flex items-center bg-gray-800/50 rounded-lg p-1 border border-gray-700">
             <Badge variant="outline" className="border-0 bg-transparent text-green-500 hover:bg-transparent font-bold">
               <TrendingUp className="h-3 w-3 mr-1.5" /> Receitas
@@ -92,20 +80,8 @@ export function PagamentosHeader({
               <CheckCircle2 className="h-3 w-3 mr-1" /> {formatCurrency(metrics.receitaTotal)}
             </Badge>
           </div>
-
-          <span className="text-[#F5C800] hidden md:inline">•</span>
-
-          <div className="flex items-center bg-gray-800/50 rounded-lg p-1 border border-gray-700">
-            <Badge variant="outline" className="border-0 bg-transparent text-red-500 hover:bg-transparent font-bold">
-              <TrendingDown className="h-3 w-3 mr-1.5" /> Despesas
-            </Badge>
-            <div className="h-4 w-[1px] bg-gray-600 mx-1"></div>
-            <Badge className="bg-red-600/20 text-red-400 hover:bg-red-600/30 border-0 mr-1">
-              <CheckCircle2 className="h-3 w-3 mr-1" /> {formatCurrency(metrics.despesaTotal)}
-            </Badge>
-          </div>
           <span className="text-gray-500 text-xs font-medium whitespace-nowrap ml-auto sm:ml-2">
-            {metrics.totalCount} lançamentos
+            {metrics.receitaCount} lançamentos
           </span>
         </div>
 
@@ -133,20 +109,6 @@ export function PagamentosHeader({
                 className="h-10 bg-[#F5C800] sm:w-[100px] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
                 <Plus className="h-4 w-4 mr-2" />Novo
               </Button>
-
-              {showViewToggler && (
-                <Select value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
-                  <SelectTrigger className="w-full sm:w-[180px] h-10 bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] border-0 font-bold">
-                    <LayoutDashboard className="h-4 w-5 mr-2" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dashboard">Dashboard</SelectItem>
-                    <SelectItem value="table">Tabela</SelectItem>
-                    <SelectItem value="options">Opções</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
 
               {activeFiltersCount > 0 && (
                 <Button variant="destructive" onClick={clearFilters} size="icon" className="h-10 w-10 shrink-0" title="Limpar Filtros">

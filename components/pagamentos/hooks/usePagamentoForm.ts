@@ -4,40 +4,28 @@ import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { parseMoneyInput } from "@/lib/utils"
 import type { Pagamentos } from "@/lib/types"
-import { saveTransactionAction } from "../actions/pagamentosActions" 
+import { saveTransactionAction } from "../actions/pagamentosActions"
 
 interface FormData {
-  description: string
   amount: number
   date: string
   type: string
-  method: string
-  status: string
   category_id: string
   subcategories_id: string
-  account_id: string
-  installments_current: number
-  installments_total: number
 }
 
 const INITIAL_STATE: FormData = {
-  description: "",
   amount: 0,
   date: "",
   type: "despesa",
-  method: "pix",
-  status: "not_pago",
   category_id: "",
-  subcategories_id: "", 
-  account_id: "",
-  installments_current: 1,
-  installments_total: 1,
+  subcategories_id: "",
 }
 
 export function usePagamentoForm(
-  isOpen: boolean, 
-  onClose: () => void, 
-  pagamento?: Pagamentos | null 
+  isOpen: boolean,
+  onClose: () => void,
+  pagamento?: Pagamentos | null
 ) {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
@@ -46,17 +34,11 @@ export function usePagamentoForm(
   useEffect(() => {
     if (isOpen && pagamento) {
       setFormData({
-        description: pagamento.description || "",
         amount: Number(pagamento.amount) || 0,
         date: pagamento.date ? new Date(pagamento.date).toISOString().split('T')[0] : "",
         type: pagamento.type || "despesa",
-        method: pagamento.method || "pix",
-        status: pagamento.status || "not_pago",
         category_id: pagamento.category_id || "",
-        subcategories_id: pagamento.subcategories_id || "", 
-        account_id: pagamento.account_id || "",
-        installments_current: pagamento.installments_current || 1,
-        installments_total: pagamento.installments_total || 1,
+        subcategories_id: pagamento.subcategories_id || "",
       })
     } else {
       setFormData(INITIAL_STATE)
@@ -65,11 +47,11 @@ export function usePagamentoForm(
 
   const updateField = (field: keyof FormData, value: any) => {
     setFormData(prev => {
-        const newData = { ...prev, [field]: value }
-        if (field === 'category_id' && value !== prev.category_id) {
-            newData.subcategories_id = ""
-        }
-        return newData
+      const newData = { ...prev, [field]: value }
+      if (field === 'category_id' && value !== prev.category_id) {
+        newData.subcategories_id = ""
+      }
+      return newData
     })
   }
 
@@ -79,7 +61,7 @@ export function usePagamentoForm(
 
   const savePagamento = async () => {
     setIsLoading(true)
-    
+
     try {
       const result = await saveTransactionAction(formData, pagamento?.id)
 

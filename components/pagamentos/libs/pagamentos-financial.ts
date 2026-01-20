@@ -10,34 +10,29 @@ export const formatCurrency = (value: number) => {
 export const calculateFinancialMetrics = (transactions: Pagamentos[]): FinancialMetrics => {
   const initialMetrics: FinancialMetrics = {
     totalCount: transactions.length,
-    recPaga: 0,
-    recPendente: 0,
-    despPaga: 0,
-    despPendente: 0,
-    saldoRealizado: 0,
-    saldoPrevisto: 0,
+    despesaCount: transactions.filter((p) => p.type === "despesa").length,
+    receitaCount: transactions.filter((p) => p.type === "receita").length,
+    receitaTotal: 0,
+    despesaTotal: 0,
+    saldo: 0,
   };
 
   const metrics = transactions.reduce((acc, p) => {
-    const valor = Number(p.amount) || 0; 
-    
-    const isPago = p.status === 'pago';
+    const valor = Number(p.amount) || 0;
+
     const isReceita = p.type === 'receita';
     const isDespesa = p.type === 'despesa';
 
     if (isReceita) {
-      if (isPago) acc.recPaga += valor;
-      else acc.recPendente += valor;
+      acc.receitaTotal += valor;
     } else if (isDespesa) {
-      if (isPago) acc.despPaga += valor;
-      else acc.despPendente += valor;
+      acc.despesaTotal += valor;
     }
 
     return acc;
   }, initialMetrics);
 
-  metrics.saldoRealizado = metrics.recPaga - metrics.despPaga;
-  metrics.saldoPrevisto = (metrics.recPaga + metrics.recPendente) - (metrics.despPaga + metrics.despPendente);
+  metrics.saldo = metrics.receitaTotal - metrics.despesaTotal;
 
   return metrics;
 };
@@ -55,9 +50,9 @@ export const calculateCategoryBalances = (data: Pagamentos[]) => {
   });
 
   return Object.entries(groups)
-    .map(([name, vals]) => ({ 
-      name, 
-      ...vals, 
+    .map(([name, vals]) => ({
+      name,
+      ...vals,
       saldo: vals.entradas - vals.saidas,
       volume: vals.entradas + vals.saidas
     }))
@@ -69,8 +64,8 @@ export const calculateDailyFlow = (data: Pagamentos[]) => {
 
   data.forEach(p => {
     if (!p.date) return;
-    const dateKey = p.date.split("T")[0]; 
-    
+    const dateKey = p.date.split("T")[0];
+
     if (!grouped[dateKey]) {
       grouped[dateKey] = { date: dateKey, receita: 0, despesa: 0 };
     }
@@ -85,6 +80,6 @@ export const calculateDailyFlow = (data: Pagamentos[]) => {
 };
 
 export const calculateProgress = (val: number, total: number) => {
-    if (total === 0) return val > 0 ? 100 : 0
-    return Math.min((val / total) * 100, 100)
-  }
+  if (total === 0) return val > 0 ? 100 : 0
+  return Math.min((val / total) * 100, 100)
+}
