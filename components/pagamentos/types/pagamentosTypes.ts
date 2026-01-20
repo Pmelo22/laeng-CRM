@@ -1,17 +1,12 @@
-export type Category = { 
-    label: string; 
-    value: string 
+export type Category = {
+  label: string;
+  value: string
 }
 
-export type Subcategory = { 
-    id: string; 
-    name: string;
-    categories_id: string 
-}
-
-export type Account = { 
-    label: string; 
-    value: string 
+export type Subcategory = {
+  id: string;
+  name: string;
+  categories_id: string
 }
 
 export type ObraData = {
@@ -30,17 +25,15 @@ export type ObraData = {
 export type modalsState = {
   isCatOpen: boolean
   isSubOpen: boolean
-  isAccountOpen: boolean
   isDeleteOpen: boolean
   isLinkOpen: boolean
   isFinanceiroLinkOpen: boolean
 }
 
 export type editingData = {
-    category: {id: string, name: string} | null
-    subcategory: {id: string, name: string, catId: string} | null
-    account: {value: string, label: string} | null
-    toDelete: {type: 'cat' | 'sub' | 'account', id: string, name: string} | null
+  category: { id: string, name: string } | null
+  subcategory: { id: string, name: string, catId: string } | null
+  toDelete: { type: 'cat' | 'sub', id: string, name: string } | null
 }
 
 

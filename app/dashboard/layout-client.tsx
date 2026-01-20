@@ -1,10 +1,10 @@
 "use client";
 
-import { 
-  LayoutDashboard, 
-  Users, 
-  Building2, 
-  DollarSign, 
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  DollarSign,
   CreditCard,
   LogOut,
   Menu,
@@ -13,7 +13,10 @@ import {
   ChevronRight,
   ScrollText,
   User,
-  Shield
+  Shield,
+  TrendingUp,
+  TrendingDown,
+  BarChart3
 } from 'lucide-react';
 import Link from "next/link";
 import Image from "next/image";
@@ -51,9 +54,19 @@ const menuItems = [
     href: "/logs",
   },
   {
-    title: "Pagamentos",
-    icon: CreditCard,
-    href: "/pagamentos"
+    title: "Receita",
+    icon: TrendingUp,
+    href: "/receita",
+  },
+  {
+    title: "Despesas",
+    icon: TrendingDown,
+    href: "/despesas",
+  },
+  {
+    title: "Fluxo de Caixa",
+    icon: BarChart3,
+    href: "/fluxoDeCaixa",
   },
   {
     title: "Admin",
@@ -67,9 +80,9 @@ function Logo({ collapsed }: { collapsed: boolean }) {
     <div className="flex items-center justify-center h-16 border-b border-gray-800 bg-[#1E1E1E]">
       {collapsed ? (
         <div className="w-10 h-10 rounded-lg bg-[#F5C800] flex items-center justify-center">
-          <Image 
-            src="/icon.jpg" 
-            alt="LA" 
+          <Image
+            src="/icon.jpg"
+            alt="LA"
             width={40}
             height={40}
           />
@@ -77,9 +90,9 @@ function Logo({ collapsed }: { collapsed: boolean }) {
       ) : (
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-[#F5C800] flex items-center justify-center shadow-lg">
-            <Image 
-              src="/icon.jpg" 
-              alt="LA Engenharia" 
+            <Image
+              src="/icon.jpg"
+              alt="LA Engenharia"
               width={50}
               height={50}
             />
@@ -95,11 +108,11 @@ function Logo({ collapsed }: { collapsed: boolean }) {
 
 function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { collapsed: boolean; onToggle: () => void; user: SupabaseUser; userRole: string, userPermissions: Record<string, any>; }) {
   const pathname = usePathname();
-  
+
   let items =
     userRole === "admin"
       ? menuItems
-      : menuItems.filter((i) => i.title !== "Admin" && i.title !== "Pagamentos");
+      : menuItems.filter((i) => i.title !== "Admin" && i.title !== "Receita" && i.title !== "Despesas" && i.title !== "Fluxo de Caixa");
 
   if (!userPermissions?.dashboard?.view) {
     items = items.filter((i) => i.title !== "Dashboard")
@@ -122,14 +135,14 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
   }
 
   return (
-    <aside 
+    <aside
       className={cn(
         "hidden lg:flex flex-col bg-[#1E1E1E] border-r border-gray-800 transition-all duration-300 ease-in-out relative",
         collapsed ? "w-20" : "w-72"
       )}
     >
       <Logo collapsed={collapsed} />
-      
+
       {/* Toggle button */}
       <button
         onClick={onToggle}
@@ -152,8 +165,8 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all",
                 collapsed ? "justify-center" : "",
-                isActive 
-                  ? "bg-[#F5C800] text-black shadow-lg" 
+                isActive
+                  ? "bg-[#F5C800] text-black shadow-lg"
                   : "text-gray-300 hover:bg-gray-800 hover:text-white"
               )}
               title={collapsed ? item.title : undefined}
@@ -192,8 +205,8 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
 
       <div className="border-t border-gray-800 p-3">
         <form action="/auth/signout" method="post">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className={cn(
               "w-full text-gray-300 hover:bg-gray-800 hover:text-white",
               collapsed ? "justify-center px-3" : "justify-start"
@@ -212,9 +225,9 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
         <div className="border-t border-gray-800 p-3 bg-[#2A2A2A]">
           <p className="text-xs text-center text-gray-400">
             Desenvolvido por{" "}
-            <a 
-              href="https://www.linkedin.com/company/theralabs/" 
-              target="_blank" 
+            <a
+              href="https://www.linkedin.com/company/theralabs/"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-[#F5C800] hover:text-yellow-400 transition-colors"
             >
@@ -230,7 +243,7 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
 function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { isOpen: boolean; onClose: () => void; user: SupabaseUser; userRole: string, userPermissions: Record<string, any> }) {
 
   const pathname = usePathname();
-  
+
   let items =
     userRole === "admin"
       ? menuItems
@@ -272,14 +285,14 @@ function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { i
     <>
       {/* Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
-      
+
       {/* Sidebar */}
-      <aside 
+      <aside
         className={cn(
           "fixed top-0 left-0 h-full w-72 bg-[#1E1E1E] border-r border-gray-800 z-50 lg:hidden transition-transform duration-300 ease-in-out flex flex-col",
           isOpen ? "translate-x-0" : "-translate-x-full"
@@ -305,8 +318,8 @@ function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { i
                 onClick={onClose}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all",
-                  isActive 
-                    ? "bg-[#F5C800] text-black shadow-lg" 
+                  isActive
+                    ? "bg-[#F5C800] text-black shadow-lg"
                     : "text-gray-300 hover:bg-gray-800 hover:text-white"
                 )}
               >
@@ -337,8 +350,8 @@ function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { i
 
         <div className="border-t border-gray-800 p-3">
           <form action="/auth/signout" method="post">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-white"
               type="submit"
             >
@@ -352,9 +365,9 @@ function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { i
         <div className="border-t border-gray-800 p-3 bg-[#2A2A2A]">
           <p className="text-xs text-center text-gray-400">
             Desenvolvido por{" "}
-            <a 
-              href="https://www.linkedin.com/company/theralabs/" 
-              target="_blank" 
+            <a
+              href="https://www.linkedin.com/company/theralabs/"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-[#F5C800] hover:text-yellow-400 transition-colors"
             >
@@ -387,7 +400,7 @@ export default function DashboardLayoutClient({
     <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} user={user} userRole={userRole} userPermissions={userPermissions} />
       <MobileSidebar isOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} user={user} userRole={userRole} userPermissions={userPermissions} />
-      
+
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile Header */}
         <header className="flex lg:hidden h-16 items-center border-b bg-white px-4 gap-4 shadow-sm">
@@ -399,9 +412,9 @@ export default function DashboardLayoutClient({
           </button>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#F5C800] flex items-center justify-center">
-              <Image 
-                src="/icon.jpg" 
-                alt="LA" 
+              <Image
+                src="/icon.jpg"
+                alt="LA"
                 width={32}
                 height={32}
               />

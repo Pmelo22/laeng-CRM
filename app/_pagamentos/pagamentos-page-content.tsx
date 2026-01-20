@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { PagamentosTableFull } from "@/components/pagamentos/pagamentos-table-full"
-import { PagamentosHeader, ViewMode } from "@/components/pagamentos/pagamentos-header" 
-import { PagamentosEditModal } from "@/components/pagamentos/pagamentos-edit-modal" 
+import { PagamentosHeader, ViewMode } from "@/components/pagamentos/pagamentos-header"
+import { PagamentosEditModal } from "@/components/pagamentos/pagamentos-edit-modal"
 import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/components/pagamentos/libs/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
 import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLogic"
@@ -18,9 +18,8 @@ import { PagamentosOptionsTable } from "@/components/pagamentos/pagamentos-optio
 interface PagamentosPageContentProps {
   pagamentos: Pagamentos[]
   categories: { label: string; value: string }[]
-  accounts: { label: string; value: string }[]
-  subcategories: { id: string; name: string ; categories_id: string}[]
-  metrics: FinancialMetrics 
+  subcategories: { id: string; name: string; categories_id: string }[]
+  metrics: FinancialMetrics
   userPermissions: Record<string, any>
 }
 
@@ -30,14 +29,13 @@ interface DeleteState {
   isDeleting: boolean
 }
 
-export default function PagamentosPageContent({ 
-  pagamentos, 
-  categories, 
+export default function PagamentosPageContent({
+  pagamentos,
+  categories,
   subcategories,
-  accounts, 
-  userPermissions 
+  userPermissions
 }: PagamentosPageContentProps) {
-  
+
   // Estados de Filtro e View 
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<ViewMode>("dashboard")
@@ -80,15 +78,15 @@ export default function PagamentosPageContent({
 
   // Handlers do Modal 
   const handleNewPayment = () => {
-    setSelectedPayment(null) 
+    setSelectedPayment(null)
     setIsModalOpen(true)
   }
 
   const handleEditPayment = (payment: Pagamentos) => {
-    setSelectedPayment(payment) 
+    setSelectedPayment(payment)
     setIsModalOpen(true)
   }
-  
+
   const handleOpenDeleteDialog = useCallback((payment: Pagamentos) => {
     setDeleteState(prev => ({
       ...prev,
@@ -129,7 +127,7 @@ export default function PagamentosPageContent({
       const errorMessage = error instanceof Error
         ? error.message
         : "Ocorreu um erro ao excluir o usuário."
-      
+
       console.error("❌ Erro ao excluir usuário:", error)
 
       toast({
@@ -141,10 +139,10 @@ export default function PagamentosPageContent({
       setDeleteState(prev => ({ ...prev, isDeleting: false }))
     }
   }, [deleteState, handleCloseDeleteDialog, toast])
-  
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
-      
+
       <PagamentosHeader
         metrics={currentMetrics}
         searchTerm={searchTerm}
@@ -159,42 +157,39 @@ export default function PagamentosPageContent({
         availableWeeks={availableWeeks}
         categories={categories}
         subcategories={subcategories}
-        accounts={accounts}
-        onNewPayment={handleNewPayment} 
+        onNewPayment={handleNewPayment}
       />
-            
-    <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
-          {/* Lógica de Renderização Condicional*/}
-          {viewMode === 'dashboard' && (
-              <div className="pb-10">
-                  <PagamentosDashboard data={filteredPagamentos} metrics={currentMetrics}/>
-              </div>
-          )}
-          {viewMode === 'table' && (
-              <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg min-h-[500px]">
-                  <CardContent className="p-0">
-                    <PagamentosTableFull 
-                        data={filteredPagamentos} 
-                        userPermissions={userPermissions} 
-                        categories={categories} 
-                        subcategories={subcategories}
-                        accounts={accounts} 
-                        onEdit={handleEditPayment} 
-                        onDelete={handleOpenDeleteDialog}
-                      />
-                  </CardContent>
-              </Card>
-          )}
-          {viewMode === 'options' && (
-             <PagamentosOptionsTable 
-                categories={categories} 
-                subcategories={subcategories} 
-                accounts={accounts}
-             />
-          )}
+
+      <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
+        {/* Lógica de Renderização Condicional*/}
+        {viewMode === 'dashboard' && (
+          <div className="pb-10">
+            <PagamentosDashboard data={filteredPagamentos} metrics={currentMetrics} />
+          </div>
+        )}
+        {viewMode === 'table' && (
+          <Card className="border-0 rounded-xl sm:rounded-2xl shadow-lg min-h-[500px]">
+            <CardContent className="p-0">
+              <PagamentosTableFull
+                data={filteredPagamentos}
+                userPermissions={userPermissions}
+                categories={categories}
+                subcategories={subcategories}
+                onEdit={handleEditPayment}
+                onDelete={handleOpenDeleteDialog}
+              />
+            </CardContent>
+          </Card>
+        )}
+        {viewMode === 'options' && (
+          <PagamentosOptionsTable
+            categories={categories}
+            subcategories={subcategories}
+          />
+        )}
       </div>
 
-      <PagamentosDeleteDialog 
+      <PagamentosDeleteDialog
         isOpen={deleteState.isOpen}
         pagamento={deleteState.pagamentos}
         isDeleting={deleteState.isDeleting}
@@ -202,15 +197,14 @@ export default function PagamentosPageContent({
         onConfirm={handleConfirmDelete}
       />
 
-      <PagamentosEditModal 
+      <PagamentosEditModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         pagamento={selectedPayment}
         categories={categories}
         subcategories={subcategories}
-        accounts={accounts}
       />
     </div>
-    
+
   )
 }
