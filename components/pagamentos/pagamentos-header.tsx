@@ -118,7 +118,7 @@ export function PagamentosHeader({
             <div className="flex-1 relative group">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#F5C800]" />
               <Input
-                placeholder="Buscar por descrição, cliente, categoria..."
+                placeholder="Buscar por cliente, categoria, subcategoria..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-10 bg-white border-0 text-gray-900 placeholder:text-gray-500 rounded-md shadow-sm w-full"
@@ -130,7 +130,7 @@ export function PagamentosHeader({
 
               <Button
                 onClick={onNewPayment}
-                className="h-9 bg-[#F5C800] sm:w-[100px] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
+                className="h-10 bg-[#F5C800] sm:w-[100px] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
                 <Plus className="h-4 w-4 mr-2" />Novo
               </Button>
 

@@ -21,7 +21,6 @@ export async function saveTransactionAction(data: TransactionPayload, id?: strin
     date: data.date,
     type: data.type,
     subcategories_id: data.subcategories_id || null,
-    category_id: data.category_id || null, 
     updated_at: new Date().toISOString(),
   }
 
