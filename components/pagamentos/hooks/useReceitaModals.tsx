@@ -124,7 +124,8 @@ export function useReceitaModals(
                     date: importDate,
                     type: "receita",
                     subcategories_id: mapItem.id,
-                    cliente_id: selectedObra.cliente_id
+                    cliente_id: selectedObra.cliente_id,
+                    codigo: selectedObra.codigo
                 }
             })
 

@@ -21,10 +21,6 @@ interface ReceitaTableFullProps {
     onDelete: (payment: Pagamentos) => void
 }
 
-const getTypeBadge = (type: string) => {
-    return <Badge className="bg-emerald-500 hover:bg-emerald-600 h-6">Receita</Badge>
-}
-
 export function ReceitaTableFull({ data, userPermissions, categories, subcategories, onDelete }: ReceitaTableFullProps) {
 
     // Force filter for Receita
@@ -98,7 +94,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">CATEGORIA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">SUBCATEGORIA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 min-w-[200px]">CLIENTE</TableHead>
-                                <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[100px]">TIPO</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[110px]">DATA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">VALOR</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">Ações</TableHead>
@@ -144,15 +139,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                             <span className="text-sm font-semibold text-gray-800 truncate" title={row.cliente_nome}>
                                                 {row.cliente_nome || "-"}
                                             </span>
-                                        </div>
-                                    </TableCell>
-
-                                    {/* TIPO */}
-                                    <TableCell className="text-center p-2">
-                                        <div
-                                            className={`inline-flex justify-center`}
-                                        >
-                                            {getTypeBadge(row.type || 'despesa')}
                                         </div>
                                     </TableCell>
 

@@ -13,6 +13,7 @@ export async function getFinanceiroForLinkAction() {
       .from("obras")
       .select(`
         id, 
+        codigo,
         cliente_id,
         entrada,
         valor_financiado,
