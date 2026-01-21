@@ -116,7 +116,7 @@ export function ReceitaModal({
     const toggleMeasurement = (key: string) => {
         setMeasurements(prev => {
             const current = prev[key]
-            if (!current) return prev 
+            if (!current) return prev
             return { ...prev, [key]: { ...current, enabled: !current.enabled } }
         })
     }
@@ -139,7 +139,7 @@ export function ReceitaModal({
                 const mapItem = MEDICOES_MAP[key]
                 return {
                     amount: state.value,
-                    date: importDate, 
+                    date: importDate,
                     type: "receita",
                     subcategories_id: mapItem.id,
                     cliente_id: selectedObra.cliente_id
@@ -207,33 +207,6 @@ export function ReceitaModal({
                                         onChange={e => updateField('date', e.target.value)}
                                         className="border-gray-300 focus:border-[#F5C800]"
                                     />
-                                </div>
-                            </div>
-
-                            {/* Classification */}
-                            <div>
-                                <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 tracking-wider">Classificação</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                        <Label>Categoria</Label>
-                                        <Select value={formData.category_id} onValueChange={v => updateField('category_id', v)}>
-                                            <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                                            <SelectContent>
-                                                {categories.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label>Subcategoria</Label>
-                                        <Select value={formData.subcategories_id} onValueChange={v => updateField('subcategories_id', v)} disabled={!formData.category_id}>
-                                            <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                                            <SelectContent>
-                                                {subcategories.filter(s => s.categories_id === formData.category_id).map(sub => (
-                                                    <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
                                 </div>
                             </div>
                         </div>

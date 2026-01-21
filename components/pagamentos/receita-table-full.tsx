@@ -8,7 +8,7 @@ import { CircleDollarSign, CalendarDays, Tag, Pencil, ListTree, Trash2, User } f
 import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
 import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
-import { PagamentosEditModal } from "./pagamentos-edit-modal"
+import { ReceitaModal } from "./receita-modal"
 import { PagamentosPagination } from "./pagamentos-pagination"
 import type { Pagamentos } from "@/lib/types"
 
@@ -134,24 +134,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                                     {row.subcategory_name || "Geral"}
                                                 </span>
                                             </div>
-
-                                            {/* Edição*/}
-                                            {canEdit && (
-                                                <button
-                                                    onClick={() => handleEdit(
-                                                        row,
-                                                        "subcategories_id",
-                                                        "Classificação",
-                                                        "category_tree",
-                                                        subcategories as any,
-                                                        undefined
-                                                    )}
-                                                    className="opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-[#F5C800]"
-                                                    title="Editar Classificação"
-                                                >
-                                                    <ListTree className="h-4 w-4" />
-                                                </button>
-                                            )}
                                         </div>
                                     </TableCell>
 
@@ -168,13 +150,9 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                     {/* TIPO */}
                                     <TableCell className="text-center p-2">
                                         <div
-                                        onClick={() => handleEdit(row, "type", "Tipo", "select", [
-                                            { label: "Receita", value: "receita" },
-                                            { label: "Despesa", value: "despesa" },
-                                        ])}
-                                        className={`inline-flex justify-center ${canEdit ? 'cursor-pointer hover:opacity-80' : ''}`}
+                                            className={`inline-flex justify-center`}
                                         >
-                                        {getTypeBadge(row.type || 'despesa')}
+                                            {getTypeBadge(row.type || 'despesa')}
                                         </div>
                                     </TableCell>
 
@@ -268,7 +246,7 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                 />
             )}
 
-            <PagamentosEditModal
+            <ReceitaModal
                 isOpen={isEditModalFullOpen}
                 onClose={() => {
                     setIsEditModalFullOpen(false)
