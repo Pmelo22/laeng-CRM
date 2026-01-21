@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { ReceitaTableFull } from "@/components/pagamentos/receita-table-full"
-import { PagamentosHeader, ViewMode } from "@/components/pagamentos/pagamentos-header"
-import { PagamentosEditModal } from "@/components/pagamentos/pagamentos-edit-modal"
+import { ViewMode } from "@/components/pagamentos/pagamentos-header"
+import { ReceitaModal } from "@/components/pagamentos/receita-modal"
 import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/components/pagamentos/libs/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
 import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLogic"
@@ -100,6 +100,7 @@ export default function ReceitaPageContent({
             ...prev,
             isOpen: false,
             pagamentos: null,
+            isDeleting: false, // Reset deleting state
         }))
     }, [])
 
@@ -114,6 +115,8 @@ export default function ReceitaPageContent({
                 title: "Pagamento excluído!",
                 description: `${pagamentos.id} foi removido com sucesso.`,
             })
+            handleCloseDeleteDialog()
+
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "Erro desconhecido"
             toast({
@@ -124,7 +127,7 @@ export default function ReceitaPageContent({
         } finally {
             setDeleteState(prev => ({ ...prev, isDeleting: false }))
         }
-    }, [deleteState, toast])
+    }, [deleteState, toast, handleCloseDeleteDialog])
 
     return (
         <div className="flex min-h-screen flex-col bg-gray-50">
@@ -168,7 +171,7 @@ export default function ReceitaPageContent({
                 onConfirm={handleConfirmDelete}
             />
 
-            <PagamentosEditModal
+            <ReceitaModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 pagamento={selectedPayment}
@@ -178,3 +181,4 @@ export default function ReceitaPageContent({
         </div>
     )
 }
+
