@@ -40,13 +40,43 @@ export async function getFinanceiroForLinkAction() {
 export async function createBulkTransactionsAction(transactions: any[]) {
   const supabase = await createClient()
   try {
-    const { error } = await supabase.from("transactions").insert(transactions)
+    if (!transactions || transactions.length === 0) {
+      return { ok: true, insertedCount: 0, duplicates: [] }
+    }
 
-    if (error) throw error
+    // 1. Identificar quais já existem para este cliente
+    // Assumindo que todos os itens do array são do mesmo cliente (uso atual do frontend garante isso)
+    const clienteId = transactions[0].cliente_id
+    const subcatsToCheck = transactions.map((t: any) => t.subcategories_id)
 
+    const { data: existingData, error: checkError } = await supabase
+      .from("transactions")
+      .select("subcategories_id")
+      .eq("cliente_id", clienteId)
+      .in("subcategories_id", subcatsToCheck)
+
+    if (checkError) throw checkError
+
+    const existingSet = new Set(existingData?.map((t: any) => t.subcategories_id))
+
+    // 2. Filtrar
+    const toInsert = transactions.filter((t: any) => !existingSet.has(t.subcategories_id))
+    const duplicates = transactions
+      .filter((t: any) => existingSet.has(t.subcategories_id))
+      .map((t: any) => ({ subcategories_id: t.subcategories_id }))
+
+    // 3. Inserir somente novos
+    if (toInsert.length > 0) {
+      const { error } = await supabase.from("transactions").insert(toInsert)
+      if (error) throw error
+    }
 
     revalidatePath("/pagamentos")
-    return { ok: true }
+    return {
+      ok: true,
+      insertedCount: toInsert.length,
+      duplicates: duplicates // array de { subcategories_id }
+    }
   } catch (e: any) {
     return { ok: false, error: e.message }
   }
@@ -59,6 +89,7 @@ export async function getObrasForReceitaAction() {
       .from("obras")
       .select(`
         id, 
+        codigo,
         cliente_id,
         medicao_01,
         medicao_02,

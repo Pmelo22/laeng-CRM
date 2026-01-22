@@ -52,7 +52,7 @@ export function ReceitaModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 bg-white">
+            <DialogContent className="max-w-2xl min-h-[30vh] max-h-[90vh] flex flex-col p-0 bg-white">
                 <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gray-50/50">
                     <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
                         {isEditing ? "Editar Receita" : "Nova Receita"}
@@ -147,36 +147,32 @@ export function ReceitaModal({
                                     <div className="space-y-3">
                                         <Label className="uppercase text-xs font-bold text-gray-500 tracking-wider">Medições Disponíveis</Label>
 
-                                        {Object.entries(measurements).length === 0 ? (
-                                            <div className="text-gray-500 text-sm italic py-4 text-center bg-gray-50 rounded">
-                                                Nenhuma medição encontrada para este cliente.
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-2">
-                                                {Object.entries(measurements).map(([key, state]) => {
-                                                    const mapItem = MEDICOES_MAP[key]
-                                                    return (
-                                                        <div
-                                                            key={key}
-                                                            className={`flex items-center gap-3 p-3 rounded-md border transition-colors ${state.enabled ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200'}`}
-                                                        >
-                                                            <Checkbox
-                                                                checked={state.enabled}
-                                                                onCheckedChange={() => toggleMeasurement(key)}
-                                                                className={state.enabled ? 'data-[state=checked]:bg-[#F5C800] data-[state=checked]:text-black border-gray-400' : ''}
-                                                            />
-                                                            <div className="flex-1 text-sm font-medium">{mapItem.name}</div>
-                                                            <Input
-                                                                className="w-32 h-8 text-right font-mono"
-                                                                value={formatMoneyInput(state.value)}
-                                                                onChange={e => updateMeasurementValue(key, e.target.value)}
-                                                                disabled={!state.enabled}
-                                                            />
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        )}
+                                        <div className="space-y-2">
+                                            {Object.entries(measurements).map(([key, state]) => {
+                                                const mapItem = MEDICOES_MAP[key]
+                                                return (
+                                                    <div
+                                                        key={key}
+                                                        className={`flex items-center gap-3 p-3 rounded-md border transition-colors ${state.enabled
+                                                            ? 'bg-yellow-50 border-yellow-200'
+                                                            : 'bg-gray-50 border-gray-300 opacity-60'
+                                                            }`}
+                                                    >
+                                                        <Checkbox
+                                                            checked={state.enabled}
+                                                            onCheckedChange={() => toggleMeasurement(key)}
+                                                        />
+                                                        <div className="flex-1 text-sm font-medium">{mapItem.name}</div>
+                                                        <Input
+                                                            className="w-32 h-8 text-right font-mono"
+                                                            value={formatMoneyInput(state.value)}
+                                                            onChange={e => updateMeasurementValue(key, e.target.value)}
+                                                            disabled={!state.enabled}
+                                                        />
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
                                     </div>
                                 </>
                             )}

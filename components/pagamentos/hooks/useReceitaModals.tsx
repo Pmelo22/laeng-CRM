@@ -85,8 +85,8 @@ export function useReceitaModals(
             const newMeas: Record<string, MeasurementState> = {}
             Object.values(MEDICOES_MAP).forEach(m => {
                 const val = Number(selectedObra[m.key]) || 0
-                if (val > 0) {
-                    newMeas[m.key] = { enabled: true, value: val, originalValue: val }
+                if (val >= 0) {
+                    newMeas[m.key] = { enabled: val > 0, value: val, originalValue: val }
                 }
             })
             setMeasurements(newMeas)
@@ -116,7 +116,7 @@ export function useReceitaModals(
         setIsSavingBulk(true)
 
         const transactionsToInsert = Object.entries(measurements)
-            .filter(([_, state]) => state.enabled && state.value > 0)
+            .filter(([_, state]) => state.enabled)
             .map(([key, state]) => {
                 const mapItem = MEDICOES_MAP[key]
                 return {
@@ -129,17 +129,37 @@ export function useReceitaModals(
                 }
             })
 
-        if (transactionsToInsert.length === 0) {
-            toast({ title: "Nenhum item selecionado", variant: "destructive" })
-            setIsSavingBulk(false)
-            return
-        }
-
         const res = await createBulkTransactionsAction(transactionsToInsert)
         setIsSavingBulk(false)
 
         if (res.ok) {
-            toast({ title: "Receitas geradas com sucesso!" })
+            // Verifica duplicatas
+            if (res.duplicates && res.duplicates.length > 0) {
+                const duplicateNames = res.duplicates.map((d: any) => {
+                    const entry = Object.values(MEDICOES_MAP).find(m => m.id === d.subcategories_id)
+                    return entry ? entry.name : "Desconhecido"
+                })
+
+                const inserted = res.insertedCount || 0
+                const dupMsg = duplicateNames.join(", ")
+
+                if (inserted > 0) {
+                    toast({
+                        title: "Salvo Parcialmente",
+                        description: `Foram salvas ${inserted} transações. As seguintes já existiam: ${dupMsg}`,
+                        duration: 5000
+                    })
+                } else {
+                    toast({
+                        title: "Nenhuma transação salva",
+                        description: `Todas as transações selecionadas já existem: ${dupMsg}`,
+                        variant: "destructive",
+                        duration: 5000
+                    })
+                }
+            } else {
+                toast({ title: "Receitas geradas com sucesso!" })
+            }
             onClose()
         } else {
             toast({ title: "Erro ao salvar", description: res.error, variant: "destructive" })
