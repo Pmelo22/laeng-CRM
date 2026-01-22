@@ -94,7 +94,7 @@ export function ReceitasHeader({
             <div className="flex-1 relative group">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#F5C800]" />
               <Input
-                placeholder="Buscar por cliente, categoria, subcategoria..."
+                placeholder="Buscar por cliente..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-10 bg-white border-0 text-gray-900 placeholder:text-gray-500 rounded-md shadow-sm w-full"
@@ -120,22 +120,6 @@ export function ReceitasHeader({
 
           {/* LINHA 2: Grid de Filtros (Abaixo da busca) */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-2">
-            <div className={!isWeekEnabled ? "opacity-50 pointer-events-none" : ""}>
-              <FilterSelect
-                value={filters.week}
-                onChange={(v: string) => updateFilter('week', v)}
-                placeholder="Semana"
-                icon={Calendar}
-              >
-                <SelectItem value="all">Todas Semanas</SelectItem>
-                {weekOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </FilterSelect>
-            </div>
-
             <FilterSelect
               value={filters.month}
               onChange={(v: string) => {
@@ -156,11 +140,6 @@ export function ReceitasHeader({
             <FilterSelect value={filters.year} onChange={(v: string) => updateFilter('year', v)} placeholder="Ano" icon={Calendar}>
               <SelectItem value="all">Todos Anos</SelectItem>
               {availableYears.map(year => <SelectItem key={year} value={String(year)}>{year}</SelectItem>)}
-            </FilterSelect>
-
-            <FilterSelect value={filters.category} onChange={(v: string) => updateFilter('category', v)} placeholder="Categoria" icon={Layers}>
-              <SelectItem value="all">Categorias</SelectItem>
-              {categories.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
             </FilterSelect>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { CircleDollarSign, CalendarDays, Tag, Pencil, ListTree, Trash2, User } f
 import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
 import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
-import { PagamentosEditModal } from "./pagamentos-edit-modal"
+import { ReceitaModal } from "./receita-modal"
 import { PagamentosPagination } from "./pagamentos-pagination"
 import type { Pagamentos } from "@/lib/types"
 
@@ -19,10 +19,6 @@ interface ReceitaTableFullProps {
     userPermissions?: Record<string, any>
     onEdit: (payment: Pagamentos) => void // Kept for interface compatibility, though mostly handled internally or via modals
     onDelete: (payment: Pagamentos) => void
-}
-
-const getTypeBadge = (type: string) => {
-    return <Badge className="bg-emerald-500 hover:bg-emerald-600 h-6">Receita</Badge>
 }
 
 export function ReceitaTableFull({ data, userPermissions, categories, subcategories, onDelete }: ReceitaTableFullProps) {
@@ -98,7 +94,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">CATEGORIA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">SUBCATEGORIA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 min-w-[200px]">CLIENTE</TableHead>
-                                <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[100px]">TIPO</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[110px]">DATA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">VALOR</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">Ações</TableHead>
@@ -134,24 +129,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                                     {row.subcategory_name || "Geral"}
                                                 </span>
                                             </div>
-
-                                            {/* Edição*/}
-                                            {canEdit && (
-                                                <button
-                                                    onClick={() => handleEdit(
-                                                        row,
-                                                        "subcategories_id",
-                                                        "Classificação",
-                                                        "category_tree",
-                                                        subcategories as any,
-                                                        undefined
-                                                    )}
-                                                    className="opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-[#F5C800]"
-                                                    title="Editar Classificação"
-                                                >
-                                                    <ListTree className="h-4 w-4" />
-                                                </button>
-                                            )}
                                         </div>
                                     </TableCell>
 
@@ -162,19 +139,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                             <span className="text-sm font-semibold text-gray-800 truncate" title={row.cliente_nome}>
                                                 {row.cliente_nome || "-"}
                                             </span>
-                                        </div>
-                                    </TableCell>
-
-                                    {/* TIPO */}
-                                    <TableCell className="text-center p-2">
-                                        <div
-                                        onClick={() => handleEdit(row, "type", "Tipo", "select", [
-                                            { label: "Receita", value: "receita" },
-                                            { label: "Despesa", value: "despesa" },
-                                        ])}
-                                        className={`inline-flex justify-center ${canEdit ? 'cursor-pointer hover:opacity-80' : ''}`}
-                                        >
-                                        {getTypeBadge(row.type || 'despesa')}
                                         </div>
                                     </TableCell>
 
@@ -268,7 +232,7 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                 />
             )}
 
-            <PagamentosEditModal
+            <ReceitaModal
                 isOpen={isEditModalFullOpen}
                 onClose={() => {
                     setIsEditModalFullOpen(false)
