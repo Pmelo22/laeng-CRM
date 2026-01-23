@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
@@ -20,7 +20,6 @@ interface PagamentosDashboardProps {
   metrics: FinancialMetrics
   periodLabel?: string
 }
-
 
 const COLORS = {
   receita: "#22c55e",
@@ -42,6 +41,8 @@ export function PagamentosDashboard({ data, periodLabel = "Geral", metrics }: Pa
   const dailyData = useMemo(() => {
     return calculateDailyFlow(data)
   }, [data])
+
+  //APESAR DO NOME PAGAMENTOS, É COMPONENTE APENAS PARA FLUXO DE CAIXA
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">

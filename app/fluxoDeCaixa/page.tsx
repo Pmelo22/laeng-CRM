@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getUserContext } from "@/app/auth/context/userContext";
 import { Pagamentos } from "@/lib/types";
 import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial";
-import FluxoPageContent from "@/components/pagamentos/fluxo-page-content"
+import FluxoPageContent from "@/app/fluxoDeCaixa/fluxo-page-content"
 
 export const dynamic = 'force-dynamic';
 
