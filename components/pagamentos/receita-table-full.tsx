@@ -42,8 +42,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
         type: "text",
     })
 
-    const canEdit = userPermissions?.pagamentos?.edit ?? true
-
     const handleEdit = (
         row: Pagamentos,
         field: string,
@@ -52,7 +50,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
         options?: { label: string; value: string }[],
         fieldSecondary?: string
     ) => {
-        if (!canEdit) return
         setEditConfig({
             isOpen: true,
             row,
@@ -146,7 +143,7 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                     <TableCell className="text-center p-2">
                                         <div
                                             onClick={() => handleEdit(row, "date", "Data", "date")}
-                                            className={`text-xs font-medium text-gray-600 flex items-center justify-center gap-1.5 whitespace-nowrap ${canEdit ? 'cursor-pointer hover:text-[#F5C800]' : ''}`}
+                                            className={`text-xs font-medium text-gray-600 flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer hover:text-[#F5C800]`}
                                         >
                                             <CalendarDays className="h-3 w-3 text-gray-400" />
 
@@ -162,7 +159,7 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                     <TableCell className="text-right pr-6 p-2">
                                         <div
                                             onClick={() => handleEdit(row, "amount", "Valor", "money")}
-                                            className={`font-bold text-sm whitespace-nowrap ${canEdit ? 'cursor-pointer hover:opacity-70' : ''} text-emerald-600`}
+                                            className={`font-bold text-sm whitespace-nowrap cursor-pointer hover:opacity-70 text-emerald-600`}
                                         >
                                             + {formatCurrency(row.amount || 0)}
                                         </div>
@@ -170,7 +167,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
 
                                     {/* BOTÃO DE EDITAR */}
                                     <TableCell className="py-3 text-right pr-4">
-                                        {canEdit && (
                                             <Button
                                                 size="sm"
                                                 onClick={() => handleFullEdit(row)}
@@ -179,7 +175,6 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                             >
                                                 <Pencil className="h-4 w-4 text-[#1E1E1E]" />
                                             </Button>
-                                        )}
 
                                         <Button
                                             size="sm"

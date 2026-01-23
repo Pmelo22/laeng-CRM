@@ -1,6 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,10 +23,12 @@ interface PagamentosQuickEditModalProps {
   extraOptions?: { label: string; value: string }[]
 }
 
+//COMPONENTE GENÉRICO PARA EDIÇÃO RAPIDAS DE PAGAMENTOS
+
 export function PagamentosQuickEditModal(props: PagamentosQuickEditModalProps) {
   const { isOpen, onClose, title, type, options, extraOptions } = props
 
-  const { value, setValue, valueSecondary, setValueSecondary, isLoading, step, setStep, selectedCategory, selectedSubcategory, setSelectedSubcategory, filteredSubcategories, handleCategorySelect, handleSave
+  const { value, setValue, isLoading, step, setStep, selectedCategory, selectedSubcategory, setSelectedSubcategory, filteredSubcategories, handleCategorySelect, handleSave
   } = useQuickEdit(props)
 
   const renderInput = () => {

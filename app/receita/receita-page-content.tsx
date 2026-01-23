@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { ReceitaTableFull } from "@/components/pagamentos/receita-table-full"
-import { ViewMode } from "@/components/pagamentos/pagamentos-header"
 import { ReceitaModal } from "@/components/pagamentos/receita-modal"
 import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/components/pagamentos/libs/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
@@ -37,9 +36,10 @@ export default function ReceitaPageContent({
 
     // Estados de Filtro e View 
     const [searchTerm, setSearchTerm] = useState("")
-    // Fixed view mode for Receita
-    const [viewMode] = useState<ViewMode>("table")
-    const [filters, setFilters] = useState<PaymentFiltersState>(INITIAL_FILTERS)
+    const [filters, setFilters] = useState<PaymentFiltersState>({
+        ...INITIAL_FILTERS,
+        week: 'all'
+    })
 
     // Estados do Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -55,7 +55,6 @@ export default function ReceitaPageContent({
     // Contexto de Data
     const availableYears = useMemo(() => getAvailableYears(pagamentos), [pagamentos])
     const availableMonth = useMemo(() => getAvailableMonth(pagamentos), [pagamentos])
-    const availableWeeks = useMemo(() => getAvailableWeek(pagamentos), [pagamentos])
 
     // Contexto de Filtro e Métricas
     const filteredPagamentos = useMemo(() => {
@@ -72,7 +71,7 @@ export default function ReceitaPageContent({
     }
 
     const clearFilters = () => {
-        setFilters(INITIAL_FILTERS)
+        setFilters({ ...INITIAL_FILTERS, week: 'all' })
         setSearchTerm("")
     }
 
@@ -136,15 +135,11 @@ export default function ReceitaPageContent({
                 metrics={currentMetrics}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
-                showViewToggler={false}
                 filters={filters}
                 updateFilter={updateFilter}
                 clearFilters={clearFilters}
                 availableYears={availableYears}
                 availableMonth={availableMonth}
-                availableWeeks={availableWeeks}
-                categories={categories}
-                subcategories={subcategories}
                 onNewPayment={handleNewPayment}
             />
 

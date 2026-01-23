@@ -3,7 +3,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
-
 export async function createBulkTransactionsAction(transactions: any[]) {
   const supabase = await createClient()
   try {
@@ -41,14 +40,14 @@ export async function createBulkTransactionsAction(transactions: any[]) {
     return {
       ok: true,
       insertedCount: toInsert.length,
-      duplicates: duplicates // array de { subcategories_id }
+      duplicates: duplicates
     }
   } catch (e: any) {
     return { ok: false, error: e.message }
   }
 }
 
-export async function getObrasForReceitaAction() {
+export async function getObrasForDespesaAction() {
   const supabase = await createClient()
   try {
     const { data, error } = await supabase
@@ -57,11 +56,13 @@ export async function getObrasForReceitaAction() {
         id, 
         codigo,
         cliente_id,
-        medicao_01,
-        medicao_02,
-        medicao_03,
-        medicao_04,
-        medicao_05,
+        manutencao,
+        material,
+        empreiteiro,
+        pintor,
+        gesseiro,
+        azulejista,
+        eletricista,
         clientes:cliente_id (
           nome
         )
@@ -76,7 +77,7 @@ export async function getObrasForReceitaAction() {
 
     return { ok: true, data: formattedData }
   } catch (e: any) {
-    console.error("❌ ERRO CATCH OBRAS RECEITA:", e.message)
+    console.error("❌ ERRO CATCH OBRAS DESPESA:", e.message)
     return { ok: false, error: e.message }
   }
 }

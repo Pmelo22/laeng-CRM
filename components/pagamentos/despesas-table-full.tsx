@@ -8,10 +8,10 @@ import { CircleDollarSign, CalendarDays, Tag, Pencil, ListTree, Trash2, User } f
 import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
 import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
-import { PagamentosEditModal } from "./pagamentos-edit-modal"
-// import { PagamentosPagination } from "./pagamentos-pagination"
+import { DespesaModals } from "./despesa-modals"
 import { PagamentosPagination } from "./pagamentos-pagination"
 import type { Pagamentos } from "@/lib/types"
+import { OBRA_CATEGORY_ID } from "./types/pagamentosTypes"
 
 interface DespesasTableFullProps {
     data: Pagamentos[]
@@ -26,7 +26,7 @@ const getTypeBadge = (type: string) => {
     return <Badge className="bg-rose-500 hover:bg-rose-600 h-6">Despesa</Badge>
 }
 
-export function DespesasTableFull({ data, userPermissions, categories, subcategories, onDelete }: DespesasTableFullProps) {
+export function DespesasTableFull({ data, categories, subcategories, onDelete }: DespesasTableFullProps) {
 
     // Force filter for Despesa
     const filteredData = data.filter(item => item.type === 'despesa');
@@ -47,8 +47,6 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
         type: "text",
     })
 
-    const canEdit = userPermissions?.pagamentos?.edit ?? true
-
     const handleEdit = (
         row: Pagamentos,
         field: string,
@@ -57,7 +55,6 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
         options?: { label: string; value: string }[],
         fieldSecondary?: string
     ) => {
-        if (!canEdit) return
         setEditConfig({
             isOpen: true,
             row,
@@ -99,7 +96,6 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">CATEGORIA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">SUBCATEGORIA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 min-w-[200px]">CLIENTE</TableHead>
-                                <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[100px]">TIPO</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[110px]">DATA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">VALOR</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">Ações</TableHead>
@@ -135,10 +131,10 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                                     {row.subcategory_name || "Geral"}
                                                 </span>
                                             </div>
-
                                             {/* Edição*/}
-                                            {canEdit && (
-                                                <button
+                                            {row.category_id !== OBRA_CATEGORY_ID && (
+                                                <Button
+                                                    size="sm"
                                                     onClick={() => handleEdit(
                                                         row,
                                                         "subcategories_id",
@@ -147,11 +143,11 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                                         subcategories as any,
                                                         undefined
                                                     )}
-                                                    className="opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-[#F5C800]"
+                                                    className="bg-transparent hover:bg-yellow-50 border-2 border-transparent hover:border-[#F5C800] h-8 w-8 p-0 transition-all group/btn"
                                                     title="Editar Classificação"
                                                 >
-                                                    <ListTree className="h-4 w-4" />
-                                                </button>
+                                                    <ListTree className="h-4 w-4 text-gray-400 group-hover/btn:text-[#F5C800]" />
+                                                </Button>
                                             )}
                                         </div>
                                     </TableCell>
@@ -165,24 +161,12 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                             </span>
                                         </div>
                                     </TableCell>
-                                    {/* TIPO */}
-                                    <TableCell className="text-center p-2">
-                                        <div
-                                        onClick={() => handleEdit(row, "type", "Tipo", "select", [
-                                            { label: "Receita", value: "receita" },
-                                            { label: "Despesa", value: "despesa" },
-                                        ])}
-                                        className={`inline-flex justify-center ${canEdit ? 'cursor-pointer hover:opacity-80' : ''}`}
-                                        >
-                                        {getTypeBadge(row.type || 'despesa')}
-                                        </div>
-                                    </TableCell>
 
                                     {/* DATA */}
                                     <TableCell className="text-center p-2">
                                         <div
                                             onClick={() => handleEdit(row, "date", "Data", "date")}
-                                            className={`text-xs font-medium text-gray-600 flex items-center justify-center gap-1.5 whitespace-nowrap ${canEdit ? 'cursor-pointer hover:text-[#F5C800]' : ''}`}
+                                            className={`text-xs font-medium text-gray-600 flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer hover:text-[#F5C800]`}
                                         >
                                             <CalendarDays className="h-3 w-3 text-gray-400" />
 
@@ -198,7 +182,7 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                     <TableCell className="text-right pr-6 p-2">
                                         <div
                                             onClick={() => handleEdit(row, "amount", "Valor", "money")}
-                                            className={`font-bold text-sm whitespace-nowrap ${canEdit ? 'cursor-pointer hover:opacity-70' : ''} text-red-600`}
+                                            className={`font-bold text-sm whitespace-nowrap cursor-pointer hover:opacity-70 text-red-600`}
                                         >
                                             - {formatCurrency(row.amount || 0)}
                                         </div>
@@ -206,16 +190,15 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
 
                                     {/* BOTÃO DE EDITAR */}
                                     <TableCell className="py-3 text-right pr-4">
-                                        {canEdit && (
-                                            <Button
-                                                size="sm"
-                                                onClick={() => handleFullEdit(row)}
-                                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
-                                                title="Editar Detalhes Completos"
-                                            >
-                                                <Pencil className="h-4 w-4 text-[#1E1E1E]" />
-                                            </Button>
-                                        )}
+                                        <Button
+                                            size="sm"
+                                            onClick={() => handleFullEdit(row)}
+                                            className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
+                                            title="Editar Detalhes Completos"
+                                        >
+                                            <Pencil className="h-4 w-4 text-[#1E1E1E]" />
+                                        </Button>
+
 
                                         <Button
                                             size="sm"
@@ -264,11 +247,11 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                     tableId={editConfig.row.id}
                     type={editConfig.type}
                     options={editConfig.options}
-                    extraOptions={categories}
+                    extraOptions={categories.filter(c => c.value !== OBRA_CATEGORY_ID)}
                 />
             )}
 
-            <PagamentosEditModal
+            <DespesaModals
                 isOpen={isEditModalFullOpen}
                 onClose={() => {
                     setIsEditModalFullOpen(false)
