@@ -8,7 +8,7 @@ import { CircleDollarSign, CalendarDays, Tag, Pencil, ListTree, Trash2, User } f
 import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
 import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
-import { PagamentosEditModal } from "./pagamentos-edit-modal"
+import { DespesaModals } from "./despesa-modals"
 // import { PagamentosPagination } from "./pagamentos-pagination"
 import { PagamentosPagination } from "./pagamentos-pagination"
 import type { Pagamentos } from "@/lib/types"
@@ -168,13 +168,13 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                     {/* TIPO */}
                                     <TableCell className="text-center p-2">
                                         <div
-                                        onClick={() => handleEdit(row, "type", "Tipo", "select", [
-                                            { label: "Receita", value: "receita" },
-                                            { label: "Despesa", value: "despesa" },
-                                        ])}
-                                        className={`inline-flex justify-center ${canEdit ? 'cursor-pointer hover:opacity-80' : ''}`}
+                                            onClick={() => handleEdit(row, "type", "Tipo", "select", [
+                                                { label: "Receita", value: "receita" },
+                                                { label: "Despesa", value: "despesa" },
+                                            ])}
+                                            className={`inline-flex justify-center ${canEdit ? 'cursor-pointer hover:opacity-80' : ''}`}
                                         >
-                                        {getTypeBadge(row.type || 'despesa')}
+                                            {getTypeBadge(row.type || 'despesa')}
                                         </div>
                                     </TableCell>
 
@@ -206,7 +206,7 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
 
                                     {/* BOTÃO DE EDITAR */}
                                     <TableCell className="py-3 text-right pr-4">
-                                        {canEdit && (
+                                        {canEdit && row.category_id !== "522c635e-0957-4c93-90e7-ffb7b6d23e75" && (
                                             <Button
                                                 size="sm"
                                                 onClick={() => handleFullEdit(row)}
@@ -268,7 +268,7 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                 />
             )}
 
-            <PagamentosEditModal
+            <DespesaModals
                 isOpen={isEditModalFullOpen}
                 onClose={() => {
                     setIsEditModalFullOpen(false)

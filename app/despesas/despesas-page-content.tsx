@@ -6,7 +6,7 @@ import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagament
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { DespesasTableFull } from "@/components/pagamentos/despesas-table-full"
 import { ViewMode } from "@/components/pagamentos/pagamentos-header"
-import { PagamentosEditModal } from "@/components/pagamentos/pagamentos-edit-modal"
+import { DespesaModals } from "@/components/pagamentos/despesa-modals"
 import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/components/pagamentos/libs/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
 import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLogic"
@@ -167,7 +167,7 @@ export default function DespesasPageContent({
                 onConfirm={handleConfirmDelete}
             />
 
-            <PagamentosEditModal
+            <DespesaModals
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 pagamento={selectedPayment}
