@@ -38,11 +38,9 @@ export function DespesaModals({
 
         mode,
         setMode,
-
         loadingObras,
         filteredObras,
         selectedObra,
-        selectedObraId,
         setSelectedObraId,
         searchTerm,
         setSearchTerm,
@@ -85,7 +83,7 @@ export function DespesaModals({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl min-h-[30vh] max-h-[90vh] flex flex-col p-0 bg-white">
+            <DialogContent className="max-w-2xl min-h-[20vh] max-h-[90vh] flex flex-col p-0 bg-white">
                 <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gray-50/50">
                     <div className="flex items-center gap-2">
                         {!isEditing && mode !== 'initial' && (
@@ -111,27 +109,25 @@ export function DespesaModals({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 pb-8">
                             <button
                                 onClick={() => setMode('obras')}
-                                className="flex flex-col items-center justify-center p-8 gap-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-[#F5C800] hover:bg-yellow-50/50 transition-all group"
+                                className="flex flex-col items-center justify-start h-full p-8 gap-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-[#F5C800] hover:bg-yellow-50/50 transition-all group"
                             >
-                                <div className="h-16 w-16 rounded-full bg-yellow-100 flex items-center justify-center group-hover:bg-[#F5C800] transition-colors">
+                                <div className="h-16 w-16 rounded-full bg-yellow-100 flex items-center justify-center group-hover:bg-[#F5C800] transition-colors shrink-0">
                                     <HardHat className="h-8 w-8 text-yellow-700 group-hover:text-black" />
                                 </div>
                                 <div className="text-center">
-                                    <h3 className="font-bold text-lg text-gray-800">Registrar Obras</h3>
-                                    <p className="text-sm text-gray-500 mt-1">Vincular despesas a um cliente e obra específica</p>
+                                    <h3 className="font-bold text-lg text-gray-800">Obras</h3>
                                 </div>
                             </button>
 
                             <button
                                 onClick={() => setMode('general')}
-                                className="flex flex-col items-center justify-center p-8 gap-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all group"
+                                className="flex flex-col items-center justify-start h-full p-8 gap-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all group"
                             >
-                                <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                                <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors shrink-0">
                                     <Plus className="h-8 w-8 text-gray-600 group-hover:text-black" />
                                 </div>
                                 <div className="text-center">
-                                    <h3 className="font-bold text-lg text-gray-800">Outra Despesa</h3>
-                                    <p className="text-sm text-gray-500 mt-1">Despesas gerais administrativas ou avulsas</p>
+                                    <h3 className="font-bold text-lg text-gray-800">Empresa</h3>
                                 </div>
                             </button>
                         </div>
@@ -154,7 +150,7 @@ export function DespesaModals({
                                 </div>
 
                                 {searchTerm.length >= 3 && (
-                                    <div className="absolute top-[75px] left-0 w-full z-50 bg-white border border-gray-200 rounded-md shadow-xl max-h-60 overflow-y-auto">
+                                    <div className="mt-1 w-full z-50 bg-white border border-gray-200 rounded-md shadow-sm max-h-60 overflow-y-auto">
                                         {loadingObras ? (
                                             <div className="p-4 text-center">
                                                 <Loader2 className="h-5 w-5 animate-spin mx-auto text-[#F5C800]" />
@@ -210,6 +206,7 @@ export function DespesaModals({
                                                         <Checkbox
                                                             checked={state.enabled}
                                                             onCheckedChange={() => toggleMeasurement(key)}
+                                                            className="border-2 border-gray-600 data-[state=checked]:border-[#F5C800] data-[state=checked]:bg-[#F5C800] data-[state=unchecked]:bg-gray-400"
                                                         />
                                                         <div className="flex-1 text-sm font-medium">{mapItem.name}</div>
                                                         <Input
@@ -251,11 +248,10 @@ export function DespesaModals({
                                 </div>
                             </div>
 
-                            <div className="h-[1px] bg-gray-200"></div>
-
                             {/* Classification - Only show if NOT editing an Obra expense */}
                             {(!isEditing || formData.category_id !== OBRA_CATEGORY_ID) && (
                                 <div>
+                                    <div className="h-[1px] bg-gray-200"></div>
                                     <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 tracking-wider">Classificação</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 

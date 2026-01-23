@@ -133,7 +133,8 @@ export function DespesasTableFull({ data, categories, subcategories, onDelete }:
                                             </div>
                                             {/* Edição*/}
                                             {row.category_id !== OBRA_CATEGORY_ID && (
-                                                <button
+                                                <Button
+                                                    size="sm"
                                                     onClick={() => handleEdit(
                                                         row,
                                                         "subcategories_id",
@@ -142,11 +143,11 @@ export function DespesasTableFull({ data, categories, subcategories, onDelete }:
                                                         subcategories as any,
                                                         undefined
                                                     )}
-                                                    className="opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-[#F5C800]"
+                                                    className="bg-transparent hover:bg-yellow-50 border-2 border-transparent hover:border-[#F5C800] h-8 w-8 p-0 transition-all group/btn"
                                                     title="Editar Classificação"
                                                 >
-                                                    <ListTree className="h-4 w-4" />
-                                                </button>
+                                                    <ListTree className="h-4 w-4 text-gray-400 group-hover/btn:text-[#F5C800]" />
+                                                </Button>
                                             )}
                                         </div>
                                     </TableCell>
@@ -246,7 +247,7 @@ export function DespesasTableFull({ data, categories, subcategories, onDelete }:
                     tableId={editConfig.row.id}
                     type={editConfig.type}
                     options={editConfig.options}
-                    extraOptions={categories}
+                    extraOptions={categories.filter(c => c.value !== OBRA_CATEGORY_ID)}
                 />
             )}
 
