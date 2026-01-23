@@ -7,7 +7,7 @@ import { toast } from "@/hooks/use-toast"
 import { parseMoneyInput } from "@/lib/utils"
 import { DESPESAS_OBRAS_MAP } from "../types/pagamentosTypes"
 import type { Pagamentos } from "@/lib/types"
-import { getObrasForDespesaAction } from "../actions/obraslinkActions"
+import { getObrasForDespesaAction } from "../actions/obrasActions"
 
 export interface MeasurementState {
     enabled: boolean
