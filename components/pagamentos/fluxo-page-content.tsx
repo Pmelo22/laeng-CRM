@@ -3,13 +3,11 @@
 import { useState, useMemo, useCallback } from "react"
 import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
-import { PagamentosHeader, ViewMode } from "@/components/pagamentos/fluxo-header"
-import { PagamentosEditModal } from "@/components/pagamentos/pagamentos-edit-modal"
+import { PagamentosHeader} from "@/components/pagamentos/fluxo-header"
 import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/components/pagamentos/libs/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
 import { PagamentosDashboard } from "@/components/pagamentos/pagamentos-dashboard"
-import { PagamentosDeleteDialog } from "@/components/pagamentos/pagamentos-delete-dialog"
 import { deletarPagamentoAction } from "@/components/actions/pagamentosDeleteLogic"
 
 
@@ -30,13 +28,10 @@ interface DeleteState {
 export default function FluxoPageContent({
     pagamentos,
     categories,
-    subcategories,
-    userPermissions
 }: FluxoPageContentProps) {
 
     // Estados de Filtro e View 
     const [searchTerm, setSearchTerm] = useState("")
-    const [viewMode] = useState<ViewMode>("dashboard")
     const [filters, setFilters] = useState<PaymentFiltersState>(INITIAL_FILTERS)
 
     // Estados do Modal
@@ -119,9 +114,6 @@ export default function FluxoPageContent({
                 metrics={currentMetrics}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
-                viewMode={viewMode}
-                setViewMode={() => { }}
-                showViewToggler={false}
                 filters={filters}
                 updateFilter={updateFilter}
                 clearFilters={clearFilters}
@@ -129,8 +121,6 @@ export default function FluxoPageContent({
                 availableMonth={availableMonth}
                 availableWeeks={availableWeeks}
                 categories={categories}
-                subcategories={subcategories}
-                onNewPayment={handleNewPayment}
             />
 
             <div className="flex-1 px-2 sm:px-4 lg:px-8 py-3 sm:py-6">
@@ -139,21 +129,6 @@ export default function FluxoPageContent({
                 </div>
             </div>
 
-            <PagamentosDeleteDialog
-                isOpen={deleteState.isOpen}
-                pagamento={deleteState.pagamentos}
-                isDeleting={deleteState.isDeleting}
-                onClose={handleCloseDeleteDialog}
-                onConfirm={handleConfirmDelete}
-            />
-
-            <PagamentosEditModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                pagamento={selectedPayment}
-                categories={categories}
-                subcategories={subcategories}
-            />
         </div>
     )
 }

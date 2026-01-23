@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { ReceitaTableFull } from "@/components/pagamentos/receita-table-full"
-import { ViewMode } from "@/components/pagamentos/fluxo-header"
 import { ReceitaModal } from "@/components/pagamentos/receita-modal"
 import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/components/pagamentos/libs/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
@@ -38,7 +37,6 @@ export default function ReceitaPageContent({
     // Estados de Filtro e View 
     const [searchTerm, setSearchTerm] = useState("")
     // Fixed view mode for Receita
-    const [viewMode] = useState<ViewMode>("table")
     const [filters, setFilters] = useState<PaymentFiltersState>(INITIAL_FILTERS)
 
     // Estados do Modal
@@ -136,15 +134,11 @@ export default function ReceitaPageContent({
                 metrics={currentMetrics}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
-                showViewToggler={false}
                 filters={filters}
                 updateFilter={updateFilter}
                 clearFilters={clearFilters}
                 availableYears={availableYears}
                 availableMonth={availableMonth}
-                availableWeeks={availableWeeks}
-                categories={categories}
-                subcategories={subcategories}
                 onNewPayment={handleNewPayment}
             />
 

@@ -23,7 +23,7 @@ interface PagamentosQuickEditModalProps {
   extraOptions?: { label: string; value: string }[]
 }
 
-//Vou deixar as funções de editar texto e select de tipos case o cliente mude de ideia no futuro, de qualquer forma isso é pra ser um componente genérico pra receitas e despesas
+//COMPONENTE GENÉRICO PARA EDIÇÃO RAPIDAS DE PAGAMENTOS
 
 export function PagamentosQuickEditModal(props: PagamentosQuickEditModalProps) {
   const { isOpen, onClose, title, type, options, extraOptions } = props

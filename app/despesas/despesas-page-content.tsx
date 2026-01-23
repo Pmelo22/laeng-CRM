@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
 import { DespesasTableFull } from "@/components/pagamentos/despesas-table-full"
-import { ViewMode } from "@/components/pagamentos/fluxo-header"
 import { DespesaModals } from "@/components/pagamentos/despesa-modals"
 import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/components/pagamentos/libs/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
@@ -38,7 +37,6 @@ export default function DespesasPageContent({
     // Estados de Filtro e View 
     const [searchTerm, setSearchTerm] = useState("")
     // Fixed view mode for Despesas
-    const [viewMode] = useState<ViewMode>("table")
     const [filters, setFilters] = useState<PaymentFiltersState>(INITIAL_FILTERS)
 
     // Estados do Modal
