@@ -1,7 +1,7 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
-import { Search, Wallet, TrendingUp, TrendingDown, LayoutDashboard, CheckCircle2, Clock, Calendar, RotateCcw, Layers, Plus } from "lucide-react"
+import { Search, Wallet, TrendingDown, CheckCircle2, Calendar, RotateCcw, Plus, Layers } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,15 +9,7 @@ import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financia
 import type { FinancialMetrics, PaymentFiltersState } from "@/lib/types"
 import { useMemo } from "react"
 import { getWeeksOptions } from "./libs/pagamentos-filter-logic"
-
-const MONTHS = [
-  { value: "0", label: "Janeiro" }, { value: "1", label: "Fevereiro" },
-  { value: "2", label: "Março" }, { value: "3", label: "Abril" },
-  { value: "4", label: "Maio" }, { value: "5", label: "Junho" },
-  { value: "6", label: "Julho" }, { value: "7", label: "Agosto" },
-  { value: "8", label: "Setembro" }, { value: "9", label: "Outubro" },
-  { value: "10", label: "Novembro" }, { value: "11", label: "Dezembro" },
-]
+import { MONTHS } from "./types/pagamentosTypes"
 
 interface DespesasHeaderProps {
   metrics: FinancialMetrics
