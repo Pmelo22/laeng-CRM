@@ -3,43 +3,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
-export async function getObrasForLinkAction() {
-  const supabase = await createClient()
-  try {
-
-    // 1. Log para confirmar que a função foi chamada
-    console.log("--- INICIANDO BUSCA DE OBRAS ---")
-
-    const { data, error } = await supabase
-      .from("obras")
-      .select(`
-        id, 
-        cliente_id,
-        empreiteiro,
-        material,
-        pintor,
-        eletricista,
-        gesseiro,
-        azulejista,
-        manutencao,
-        clientes:cliente_id (
-          nome
-        )
-      `)
-
-    if (error) { throw error }
-
-    const formattedData = data.map((item: any) => ({
-      ...item, cliente_nome: item.clientes?.nome || `Cliente ID: ${item.cliente_id} (Não encontrado)`
-    }))
-
-    return { ok: true, data: formattedData }
-  } catch (e: any) {
-    console.error("❌ ERRO CATCH:", e.message)
-    return { ok: false, error: e.message } // Retorna a mensagem real para o Toast
-  }
-}
-
 export async function createBulkTransactionsAction(transactions: any[]) {
   const supabase = await createClient()
   try {

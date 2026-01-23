@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { usePagamentoForm } from "./usePagamentoForm"
+import { usePagamentosForm } from "./usePagamentosForm"
 import { getObrasForDespesaAction, createBulkTransactionsAction } from "../actions/financeiroActions"
 import { toast } from "@/hooks/use-toast"
 import { parseMoneyInput } from "@/lib/utils"
@@ -33,7 +33,7 @@ export function useDespesasModals(
         updateField,
         updateMoney,
         savePagamento
-    } = usePagamentoForm(isOpen, onClose, pagamento)
+    } = usePagamentosForm(isOpen, onClose, pagamento)
 
     // Force type to 'despesa' in edit mode or when saving
     useEffect(() => {
