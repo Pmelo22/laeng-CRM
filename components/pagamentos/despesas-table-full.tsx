@@ -9,7 +9,6 @@ import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financia
 import { PagamentosQuickEditModal } from "./pagamentos-quick-edit-modal"
 import { usePagination } from "@/lib/table-utils"
 import { DespesaModals } from "./despesa-modals"
-// import { PagamentosPagination } from "./pagamentos-pagination"
 import { PagamentosPagination } from "./pagamentos-pagination"
 import type { Pagamentos } from "@/lib/types"
 import { OBRA_CATEGORY_ID } from "./types/pagamentosTypes"
@@ -27,7 +26,7 @@ const getTypeBadge = (type: string) => {
     return <Badge className="bg-rose-500 hover:bg-rose-600 h-6">Despesa</Badge>
 }
 
-export function DespesasTableFull({ data, userPermissions, categories, subcategories, onDelete }: DespesasTableFullProps) {
+export function DespesasTableFull({ data, categories, subcategories, onDelete }: DespesasTableFullProps) {
 
     // Force filter for Despesa
     const filteredData = data.filter(item => item.type === 'despesa');
@@ -48,8 +47,6 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
         type: "text",
     })
 
-    const canEdit = userPermissions?.pagamentos?.edit ?? true
-
     const handleEdit = (
         row: Pagamentos,
         field: string,
@@ -58,7 +55,6 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
         options?: { label: string; value: string }[],
         fieldSecondary?: string
     ) => {
-        if (!canEdit) return
         setEditConfig({
             isOpen: true,
             row,
@@ -100,7 +96,6 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">CATEGORIA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 w-[150px]">SUBCATEGORIA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 min-w-[200px]">CLIENTE</TableHead>
-                                <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[100px]">TIPO</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-center w-[110px]">DATA</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">VALOR</TableHead>
                                 <TableHead className="text-[#F5C800] font-bold py-3 text-right pr-6 w-[130px]">Ações</TableHead>
@@ -137,7 +132,7 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                                 </span>
                                             </div>
                                             {/* Edição*/}
-                                            {canEdit && row.category_id !== OBRA_CATEGORY_ID && (
+                                            {row.category_id !== OBRA_CATEGORY_ID && (
                                                 <button
                                                     onClick={() => handleEdit(
                                                         row,
@@ -165,24 +160,12 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                             </span>
                                         </div>
                                     </TableCell>
-                                    {/* TIPO */}
-                                    <TableCell className="text-center p-2">
-                                        <div
-                                            onClick={() => handleEdit(row, "type", "Tipo", "select", [
-                                                { label: "Receita", value: "receita" },
-                                                { label: "Despesa", value: "despesa" },
-                                            ])}
-                                            className={`inline-flex justify-center ${canEdit ? 'cursor-pointer hover:opacity-80' : ''}`}
-                                        >
-                                            {getTypeBadge(row.type || 'despesa')}
-                                        </div>
-                                    </TableCell>
 
                                     {/* DATA */}
                                     <TableCell className="text-center p-2">
                                         <div
                                             onClick={() => handleEdit(row, "date", "Data", "date")}
-                                            className={`text-xs font-medium text-gray-600 flex items-center justify-center gap-1.5 whitespace-nowrap ${canEdit ? 'cursor-pointer hover:text-[#F5C800]' : ''}`}
+                                            className={`text-xs font-medium text-gray-600 flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer hover:text-[#F5C800]`}
                                         >
                                             <CalendarDays className="h-3 w-3 text-gray-400" />
 
@@ -198,7 +181,7 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                     <TableCell className="text-right pr-6 p-2">
                                         <div
                                             onClick={() => handleEdit(row, "amount", "Valor", "money")}
-                                            className={`font-bold text-sm whitespace-nowrap ${canEdit ? 'cursor-pointer hover:opacity-70' : ''} text-red-600`}
+                                            className={`font-bold text-sm whitespace-nowrap cursor-pointer hover:opacity-70 text-red-600`}
                                         >
                                             - {formatCurrency(row.amount || 0)}
                                         </div>
