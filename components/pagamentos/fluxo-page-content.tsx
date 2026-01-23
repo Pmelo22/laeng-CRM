@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from "react"
 import { calculateFinancialMetrics } from "@/components/pagamentos/libs/pagamentos-financial"
 import type { Pagamentos, FinancialMetrics } from "@/lib/types"
-import { PagamentosHeader, ViewMode } from "@/components/pagamentos/pagamentos-header"
+import { PagamentosHeader, ViewMode } from "@/components/pagamentos/fluxo-header"
 import { PagamentosEditModal } from "@/components/pagamentos/pagamentos-edit-modal"
 import { filterPayments, getAvailableMonth, getAvailableWeek, getAvailableYears, INITIAL_FILTERS } from "@/components/pagamentos/libs/pagamentos-filter-logic"
 import { PaymentFiltersState } from "@/lib/types"
