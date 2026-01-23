@@ -52,7 +52,7 @@ export function ReceitaModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl min-h-[30vh] max-h-[90vh] flex flex-col p-0 bg-white">
+            <DialogContent className="max-w-2xl min-h-[50vh] max-h-[90vh] flex flex-col p-0 bg-white">
                 <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gray-50/50">
                     <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
                         {isEditing ? "Editar Receita" : "Nova Receita"}
