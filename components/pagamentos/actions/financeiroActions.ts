@@ -80,38 +80,3 @@ export async function getObrasForReceitaAction() {
     return { ok: false, error: e.message }
   }
 }
-
-export async function getObrasForDespesaAction() {
-  const supabase = await createClient()
-  try {
-    const { data, error } = await supabase
-      .from("obras")
-      .select(`
-        id, 
-        codigo,
-        cliente_id,
-        manutencao,
-        material,
-        empreiteiro,
-        pintor,
-        gesseiro,
-        azulejista,
-        eletricista,
-        clientes:cliente_id (
-          nome
-        )
-      `)
-
-    if (error) { throw error }
-
-    const formattedData = data.map((item: any) => ({
-      ...item,
-      cliente_nome: item.clientes?.nome || `Cliente ID: ${item.cliente_id} (Não encontrado)`
-    }))
-
-    return { ok: true, data: formattedData }
-  } catch (e: any) {
-    console.error("❌ ERRO CATCH OBRAS DESPESA:", e.message)
-    return { ok: false, error: e.message }
-  }
-}
