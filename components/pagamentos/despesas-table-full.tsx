@@ -12,6 +12,7 @@ import { DespesaModals } from "./despesa-modals"
 // import { PagamentosPagination } from "./pagamentos-pagination"
 import { PagamentosPagination } from "./pagamentos-pagination"
 import type { Pagamentos } from "@/lib/types"
+import { OBRA_CATEGORY_ID } from "./types/pagamentosTypes"
 
 interface DespesasTableFullProps {
     data: Pagamentos[]
@@ -136,7 +137,7 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                                 </span>
                                             </div>
                                             {/* Edição*/}
-                                            {canEdit  && row.category_id !== "522c635e-0957-4c93-90e7-ffb7b6d23e75" &&(
+                                            {canEdit && row.category_id !== OBRA_CATEGORY_ID && (
                                                 <button
                                                     onClick={() => handleEdit(
                                                         row,
@@ -205,15 +206,15 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
 
                                     {/* BOTÃO DE EDITAR */}
                                     <TableCell className="py-3 text-right pr-4">
-                                            <Button
-                                                size="sm"
-                                                onClick={() => handleFullEdit(row)}
-                                                className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
-                                                title="Editar Detalhes Completos"
-                                            >
-                                                <Pencil className="h-4 w-4 text-[#1E1E1E]" />
-                                            </Button>
-                                        
+                                        <Button
+                                            size="sm"
+                                            onClick={() => handleFullEdit(row)}
+                                            className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
+                                            title="Editar Detalhes Completos"
+                                        >
+                                            <Pencil className="h-4 w-4 text-[#1E1E1E]" />
+                                        </Button>
+
 
                                         <Button
                                             size="sm"

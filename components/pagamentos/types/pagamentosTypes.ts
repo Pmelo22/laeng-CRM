@@ -1,3 +1,5 @@
+export const OBRA_CATEGORY_ID = "522c635e-0957-4c93-90e7-ffb7b6d23e75"
+
 export type Category = {
   label: string;
   value: string

@@ -10,7 +10,7 @@ import { formatMoneyInput } from "@/lib/utils"
 import type { Pagamentos } from "@/lib/types"
 import { useDespesasModals } from "./hooks/useDespesasModals"
 import { Loader2, Search, HardHat, ChevronLeft, Plus } from "lucide-react"
-import { DESPESAS_OBRAS_MAP } from "./types/pagamentosTypes"
+import { DESPESAS_OBRAS_MAP, OBRA_CATEGORY_ID } from "./types/pagamentosTypes"
 
 interface DespesaModalsProps {
     isOpen: boolean
@@ -60,6 +60,18 @@ export function DespesaModals({
     const filteredSubcategories = subcategories.filter(
         sub => sub.categories_id === formData.category_id
     )
+
+    // Filter Categories to exclude OBRA if needed
+    const availableCategories = categories.filter(c => {
+        // If we are in 'general' mode (New Outra Despesa), exclude Obra
+        if (mode === 'general') return c.value !== OBRA_CATEGORY_ID
+
+        // If editing and current category is NOT Obra, exclude Obra (prevent switching to Obra)
+        if (isEditing && formData.category_id !== OBRA_CATEGORY_ID) return c.value !== OBRA_CATEGORY_ID
+
+        // Otherwise (Editing an Obra despesa), allow it (though we might hide the field)
+        return true
+    })
 
     // Determine Title
     const getTitle = () => {
@@ -241,55 +253,57 @@ export function DespesaModals({
 
                             <div className="h-[1px] bg-gray-200"></div>
 
-                            {/* Classification */}
-                            <div>
-                                <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 tracking-wider">Classificação</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Classification - Only show if NOT editing an Obra expense */}
+                            {(!isEditing || formData.category_id !== OBRA_CATEGORY_ID) && (
+                                <div>
+                                    <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 tracking-wider">Classificação</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                                    <div className="space-y-1">
-                                        <Label>Categoria</Label>
-                                        <Select
-                                            value={formData.category_id}
-                                            onValueChange={v => updateField('category_id', v)}
-                                        >
-                                            <SelectTrigger className="border-gray-300 focus:ring-[#F5C800]">
-                                                <SelectValue placeholder="Selecione..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {categories.map(c => (
-                                                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
+                                        <div className="space-y-1">
+                                            <Label>Categoria</Label>
+                                            <Select
+                                                value={formData.category_id}
+                                                onValueChange={v => updateField('category_id', v)}
+                                            >
+                                                <SelectTrigger className="border-gray-300 focus:ring-[#F5C800]">
+                                                    <SelectValue placeholder="Selecione..." />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {availableCategories.map(c => (
+                                                        <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
 
-                                    <div className="space-y-1">
-                                        <Label className={!formData.category_id ? "text-gray-400" : ""}>
-                                            Subcategoria
-                                        </Label>
-                                        <Select
-                                            value={formData.subcategories_id}
-                                            onValueChange={v => updateField('subcategories_id', v)}
-                                            disabled={!formData.category_id}
-                                        >
-                                            <SelectTrigger className={`border-gray-300 focus:ring-[#F5C800] ${!formData.category_id ? 'bg-gray-100' : ''}`}>
-                                                <SelectValue placeholder={
-                                                    !formData.category_id
-                                                        ? "Selecione a categoria"
-                                                        : filteredSubcategories.length === 0
-                                                            ? "Sem subcategorias"
-                                                            : "Selecione..."
-                                                } />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {filteredSubcategories.map(sub => (
-                                                    <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <div className="space-y-1">
+                                            <Label className={!formData.category_id ? "text-gray-400" : ""}>
+                                                Subcategoria
+                                            </Label>
+                                            <Select
+                                                value={formData.subcategories_id}
+                                                onValueChange={v => updateField('subcategories_id', v)}
+                                                disabled={!formData.category_id}
+                                            >
+                                                <SelectTrigger className={`border-gray-300 focus:ring-[#F5C800] ${!formData.category_id ? 'bg-gray-100' : ''}`}>
+                                                    <SelectValue placeholder={
+                                                        !formData.category_id
+                                                            ? "Selecione a categoria"
+                                                            : filteredSubcategories.length === 0
+                                                                ? "Sem subcategorias"
+                                                                : "Selecione..."
+                                                    } />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {filteredSubcategories.map(sub => (
+                                                        <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     )}
 
