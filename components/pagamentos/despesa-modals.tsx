@@ -241,7 +241,7 @@ export function DespesaModals({
                                     <Label>Data</Label>
                                     <Input
                                         type="date"
-                                        value={importDate}
+                                        value={formData.date}
                                         onChange={e => updateField('date', e.target.value)}
                                         className="border-gray-300 focus:border-[#F5C800]"
                                     />

@@ -41,7 +41,10 @@ export function usePagamentosForm(
         subcategories_id: pagamento.subcategories_id || "",
       })
     } else {
-      setFormData(INITIAL_STATE)
+      setFormData({
+        ...INITIAL_STATE,
+        date: new Date().toISOString().split('T')[0]
+      })
     }
   }, [isOpen, pagamento])
 
