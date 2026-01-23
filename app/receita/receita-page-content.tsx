@@ -36,8 +36,10 @@ export default function ReceitaPageContent({
 
     // Estados de Filtro e View 
     const [searchTerm, setSearchTerm] = useState("")
-    // Fixed view mode for Receita
-    const [filters, setFilters] = useState<PaymentFiltersState>(INITIAL_FILTERS)
+    const [filters, setFilters] = useState<PaymentFiltersState>({
+        ...INITIAL_FILTERS,
+        week: 'all'
+    })
 
     // Estados do Modal
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -53,7 +55,6 @@ export default function ReceitaPageContent({
     // Contexto de Data
     const availableYears = useMemo(() => getAvailableYears(pagamentos), [pagamentos])
     const availableMonth = useMemo(() => getAvailableMonth(pagamentos), [pagamentos])
-    const availableWeeks = useMemo(() => getAvailableWeek(pagamentos), [pagamentos])
 
     // Contexto de Filtro e Métricas
     const filteredPagamentos = useMemo(() => {
@@ -70,7 +71,7 @@ export default function ReceitaPageContent({
     }
 
     const clearFilters = () => {
-        setFilters(INITIAL_FILTERS)
+        setFilters({ ...INITIAL_FILTERS, week: 'all' })
         setSearchTerm("")
     }
 
