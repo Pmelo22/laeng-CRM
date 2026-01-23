@@ -135,9 +135,8 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                                     {row.subcategory_name || "Geral"}
                                                 </span>
                                             </div>
-
                                             {/* Edição*/}
-                                            {canEdit && (
+                                            {canEdit  && row.category_id !== "522c635e-0957-4c93-90e7-ffb7b6d23e75" &&(
                                                 <button
                                                     onClick={() => handleEdit(
                                                         row,
@@ -206,7 +205,6 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
 
                                     {/* BOTÃO DE EDITAR */}
                                     <TableCell className="py-3 text-right pr-4">
-                                        {canEdit && row.category_id !== "522c635e-0957-4c93-90e7-ffb7b6d23e75" && (
                                             <Button
                                                 size="sm"
                                                 onClick={() => handleFullEdit(row)}
@@ -215,7 +213,7 @@ export function DespesasTableFull({ data, userPermissions, categories, subcatego
                                             >
                                                 <Pencil className="h-4 w-4 text-[#1E1E1E]" />
                                             </Button>
-                                        )}
+                                        
 
                                         <Button
                                             size="sm"

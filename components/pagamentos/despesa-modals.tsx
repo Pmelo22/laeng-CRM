@@ -70,6 +70,7 @@ export function DespesaModals({
         return "Despesa"
     }
 
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-2xl min-h-[30vh] max-h-[90vh] flex flex-col p-0 bg-white">
