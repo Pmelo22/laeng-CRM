@@ -9,24 +9,12 @@ import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financia
 import type { FinancialMetrics, PaymentFiltersState } from "@/lib/types"
 import { useMemo } from "react"
 import { getWeeksOptions } from "./libs/pagamentos-filter-logic"
-
-const MONTHS = [
-  { value: "0", label: "Janeiro" }, { value: "1", label: "Fevereiro" },
-  { value: "2", label: "Março" }, { value: "3", label: "Abril" },
-  { value: "4", label: "Maio" }, { value: "5", label: "Junho" },
-  { value: "6", label: "Julho" }, { value: "7", label: "Agosto" },
-  { value: "8", label: "Setembro" }, { value: "9", label: "Outubro" },
-  { value: "10", label: "Novembro" }, { value: "11", label: "Dezembro" },
-]
-
-export type ViewMode = 'dashboard' | 'table' | 'options'
+import { MONTHS } from "./types/pagamentosTypes"
 
 interface PagamentosHeaderProps {
   metrics: FinancialMetrics
   searchTerm: string
   setSearchTerm: (term: string) => void
-  viewMode: ViewMode
-  setViewMode: (mode: ViewMode) => void
   filters: PaymentFiltersState
   updateFilter: (key: keyof PaymentFiltersState, value: string) => void
   clearFilters: () => void
@@ -34,25 +22,18 @@ interface PagamentosHeaderProps {
   availableMonth: number[]
   availableWeeks: number[]
   categories: { label: string; value: string }[]
-  subcategories: { id: string; name: string; categories_id: string }[]
-  onNewPayment: () => void
-  showViewToggler?: boolean
 }
 
 export function PagamentosHeader({
   metrics,
   searchTerm,
   setSearchTerm,
-  viewMode,
-  setViewMode,
   filters,
   updateFilter,
   clearFilters,
   availableYears,
   availableMonth,
   categories,
-  onNewPayment,
-  showViewToggler = true
 }: PagamentosHeaderProps) {
 
   const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
@@ -127,27 +108,6 @@ export function PagamentosHeader({
 
             {/* Botões ficam à direita */}
             <div className="flex gap-2 w-full sm:w-auto">
-
-              <Button
-                onClick={onNewPayment}
-                className="h-10 bg-[#F5C800] sm:w-[100px] hover:bg-[#F5C800]/90 text-[#1E1E1E] font-bold px-4 shadow-sm">
-                <Plus className="h-4 w-4 mr-2" />Novo
-              </Button>
-
-              {showViewToggler && (
-                <Select value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
-                  <SelectTrigger className="w-full sm:w-[180px] h-10 bg-[#F5C800] hover:bg-[#F5C800]/90 text-[#1E1E1E] border-0 font-bold">
-                    <LayoutDashboard className="h-4 w-5 mr-2" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dashboard">Dashboard</SelectItem>
-                    <SelectItem value="table">Tabela</SelectItem>
-                    <SelectItem value="options">Opções</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-
               {activeFiltersCount > 0 && (
                 <Button variant="destructive" onClick={clearFilters} size="icon" className="h-10 w-10 shrink-0" title="Limpar Filtros">
                   <RotateCcw className="h-4 w-4" />

@@ -37,6 +37,8 @@ export function PagamentosDeleteDialog({
     return `${dia}/${mes}/${ano}`
   }
 
+  //COMPONENTE GENÉRICO PARA EXCLUSÃO DE PAGAMENTOS
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="bg-gray-100">
@@ -50,9 +52,6 @@ export function PagamentosDeleteDialog({
               <br />
               <br />
               <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
-                <p className="font-bold text-[#1E1E1E] text-lg">
-                  {pagamento.description || "Sem descrição"}
-                </p>
                 <div className="flex justify-between items-center mt-2 text-sm text-gray-600">
                   <span>Data: {formatDate(pagamento.date)}</span>
                   <span className={`font-bold ${pagamento.type === 'receita' ? 'text-emerald-600' : 'text-red-600'}`}>

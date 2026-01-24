@@ -52,7 +52,7 @@ export function ReceitaModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl min-h-[30vh] max-h-[90vh] flex flex-col p-0 bg-white">
+            <DialogContent className="max-w-2xl min-h-[20vh] max-h-[90vh] flex flex-col p-0 bg-white">
                 <DialogHeader className="px-6 pt-6 pb-4 border-b bg-gray-50/50">
                     <DialogTitle className="text-2xl font-bold text-[#1E1E1E]">
                         {isEditing ? "Editar Receita" : "Nova Receita"}
@@ -64,7 +64,7 @@ export function ReceitaModal({
                     )}
                 </DialogHeader>
 
-                <div className="overflow-y-auto px-6 py-6 space-y-6 scrollbar-thin flex-1">
+                <div className="overflow-y-auto px-6 py-6 space-y-6 scrollbar-thin flex-10">
 
                     {/* --- EDIT MODE --- */}
                     {isEditing && (
@@ -97,7 +97,7 @@ export function ReceitaModal({
 
                             {/* Search Client */}
                             <div className="space-y-2 relative">
-                                <Label className="text-base font-semibold">Cliente / Obra</Label>
+                                <Label className="text-base font-semibold">Cliente</Label>
                                 <div className="relative">
                                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                     <Input
@@ -109,7 +109,7 @@ export function ReceitaModal({
                                 </div>
 
                                 {searchTerm.length >= 3 && (
-                                    <div className="absolute top-[75px] left-0 w-full z-50 bg-white border border-gray-200 rounded-md shadow-xl max-h-60 overflow-y-auto">
+                                    <div className="mt-1 w-full z-50 bg-white border border-gray-200 rounded-md shadow-sm max-h-60 overflow-y-auto">
                                         {filteredObras.length === 0 ? (
                                             <div className="p-3 text-sm text-gray-500 text-center">Nenhum cliente encontrado.</div>
                                         ) : (
@@ -161,6 +161,7 @@ export function ReceitaModal({
                                                         <Checkbox
                                                             checked={state.enabled}
                                                             onCheckedChange={() => toggleMeasurement(key)}
+                                                            className="border-2 border-gray-600 data-[state=checked]:border-[#F5C800] data-[state=checked]:bg-[#F5C800] data-[state=unchecked]:bg-gray-400"
                                                         />
                                                         <div className="flex-1 text-sm font-medium">{mapItem.name}</div>
                                                         <Input

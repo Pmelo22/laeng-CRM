@@ -7,17 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/components/pagamentos/libs/pagamentos-financial"
 import type { FinancialMetrics, PaymentFiltersState } from "@/lib/types"
-import { useMemo } from "react"
-import { getWeeksOptions } from "./libs/pagamentos-filter-logic"
-
-const MONTHS = [
-  { value: "0", label: "Janeiro" }, { value: "1", label: "Fevereiro" },
-  { value: "2", label: "Março" }, { value: "3", label: "Abril" },
-  { value: "4", label: "Maio" }, { value: "5", label: "Junho" },
-  { value: "6", label: "Julho" }, { value: "7", label: "Agosto" },
-  { value: "8", label: "Setembro" }, { value: "9", label: "Outubro" },
-  { value: "10", label: "Novembro" }, { value: "11", label: "Dezembro" },
-]
+import { MONTHS } from "./types/pagamentosTypes"
 
 interface ReceitasHeaderProps {
   metrics: FinancialMetrics
@@ -28,11 +18,7 @@ interface ReceitasHeaderProps {
   clearFilters: () => void
   availableYears: number[]
   availableMonth: number[]
-  availableWeeks: number[]
-  categories: { label: string; value: string }[]
-  subcategories: { id: string; name: string; categories_id: string }[]
   onNewPayment: () => void
-  showViewToggler?: boolean
 }
 
 export function ReceitasHeader({
@@ -44,18 +30,10 @@ export function ReceitasHeader({
   clearFilters,
   availableYears,
   availableMonth,
-  categories,
   onNewPayment,
-  showViewToggler = true
 }: ReceitasHeaderProps) {
 
   const activeFiltersCount = Object.values(filters).filter(v => v !== 'all').length
-
-  const isWeekEnabled = filters.year !== 'all' && filters.month !== 'all'
-
-  const weekOptions = useMemo(() => {
-    return getWeeksOptions(filters.year, filters.month)
-  }, [filters.year, filters.month])
 
   return (
     <div className="bg-[#1E1E1E] border-b-2 sm:border-b-4 border-[#F5C800] shadow-lg">
@@ -124,7 +102,6 @@ export function ReceitasHeader({
               value={filters.month}
               onChange={(v: string) => {
                 updateFilter('month', v);
-                updateFilter('week', 'all');
               }}
               placeholder="Mês"
               icon={Calendar}
