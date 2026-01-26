@@ -208,12 +208,18 @@ export function DespesaModals({
                                                             onCheckedChange={() => toggleMeasurement(key)}
                                                             className="border-2 border-gray-600 data-[state=checked]:border-[#F5C800] data-[state=checked]:bg-[#F5C800] data-[state=unchecked]:bg-gray-400"
                                                         />
-                                                        <div className="flex-1 text-sm font-medium">{mapItem.name}</div>
+                                                        <div className="flex-1 text-sm font-medium">
+                                                            <div>{mapItem.name}</div>
+                                                            <div className="text-xs text-gray-500 font-normal">
+                                                                Atual no sistema: {state.originalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                                            </div>
+                                                        </div>
                                                         <Input
                                                             className="w-32 h-8 text-right font-mono"
                                                             value={formatMoneyInput(state.value)}
                                                             onChange={e => updateMeasurementValue(key, e.target.value)}
                                                             disabled={!state.enabled}
+                                                            placeholder="0,00"
                                                         />
                                                     </div>
                                                 )

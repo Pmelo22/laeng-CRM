@@ -24,10 +24,7 @@ describe('obraslinkActions', () => {
     })
 
     describe('createBulkTransactionsAction', () => {
-        beforeEach(() => {
-            mockSupabase.eq = jest.fn().mockReturnThis()
-            mockSupabase.in = jest.fn().mockReturnThis()
-        })
+
 
         it('returns empty result if no transactions provided', async () => {
             const result = await createBulkTransactionsAction([])
@@ -35,20 +32,17 @@ describe('obraslinkActions', () => {
             expect(mockSupabase.from).not.toHaveBeenCalled()
         })
 
-        it('inserts new transactions when no duplicates exist', async () => {
+        it('inserts all transactions', async () => {
             const transactions = [
                 { cliente_id: 'c1', subcategories_id: 's1', amount: 100 },
                 { cliente_id: 'c1', subcategories_id: 's2', amount: 200 },
             ]
 
-            mockSupabase.in.mockResolvedValueOnce({ data: [], error: null })
             mockSupabase.insert.mockResolvedValueOnce({ error: null })
 
             const result = await createBulkTransactionsAction(transactions)
 
             expect(mockSupabase.from).toHaveBeenCalledWith('transactions')
-            expect(mockSupabase.select).toHaveBeenCalledWith('subcategories_id')
-            expect(mockSupabase.eq).toHaveBeenCalledWith('cliente_id', 'c1')
             expect(mockSupabase.insert).toHaveBeenCalledWith(transactions)
             expect(result).toEqual({
                 ok: true,
@@ -58,43 +52,14 @@ describe('obraslinkActions', () => {
             expect(revalidatePath).toHaveBeenCalledWith('/pagamentos')
         })
 
-        it('filters out duplicates and inserts only new ones', async () => {
-            const transactions = [
-                { cliente_id: 'c1', subcategories_id: 's1', amount: 100 },
-                { cliente_id: 'c1', subcategories_id: 's2', amount: 200 },
-            ]
 
-            mockSupabase.in.mockResolvedValueOnce({
-                data: [{ subcategories_id: 's1' }],
-                error: null
-            })
-            mockSupabase.insert.mockResolvedValueOnce({ error: null })
 
-            const result = await createBulkTransactionsAction(transactions)
 
-            expect(mockSupabase.insert).toHaveBeenCalledWith([transactions[1]])
-            expect(result).toEqual({
-                ok: true,
-                insertedCount: 1,
-                duplicates: [{ subcategories_id: 's1' }]
-            })
-        })
-
-        it('handles database error during check', async () => {
-            const transactions = [{ cliente_id: 'c1', subcategories_id: 's1' }]
-            const dbError = new Error('DB Check Error')
-
-            mockSupabase.in.mockResolvedValueOnce({ data: null, error: dbError })
-
-            const result = await createBulkTransactionsAction(transactions)
-
-            expect(result).toEqual({ ok: false, error: 'DB Check Error' })
-        })
 
         it('handles database error during insert', async () => {
             const transactions = [{ cliente_id: 'c1', subcategories_id: 's1' }]
 
-            mockSupabase.in.mockResolvedValueOnce({ data: [], error: null })
+
             mockSupabase.insert.mockResolvedValueOnce({ error: new Error('Insert Error') })
 
             const result = await createBulkTransactionsAction(transactions)
