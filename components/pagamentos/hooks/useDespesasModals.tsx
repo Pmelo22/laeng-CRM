@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { usePagamentosForm } from "./usePagamentosForm"
-import { createBulkTransactionsAction } from "../actions/financeiroActions"
+import { createBulkTransactionsAction } from "../actions/obrasActions"
 import { toast } from "@/hooks/use-toast"
 import { parseMoneyInput } from "@/lib/utils"
 import { DESPESAS_OBRAS_MAP } from "../types/pagamentosTypes"
@@ -104,9 +104,8 @@ export function useDespesasModals(
             const newMeas: Record<string, MeasurementState> = {}
             Object.values(DESPESAS_OBRAS_MAP).forEach(m => {
                 const val = Number(selectedObra[m.key]) || 0
-                if (val >= 0) {
-                    newMeas[m.key] = { enabled: val > 0, value: val, originalValue: val }
-                }
+                // Initialize with enabled: false, value: 0 (input), originalValue: val (from DB)
+                newMeas[m.key] = { enabled: false, value: 0, originalValue: val }
             })
             setMeasurements(newMeas)
         } else {
@@ -152,33 +151,7 @@ export function useDespesasModals(
         setIsSavingBulk(false)
 
         if (res.ok) {
-            // Verifica duplicatas
-            if (res.duplicates && res.duplicates.length > 0) {
-                const duplicateNames = res.duplicates.map((d: any) => {
-                    const entry = Object.values(DESPESAS_OBRAS_MAP).find(m => m.id === d.subcategories_id)
-                    return entry ? entry.name : "Desconhecido"
-                })
-
-                const inserted = res.insertedCount || 0
-                const dupMsg = duplicateNames.join(", ")
-
-                if (inserted > 0) {
-                    toast({
-                        title: "Salvo Parcialmente",
-                        description: `Foram salvas ${inserted} despesas. As seguintes já existiam: ${dupMsg}`,
-                        duration: 5000
-                    })
-                } else {
-                    toast({
-                        title: "Nenhuma despesa salva",
-                        description: `Todas as despesas selecionadas já existem: ${dupMsg}`,
-                        variant: "destructive",
-                        duration: 5000
-                    })
-                }
-            } else {
-                toast({ title: "Despesas geradas com sucesso!" })
-            }
+            toast({ title: "Despesas geradas com sucesso!", description: `Foram salvas ${res.insertedCount} despesas.` })
             onClose()
         } else {
             toast({ title: "Erro ao salvar", description: res.error, variant: "destructive" })
