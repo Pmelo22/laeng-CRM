@@ -36,7 +36,7 @@ export async function getObrasForDespesaAction() {
         cliente_id,
         manutencao,
         material,
-        empreiteiro,
+        empreiteiro_valor_pago,
         pintor,
         gesseiro,
         azulejista,
