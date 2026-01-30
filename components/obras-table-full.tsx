@@ -24,7 +24,7 @@ interface ObrasTableFullProps {
 export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTableFullProps) {
 
   const canEdit = userPermissions?.obras?.edit
-  
+
   const router = useRouter()
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedObra, setSelectedObra] = useState<ObraComCliente | null>(null)
@@ -111,21 +111,21 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
                 const isEmpreiteiroExpanded = expandedEmpreiteiro.has(obra.id)
                 // Total Terceirizado = terceirizado base + especialistas (SEM mão de obra, que é o empreiteiro)
                 const totalTerceirizado = (obra.terceirizado || 0) + (obra.pintor || 0) + (obra.eletricista || 0) + (obra.gesseiro || 0) + (obra.azulejista || 0) + (obra.manutencao || 0)
-                
+
                 // Calcular dados do empreiteiro (mão de obra = empreiteiro)
                 const valorEmpreiteiro = obra.empreiteiro || 0
                 const valorPago = obra.empreiteiro_valor_pago || 0
                 const saldo = valorEmpreiteiro - valorPago
                 const percentualPago = valorEmpreiteiro > 0 ? (valorPago / valorEmpreiteiro) * 100 : 0
-                
+
                 // Valor total da obra = Empreiteiro + Material + Terceirizado + Terreno
                 const valorTotalObra = valorEmpreiteiro + (obra.material || 0) + totalTerceirizado + (obra.valor_terreno || 0)
-                
+
                 const isHighlighted = highlightId === obra.id
-                
+
                 return (
                   <Fragment key={obra.id}>
-                    <TableRow 
+                    <TableRow
                       id={`obra-${obra.id}`}
                       className={`hover:bg-[#F5C800]/5 border-b transition-all duration-300 ${isHighlighted ? 'bg-[#F5C800]/20' : ''}`}
                     >
@@ -178,63 +178,39 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
                         </div>
                       </TableCell>
                       <TableCell className="text-center py-3 font-bold min-w-[110px]">
-                      <button
-                        onClick={
-                          canEdit
-                            ? () =>
-                                handleEditValue(
-                                  obra,
-                                  "material",
-                                  "Material",
-                                  obra.material || 0
-                                )
-                            : undefined
-                        }
-                        disabled={!canEdit}
-                        title={
-                          canEdit
-                            ? "Clique para editar Material"
-                            : "Você não tem permissão para editar Material"
-                        }
-                        className={`
-                          text-sm font-bold inline-block transition-colors
-                          ${canEdit
-                            ? "text-black hover:text-[#F5C800] cursor-pointer"
-                            : "text-gray-400 cursor-not-allowed"}
-                        `}
-                      >
-                        {formatCurrency(obra.material || 0)}
-                      </button>
+                        <span className="text-sm font-bold text-black inline-block">
+                          {formatCurrency(obra.material || 0)}
+                        </span>
 
                       </TableCell>
                       <TableCell className="text-center py-3 font-bold min-w-[110px]">
-                      <button
-                        onClick={
-                          canEdit
-                            ? () =>
+                        <button
+                          onClick={
+                            canEdit
+                              ? () =>
                                 handleEditValue(
                                   obra,
                                   "valor_terreno",
                                   "Terreno",
                                   obra.valor_terreno || 0
                                 )
-                            : undefined
-                        }
-                        disabled={!canEdit}
-                        title={
-                          canEdit
-                            ? "Clique para editar Terreno"
-                            : "Você não tem permissão para editar Terreno"
-                        }
-                        className={`
+                              : undefined
+                          }
+                          disabled={!canEdit}
+                          title={
+                            canEdit
+                              ? "Clique para editar Terreno"
+                              : "Você não tem permissão para editar Terreno"
+                          }
+                          className={`
                           text-sm font-bold inline-block transition-colors
                           ${canEdit
-                            ? "text-black hover:text-[#F5C800] cursor-pointer"
-                            : "text-gray-400 cursor-not-allowed"}
+                              ? "text-black hover:text-[#F5C800] cursor-pointer"
+                              : "text-gray-400 cursor-not-allowed"}
                         `}
-                      >
-                        {formatCurrency(obra.valor_terreno || 0)}
-                      </button>
+                        >
+                          {formatCurrency(obra.valor_terreno || 0)}
+                        </button>
 
                       </TableCell>
                       <TableCell className="text-center py-3 font-bold min-w-[120px]">
@@ -242,16 +218,16 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
                       </TableCell>
                       <TableCell className="py-3">
                         <div className="flex items-center justify-center gap-2">
-                      {canEdit && (
-                        <Button
-                          size="sm"
-                          onClick={() => handleEditObra(obra)}
-                          className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
-                          title="Editar Obra"
-                        >
-                          <Pencil className="h-4 w-4 text-[#1E1E1E]" />
-                        </Button>
-                      )}
+                          {canEdit && (
+                            <Button
+                              size="sm"
+                              onClick={() => handleEditObra(obra)}
+                              className="bg-[#F5C800] hover:bg-[#F5C800]/90 border-2 border-[#F5C800] h-9 w-9 p-0 transition-colors"
+                              title="Editar Obra"
+                            >
+                              <Pencil className="h-4 w-4 text-[#1E1E1E]" />
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="outline"
@@ -264,7 +240,7 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
                         </div>
                       </TableCell>
                     </TableRow>
-                    
+
                     {isEmpreiteiroExpanded && (
                       <TableRow key={`${obra.id}-empreiteiro`} className="bg-yellow-50 border-l-4 border-[#F5C800]">
                         <TableCell colSpan={9} className="py-6 px-8">
@@ -306,7 +282,7 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
                                   </tbody>
                                 </table>
                               </div>
-                              
+
                               {/* Gráfico Pizza */}
                               <div className="flex flex-col items-center justify-center bg-yellow-50 rounded-lg p-4 border border-gray-200">
                                 <h5 className="text-sm font-bold text-[#1E1E1E] mb-4 uppercase">Status do Pagamento</h5>
@@ -354,7 +330,7 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
                         </TableCell>
                       </TableRow>
                     )}
-                    
+
                     {isExpanded && (
                       <TableRow key={`${obra.id}-details`} className="bg-yellow-50 border-l-4 border-[#F5C800]">
                         <TableCell colSpan={9} className="py-6 px-8">
@@ -362,7 +338,10 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
                             <h4 className="text-sm font-bold text-[#1E1E1E] mb-5 uppercase">
                               Detalhamento dos Custos Terceirizados
                             </h4>
-                            <ObraTerceirizadoSection obra={obra} userPermissions={userPermissions}/>
+                            <ObraTerceirizadoSection
+                              obra={obra}
+                              userPermissions={{ ...userPermissions, obras: { ...userPermissions?.obras, edit: false } }}
+                            />
                           </div>
                         </TableCell>
                       </TableRow>
@@ -446,7 +425,7 @@ export function ObrasTableFull({ obras, highlightId, userPermissions }: ObrasTab
         </div>
       </div>
 
-      <ObraEditModal 
+      <ObraEditModal
         isOpen={isEditModalOpen}
         onClose={handleCloseModal}
         obra={selectedObra || undefined}

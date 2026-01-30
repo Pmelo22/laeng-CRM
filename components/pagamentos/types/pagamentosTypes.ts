@@ -15,7 +15,7 @@ export type ObraData = {
   id: number
   cliente_id: number
   cliente_nome: string
-  empreiteiro: number
+  empreiteiro_valor_pago: number
   material: number
   pintor: number
   eletricista: number
@@ -49,7 +49,7 @@ export const MEDICOES_MAP: Record<string, { id: string; name: string; key: strin
 export const DESPESAS_OBRAS_MAP: Record<string, { id: string; name: string; key: string }> = {
   manutencao: { id: "23264d1e-0936-4682-9d08-098015450f76", name: "MANUNTENÇÃO", key: "manutencao" },
   material: { id: "534610b3-bf0e-49a1-bda5-18b1c6e4cb1d", name: "MATERIAL", key: "material" },
-  empreiteiro: { id: "5890a7ee-8714-4433-bed5-c317e6ccfcf0", name: "EMPREITEIRO", key: "empreiteiro" },
+  empreiteiro: { id: "5890a7ee-8714-4433-bed5-c317e6ccfcf0", name: "EMPREITEIRO", key: "empreiteiro_valor_pago" },
   pintor: { id: "886292e3-92ee-4697-8e4a-9a5a371a79e8", name: "PINTOR", key: "pintor" },
   gesseiro: { id: "977872c4-dc01-406e-a233-e260624a3999", name: "GESSEIRO", key: "gesseiro" },
   azulejista: { id: "9ae93e09-def7-4cd8-9d38-41a34fb4d287", name: "AZULEJISTA", key: "azulejista" },
