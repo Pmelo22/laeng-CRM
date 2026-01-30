@@ -102,10 +102,9 @@ export function useDespesasModals(
     useEffect(() => {
         if (selectedObra) {
             const newMeas: Record<string, MeasurementState> = {}
-            Object.values(DESPESAS_OBRAS_MAP).forEach(m => {
+            Object.entries(DESPESAS_OBRAS_MAP).forEach(([mapKey, m]) => {
                 const val = Number(selectedObra[m.key]) || 0
-                // Initialize with enabled: false, value: 0 (input), originalValue: val (from DB)
-                newMeas[m.key] = { enabled: false, value: 0, originalValue: val }
+                newMeas[mapKey] = { enabled: false, value: 0, originalValue: val }
             })
             setMeasurements(newMeas)
         } else {
