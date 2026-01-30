@@ -32,46 +32,55 @@ const menuItems = [
     title: "Dashboard",
     icon: LayoutDashboard,
     href: "/dashboard",
+    group: 1
   },
   {
     title: "Clientes",
     icon: Users,
     href: "/clientes",
+    group: 1
   },
   {
     title: "Obras",
     icon: Building2,
     href: "/obras",
+    group: 1
   },
   {
     title: "Financeiro",
     icon: DollarSign,
     href: "/financeira",
-  },
-  {
-    title: "Logs",
-    icon: ScrollText,
-    href: "/logs",
+    group: 1
   },
   {
     title: "Receita",
     icon: TrendingUp,
     href: "/receita",
+    group: 2
   },
   {
     title: "Despesas",
     icon: TrendingDown,
     href: "/despesas",
+    group: 2
   },
   {
     title: "Fluxo de Caixa",
     icon: BarChart3,
     href: "/fluxoDeCaixa",
+    group: 2
   },
   {
     title: "Admin",
     icon: Shield,
     href: "/admin",
+    group: 3
+  },
+  {
+    title: "Logs",
+    icon: ScrollText,
+    href: "/logs",
+    group: 3
   },
 ];
 
@@ -156,24 +165,30 @@ function Sidebar({ collapsed, onToggle, user, userRole, userPermissions }: { col
       </button>
 
       <nav className="flex-1 p-3 space-y-1">
-        {items.map((item) => {
+        {items.map((item, index) => {
           const isActive = pathname === item.href;
+          const showSeparator = index > 0 && item.group !== items[index - 1].group;
+
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all",
-                collapsed ? "justify-center" : "",
-                isActive
-                  ? "bg-[#F5C800] text-black shadow-lg"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+            <div key={item.href}>
+              {showSeparator && (
+                <div className={cn("my-2 h-[1px] bg-[#F5C800] mx-3 opacity-80", collapsed ? "mx-2" : "")} />
               )}
-              title={collapsed ? item.title : undefined}
-            >
-              <item.icon className={cn("h-5 w-5 flex-shrink-0")} />
-              {!collapsed && <span>{item.title}</span>}
-            </Link>
+              <Link
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all",
+                  collapsed ? "justify-center" : "",
+                  isActive
+                    ? "bg-[#F5C800] text-black shadow-lg"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                )}
+                title={collapsed ? item.title : undefined}
+              >
+                <item.icon className={cn("h-5 w-5 flex-shrink-0")} />
+                {!collapsed && <span>{item.title}</span>}
+              </Link>
+            </div>
           );
         })}
       </nav>
@@ -309,23 +324,29 @@ function MobileSidebar({ isOpen, onClose, user, userRole, userPermissions }: { i
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {items.map((item) => {
+          {items.map((item, index) => {
             const isActive = pathname === item.href;
+            const showSeparator = index > 0 && item.group !== items[index - 1].group;
+
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all",
-                  isActive
-                    ? "bg-[#F5C800] text-black shadow-lg"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
+              <div key={item.href}>
+                {showSeparator && (
+                  <div className="my-2 h-[1px] bg-[#F5C800] mx-3 opacity-80" />
                 )}
-              >
-                <item.icon className="h-5 w-5" />
-                <span>{item.title}</span>
-              </Link>
+                <Link
+                  href={item.href}
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all",
+                    isActive
+                      ? "bg-[#F5C800] text-black shadow-lg"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.title}</span>
+                </Link>
+              </div>
             );
           })}
         </nav>
