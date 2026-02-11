@@ -111,7 +111,7 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                     <TableCell>
                                         <div className="flex items-center gap-1.5">
                                             <Tag className="h-3 w-3 text-gray-400" />
-                                            <span className="text-sm font-medium text-gray-600 truncate max-w-[120px]" title={row.category_name}>
+                                            <span className="text-sm font-medium text-gray-600" title={row.category_name}>
                                                 {row.category_name || "Geral"}
                                             </span>
                                         </div>
@@ -122,7 +122,7 @@ export function ReceitaTableFull({ data, userPermissions, categories, subcategor
                                         <div className="flex items-center justify-between gap-1.5 relative group/cat">
                                             <div className="flex items-center gap-1.5">
                                                 <Tag className="h-3 w-3 text-gray-400" />
-                                                <span className="text-sm font-medium text-gray-600 truncate max-w-[120px]" title={row.subcategory_name}>
+                                                <span className="text-sm font-medium text-gray-600" title={row.subcategory_name}>
                                                     {row.subcategory_name || "Geral"}
                                                 </span>
                                             </div>

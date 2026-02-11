@@ -10,7 +10,7 @@ import { formatMoneyInput } from "@/lib/utils"
 import { isoToBR, brToISO, maskDateInput } from "./libs/pagamentos-financial"
 import type { Pagamentos } from "@/lib/types"
 import { useDespesasModals } from "./hooks/useDespesasModals"
-import { Loader2, Search, HardHat, ChevronLeft, Plus } from "lucide-react"
+import { Loader2, Search, HardHat, ChevronLeft, Plus, Building2 } from "lucide-react"
 import { DESPESAS_OBRAS_MAP, OBRA_CATEGORY_ID } from "./types/pagamentosTypes"
 
 interface DespesaModalsProps {
@@ -125,7 +125,7 @@ export function DespesaModals({
                                 className="flex flex-col items-center justify-start h-full p-8 gap-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all group"
                             >
                                 <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors shrink-0">
-                                    <Plus className="h-8 w-8 text-gray-600 group-hover:text-black" />
+                                    <Building2 className="h-8 w-8 text-gray-600 group-hover:text-black" />
                                 </div>
                                 <div className="text-center">
                                     <h3 className="font-bold text-lg text-gray-800">Empresa</h3>
