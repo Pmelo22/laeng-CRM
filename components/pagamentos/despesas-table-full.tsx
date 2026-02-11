@@ -173,7 +173,7 @@ export function DespesasTableFull({ data, categories, subcategories, onDelete }:
                                             {row.date ? (() => {
                                                 const [ano, mes, dia] = row.date.split('T')[0].split('-');
 
-                                                return `${mes}/${dia}/${ano}`;
+                                                return `${dia}/${mes}/${ano}`;
                                             })() : "-"}
                                         </div>
                                     </TableCell>
