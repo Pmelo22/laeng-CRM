@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatMoneyInput, parseMoneyInput } from "@/lib/utils"
+import { isoToBR, brToISO, maskDateInput } from "./libs/pagamentos-financial"
 import { Label } from "@/components/ui/label"
 import { Check } from "lucide-react"
 import { useQuickEdit } from "./hooks/usePagamentosQuickEdit"
@@ -134,10 +135,16 @@ export function PagamentosQuickEditModal(props: PagamentosQuickEditModalProps) {
       case "date":
         return (
           <Input
-            type="date"
-            value={value ? value.split('T')[0] : ''}
-            onChange={(e) => setValue(e.target.value)}
+            type="text"
+            placeholder="DD/MM/AAAA"
+            value={isoToBR(value || '')}
+            onChange={(e) => {
+              const masked = maskDateInput(e.target.value)
+              const iso = brToISO(masked)
+              setValue(iso || masked)
+            }}
             className="h-14 text-lg"
+            maxLength={10}
           />
         )
       default:
