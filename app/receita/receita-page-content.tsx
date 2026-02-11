@@ -112,7 +112,7 @@ export default function ReceitaPageContent({
             if (!result.ok) throw new Error(result.error)
             toast({
                 title: "Pagamento excluído!",
-                description: `${pagamentos.id} foi removido com sucesso.`,
+                description: "O registro foi removido com sucesso.",
             })
             handleCloseDeleteDialog()
 
