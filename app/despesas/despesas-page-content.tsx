@@ -110,7 +110,7 @@ export default function DespesasPageContent({
             if (!result.ok) throw new Error(result.error)
             toast({
                 title: "Pagamento excluído!",
-                description: `${pagamentos.id} foi removido com sucesso.`,
+                description: "O registro foi removido com sucesso.",
             })
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "Erro desconhecido"

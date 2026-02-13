@@ -7,7 +7,7 @@ const today = new Date()
 export const INITIAL_FILTERS: PaymentFiltersState = {
   type: "all",
   category: "all",
-  month: String(getMonth(today)), 
+  month: String(getMonth(today)),
   year: String(getYear(today)),
   week: String(getWeek(today)),
 }
@@ -31,8 +31,8 @@ export function getWeeksOptions(yearStr: string, monthStr: string): { value: str
     const weekEnd = endOfWeek(weekStart, { weekStartsOn: 0 })
     const weekIndex = getWeek(weekStart, { weekStartsOn: 0 })
 
-    const startLabel = format(weekStart, 'MM/dd', { locale: ptBR })
-    const endLabel = format(weekEnd, 'MM/dd', { locale: ptBR })
+    const startLabel = format(weekStart, 'dd/MM', { locale: ptBR })
+    const endLabel = format(weekEnd, 'dd/MM', { locale: ptBR })
 
     return {
       value: String(weekIndex),
