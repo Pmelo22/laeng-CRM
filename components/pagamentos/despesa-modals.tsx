@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatMoneyInput } from "@/lib/utils"
+import { isoToBR, brToISO, maskDateInput } from "./libs/pagamentos-financial"
 import type { Pagamentos } from "@/lib/types"
 import { useDespesasModals } from "./hooks/useDespesasModals"
-import { Loader2, Search, HardHat, ChevronLeft, Plus } from "lucide-react"
+import { Loader2, Search, HardHat, ChevronLeft, Plus, Building2 } from "lucide-react"
 import { DESPESAS_OBRAS_MAP, OBRA_CATEGORY_ID } from "./types/pagamentosTypes"
 
 interface DespesaModalsProps {
@@ -124,7 +125,7 @@ export function DespesaModals({
                                 className="flex flex-col items-center justify-start h-full p-8 gap-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all group"
                             >
                                 <div className="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors shrink-0">
-                                    <Plus className="h-8 w-8 text-gray-600 group-hover:text-black" />
+                                    <Building2 className="h-8 w-8 text-gray-600 group-hover:text-black" />
                                 </div>
                                 <div className="text-center">
                                     <h3 className="font-bold text-lg text-gray-800">Empresa</h3>
@@ -186,7 +187,17 @@ export function DespesaModals({
 
                                     <div className="space-y-1">
                                         <Label>Data do Registro</Label>
-                                        <Input type="date" value={importDate} onChange={e => setImportDate(e.target.value)} />
+                                        <Input
+                                            type="text"
+                                            placeholder="DD/MM/AAAA"
+                                            value={isoToBR(importDate)}
+                                            onChange={e => {
+                                                const masked = maskDateInput(e.target.value)
+                                                const iso = brToISO(masked)
+                                                setImportDate(iso || masked)
+                                            }}
+                                            maxLength={10}
+                                        />
                                     </div>
 
                                     <div className="space-y-3">
@@ -246,10 +257,16 @@ export function DespesaModals({
                                 <div className="space-y-1">
                                     <Label>Data</Label>
                                     <Input
-                                        type="date"
-                                        value={formData.date}
-                                        onChange={e => updateField('date', e.target.value)}
+                                        type="text"
+                                        placeholder="DD/MM/AAAA"
+                                        value={isoToBR(formData.date)}
+                                        onChange={e => {
+                                            const masked = maskDateInput(e.target.value)
+                                            const iso = brToISO(masked)
+                                            updateField('date', iso || masked)
+                                        }}
                                         className="border-gray-300 focus:border-[#F5C800]"
+                                        maxLength={10}
                                     />
                                 </div>
                             </div>

@@ -83,3 +83,24 @@ export const calculateProgress = (val: number, total: number) => {
   if (total === 0) return val > 0 ? 100 : 0
   return Math.min((val / total) * 100, 100)
 }
+
+export const isoToBR = (isoDate: string): string => {
+  if (!isoDate) return ""
+  const [ano, mes, dia] = isoDate.split('T')[0].split('-')
+  if (!ano || !mes || !dia) return isoDate
+  return `${dia}/${mes}/${ano}`
+}
+
+export const brToISO = (brDate: string): string => {
+  if (!brDate) return ""
+  const [dia, mes, ano] = brDate.split('/')
+  if (!dia || !mes || !ano || ano.length < 4) return ""
+  return `${ano}-${mes}-${dia}`
+}
+
+export const maskDateInput = (value: string): string => {
+  const digits = value.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+}
